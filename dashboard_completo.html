@@ -9590,9 +9590,9 @@ function agregarDiario(iniStr, fimStr) {
 // Retorna o bloco de dados Meta para o periodo selecionado (dados reais da API)
 function getMeta() {
   if (FILTRO.ini && FILTRO.fim) {
-    // Converte Date para string YYYY-MM-DD para comparar com d.data
-    const iniStr = FILTRO.ini.toISOString().slice(0, 10);
-    const fimStr = FILTRO.fim.toISOString().slice(0, 10);
+    // Usa as strings brutas YYYY-MM-DD para evitar deslocamento de timezone
+    const iniStr = FILTRO.iniStr || FILTRO.ini.toLocaleDateString('sv');
+    const fimStr = FILTRO.fimStr || FILTRO.fim.toLocaleDateString('sv');
     return agregarDiario(iniStr, fimStr);
   }
   if (FILTRO.dias === 'max') return DADOS_META.max || DADOS_META.d90 || DADOS_META.d30;
@@ -9631,12 +9631,15 @@ function aplicarFiltroGlobalCustom() {
   const ini = document.getElementById("globalDataInicio").value;
   const fim = document.getElementById("globalDataFim").value;
   if(!ini||!fim){ alert("Selecione data de inicio e fim."); return; }
-  const msIni = new Date(ini).getTime();
-  const msFim = new Date(fim).getTime();
+  // Usar T12:00 para evitar deslocamento de timezone ao criar Date
+  const msIni = new Date(ini+"T12:00:00").getTime();
+  const msFim = new Date(fim+"T12:00:00").getTime();
   const dias = Math.max(1, Math.round((msFim-msIni)/86400000)+1);
   FILTRO.dias = dias;
-  FILTRO.ini = new Date(ini); FILTRO.ini.setHours(0,0,0,0);
-  FILTRO.fim = new Date(fim); FILTRO.fim.setHours(23,59,59,999);
+  FILTRO.iniStr = ini; // string YYYY-MM-DD exata para comparacao com dados diarios
+  FILTRO.fimStr = fim;
+  FILTRO.ini = new Date(ini+"T00:00:00"); // para compatibilidade com filtros Rezdy
+  FILTRO.fim = new Date(fim+"T23:59:59");
   document.querySelectorAll("#filtroGlobal .btn-periodo").forEach(b=>b.classList.remove("ativo"));
   const lbl = document.getElementById("globalPeriodoLabel");
   if(lbl) lbl.textContent = "Exibindo: "+ini+" a "+fim+" ("+dias+" dias)";
