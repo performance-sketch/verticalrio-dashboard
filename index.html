@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vertical Rio — Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1d2e 0%, #16213e 100%);
+      border-bottom: 1px solid #2d3748;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .logo h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .logo span {
+      font-size: 12px;
+      color: #718096;
+      display: block;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .refresh-info {
+      font-size: 12px;
+      color: #718096;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #48bb78;
+      display: inline-block;
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .main { padding: 24px 32px; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: #1a1d2e;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 20px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .kpi-card.blue::before { background: linear-gradient(90deg, #4299e1, #667eea); }
+    .kpi-card.green::before { background: linear-gradient(90deg, #48bb78, #38a169); }
+    .kpi-card.yellow::before { background: linear-gradient(90deg, #ecc94b, #d69e2e); }
+    .kpi-card.red::before { background: linear-gradient(90deg, #fc8181, #e53e3e); }
+    .kpi-card.purple::before { background: linear-gradient(90deg, #b794f4, #805ad5); }
+
+    .kpi-label {
+      font-size: 12px;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: #718096;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #1a1d2e;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #a0aec0;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 220px;
+    }
+
+    .table-wrapper { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #718096;
+      border-bottom: 1px solid #2d3748;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #1e2535;
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover { background: #1e2535; }
+
+    tbody td {
+      padding: 12px 12px;
+      color: #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-CONFIRMED { background: #1a3a2a; color: #68d391; }
+    .badge-PENDING_CUSTOMER { background: #3a2a10; color: #f6ad55; }
+    .badge-CANCELLED { background: #3a1a1a; color: #fc8181; }
+    .badge-UNKNOWN { background: #2d3748; color: #a0aec0; }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #718096;
+      font-size: 14px;
+    }
+
+    .spinner {
+      border: 3px solid #2d3748;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      background: #3a1a1a;
+      border: 1px solid #e53e3e;
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #fc8181;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    .product-card {
+      background: #0f1117;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .product-img {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 8px;
+      flex-shrink: 0;
+      background: #2d3748;
+    }
+
+    .product-info h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+    }
+
+    .product-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: #68d391;
+    }
+
+    .product-duration {
+      font-size: 11px;
+      color: #718096;
+    }
+
+    @media (max-width: 768px) {
+      .main { padding: 16px; }
+      header { padding: 12px 16px; }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🚁</div>
+    <div>
+      <h1>Vertical Rio</h1>
+      <span>Dashboard de Reservas</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="refresh-info">
+      <span class="status-dot"></span>
+      Atualiza a cada 30s &nbsp;|&nbsp; Última atualização: <span id="lastUpdate">—</span>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div id="errorMsg" class="error-msg">⚠️ Erro ao carregar dados. Verifique se o backend está rodando.</div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="loading"><div class="spinner"></div>Carregando...</div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <div class="card">
+      <div class="card-title">Reservas por Dia (últimos 14 dias)</div>
+      <div class="chart-container">
+        <canvas id="bookingsByDayChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Receita por Produto</div>
+      <div class="chart-container">
+        <canvas id="revenueByProductChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status breakdown -->
+  <div class="charts-grid" style="grid-template-columns: 1fr 2fr;">
+    <div class="card">
+      <div class="card-title">Status das Reservas</div>
+      <div class="chart-container">
+        <canvas id="statusChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="card">
+      <div class="card-title">Produtos Ativos</div>
+      <div id="productsGrid" class="products-grid">
+        <div class="loading"><div class="spinner"></div>Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookings Table -->
+  <div class="card" style="margin-top: 16px;">
+    <div class="card-title">Reservas Recentes</div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Status</th>
+            <th>Cliente</th>
+            <th>Produto</th>
+            <th>Data do Voo</th>
+            <th>Pax</th>
+            <th>Total (BRL)</th>
+            <th>Pago</th>
+            <th>A Pagar</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsBody">
+          <tr><td colspan="9" class="loading">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Variáveis globais para os gráficos (necessário destruir antes de recriar)
+  let graficoReservasPorDia = null;
+  let graficoReceitaPorProduto = null;
+  let graficoStatus = null;
+
+  // Formata número como moeda brasileira (ex: 1234.5 → "1.234,50")
+  function formatarMoeda(numero) {
+    return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(numero || 0);
+  }
+
+  // Retorna a classe CSS correta para o badge de status
+  function classeBadgeStatus(status) {
+    if (['CONFIRMED', 'PROCESSING'].includes(status)) return 'badge-CONFIRMED';
+    if (status && status.startsWith('PENDING')) return 'badge-PENDING_CUSTOMER';
+    if (status === 'CANCELLED') return 'badge-CANCELLED';
+    return 'badge-UNKNOWN';
+  }
+
+  // Traduz o código de status para português
+  function traduzirStatus(status) {
+    const traducoes = {
+      CONFIRMED: 'Confirmado',
+      PROCESSING: 'Processando',
+      PENDING_CUSTOMER: 'Aguardando Cliente',
+      PENDING_SUPPLIER: 'Aguardando Operador',
+      CANCELLED: 'Cancelado',
+    };
+    return traducoes[status] || status || 'Desconhecido';
+  }
+
+  // Busca o resumo geral (KPIs e dados dos gráficos)
+  async function carregarResumo() {
+    try {
+      const resposta = await fetch('/api/resumo');
+      if (!resposta.ok) throw new Error('Erro HTTP ' + resposta.status);
+      const dados = await resposta.json();
+
+      // Renderiza os cards de KPI
+      document.getElementById('kpiGrid').innerHTML = `
+        <div class="kpi-card blue">
+          <div class="kpi-label">Total de Reservas</div>
+          <div class="kpi-value">${dados.total_reservas}</div>
+          <div class="kpi-sub">Últimas 100 registradas</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-label">Receita Total</div>
+          <div class="kpi-value">R$ ${formatarMoeda(dados.receita_total)}</div>
+          <div class="kpi-sub">Valor bruto das reservas</div>
+        </div>
+        <div class="kpi-card purple">
+          <div class="kpi-label">Total Pago</div>
+          <div class="kpi-value">R$ ${formatarMoeda(dados.total_pago)}</div>
+          <div class="kpi-sub">Pagamentos confirmados</div>
+        </div>
+        <div class="kpi-card yellow">
+          <div class="kpi-label">A Receber</div>
+          <div class="kpi-value">R$ ${formatarMoeda(dados.total_a_pagar)}</div>
+          <div class="kpi-sub">Saldo em aberto</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-label">Canceladas</div>
+          <div class="kpi-value">${dados.contagem_por_status['CANCELLED'] || 0}</div>
+          <div class="kpi-sub">Total canceladas</div>
+        </div>
+      `;
+
+      // Renderiza os três gráficos
+      renderizarGraficoReservasPorDia(dados.reservas_por_dia);
+      renderizarGraficoReceitaPorProduto(dados.receita_por_produto);
+      renderizarGraficoStatus(dados.contagem_por_status);
+
+    } catch(erro) {
+      document.getElementById('errorMsg').style.display = 'block';
+      document.getElementById('kpiGrid').innerHTML = '<div class="loading">Falha ao carregar resumo.</div>';
+    }
+  }
+
+  // Desenha o gráfico de linha: quantidade de reservas por dia
+  function renderizarGraficoReservasPorDia(dados) {
+    const rotulos = Object.keys(dados);
+    const valores = Object.values(dados);
+    const ctx = document.getElementById('bookingsByDayChart').getContext('2d');
+    if (graficoReservasPorDia) graficoReservasPorDia.destroy();
+    graficoReservasPorDia = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: rotulos,
+        datasets: [{
+          label: 'Reservas',
+          data: valores,
+          borderColor: '#667eea',
+          backgroundColor: 'rgba(102,126,234,0.15)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#667eea',
+          pointRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#718096', maxTicksLimit: 7 }, grid: { color: '#1e2535' } },
+          y: { ticks: { color: '#718096', stepSize: 1 }, grid: { color: '#1e2535' } }
+        }
+      }
+    });
+  }
+
+  // Desenha o gráfico de rosca: receita dividida por produto
+  function renderizarGraficoReceitaPorProduto(dados) {
+    const rotulos = Object.keys(dados).map(nome => nome.length > 20 ? nome.slice(0, 20) + '…' : nome);
+    const valores = Object.values(dados);
+    const cores = ['#667eea','#48bb78','#ecc94b','#fc8181','#b794f4','#63b3ed','#f6ad55'];
+    const ctx = document.getElementById('revenueByProductChart').getContext('2d');
+    if (graficoReceitaPorProduto) graficoReceitaPorProduto.destroy();
+    graficoReceitaPorProduto = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: rotulos,
+        datasets: [{
+          data: valores,
+          backgroundColor: cores,
+          borderWidth: 2,
+          borderColor: '#1a1d2e',
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right', labels: { color: '#a0aec0', font: { size: 11 }, boxWidth: 12 } }
+        }
+      }
+    });
+  }
+
+  // Desenha o gráfico de barras: quantidade de reservas por status
+  function renderizarGraficoStatus(dados) {
+    const coresPorStatus = {
+      CONFIRMED: '#48bb78', PROCESSING: '#68d391',
+      PENDING_CUSTOMER: '#f6ad55', PENDING_SUPPLIER: '#ecc94b',
+      CANCELLED: '#fc8181',
+    };
+    const rotulos = Object.keys(dados).map(traduzirStatus);
+    const valores = Object.values(dados);
+    const coresFundo = Object.keys(dados).map(k => coresPorStatus[k] || '#667eea');
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    if (graficoStatus) graficoStatus.destroy();
+    graficoStatus = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: rotulos,
+        datasets: [{
+          data: valores,
+          backgroundColor: coresFundo,
+          borderRadius: 6,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#718096' }, grid: { color: '#1e2535' } },
+          y: { ticks: { color: '#718096', stepSize: 1 }, grid: { color: '#1e2535' } }
+        }
+      }
+    });
+  }
+
+  // Busca e exibe a tabela de reservas recentes
+  async function carregarReservas() {
+    try {
+      const resposta = await fetch('/api/reservas');
+      if (!resposta.ok) throw new Error('Erro HTTP ' + resposta.status);
+      const reservas = await resposta.json();
+
+      const corpoTabela = document.getElementById('bookingsBody');
+      if (!reservas.length) {
+        corpoTabela.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:#718096;">Nenhuma reserva encontrada</td></tr>';
+        return;
+      }
+
+      corpoTabela.innerHTML = reservas.map(r => `
+        <tr>
+          <td style="font-weight:600;color:#667eea;">${r.numeroPedido}</td>
+          <td><span class="badge ${classeBadgeStatus(r.status)}">${traduzirStatus(r.status)}</span></td>
+          <td>
+            <div style="font-weight:500;">${r.nomeCliente}</div>
+            <div style="font-size:11px;color:#718096;">${r.emailCliente}</div>
+          </td>
+          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${r.produto}</td>
+          <td style="color:#a0aec0;">${r.horarioVoo ? r.horarioVoo.slice(0,16) : '—'}</td>
+          <td style="text-align:center;">${r.quantidade}</td>
+          <td style="font-weight:600;">R$ ${formatarMoeda(r.valorTotal)}</td>
+          <td style="color:#68d391;">R$ ${formatarMoeda(r.valorPago)}</td>
+          <td style="color:${r.valorAPagar > 0 ? '#f6ad55' : '#718096'};">R$ ${formatarMoeda(r.valorAPagar)}</td>
+        </tr>
+      `).join('');
+    } catch(erro) {
+      document.getElementById('bookingsBody').innerHTML =
+        '<tr><td colspan="9" style="color:#fc8181;padding:16px;">Erro ao carregar reservas.</td></tr>';
+    }
+  }
+
+  // Busca e exibe os cards de produtos
+  async function carregarProdutos() {
+    try {
+      const resposta = await fetch('/api/produtos');
+      if (!resposta.ok) throw new Error('Erro HTTP ' + resposta.status);
+      const produtos = await resposta.json();
+      const grade = document.getElementById('productsGrid');
+
+      if (!produtos.length) {
+        grade.innerHTML = '<p style="color:#718096;font-size:13px;">Nenhum produto encontrado.</p>';
+        return;
+      }
+
+      grade.innerHTML = produtos.map(p => `
+        <div class="product-card">
+          ${p.imagem ? `<img class="product-img" src="${p.imagem}" alt="" onerror="this.style.display='none'">` : ''}
+          <div class="product-info">
+            <h4>${p.nome}</h4>
+            <div class="product-price">R$ ${formatarMoeda(p.precoAnunciado)}</div>
+            <div class="product-duration">${p.duracaoMinutos} min · ${p.moeda}</div>
+          </div>
+        </div>
+      `).join('');
+    } catch(erro) {
+      document.getElementById('productsGrid').innerHTML = '<p style="color:#fc8181;font-size:13px;">Erro ao carregar produtos.</p>';
+    }
+  }
+
+  // Atualiza o horário de "última atualização" no cabeçalho
+  function atualizarHorario() {
+    const agora = new Date();
+    document.getElementById('lastUpdate').textContent =
+      agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  // Função principal: atualiza todos os dados do dashboard
+  async function atualizarDashboard() {
+    await Promise.all([carregarResumo(), carregarReservas(), carregarProdutos()]);
+    atualizarHorario();
+    document.getElementById('errorMsg').style.display = 'none';
+  }
+
+  // Executa imediatamente e repete a cada 30 segundos
+  atualizarDashboard();
+  setInterval(atualizarDashboard, 30000);
+</script>
+</body>
+</html>
