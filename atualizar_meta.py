@@ -1,7 +1,8 @@
 """
 atualizar_meta.py
 =================
-Busca dados reais da Meta Ads API e atualiza o dashboard_completo.html.
+Busca dados reais da Meta Ads API para 4 periodos (7d, 14d, 30d, 90d)
+e atualiza o dashboard_completo.html.
 Execute: python atualizar_meta.py
 
 ─── COMO OBTER O TOKEN ───────────────────────────────────────────────────────
@@ -35,11 +36,13 @@ ARQUIVO_DASH  = "dashboard_completo.html"
 API_VERSION   = "v19.0"
 BASE_URL      = f"https://graph.facebook.com/{API_VERSION}"
 
-# Intervalo de datas — opcoes: last_7_days, last_14_days, last_30_days,
-#   last_90_days, this_month, last_month, ou usar since/until abaixo
-DATE_PRESET   = "last_30d"
-# DATE_SINCE  = "2025-04-01"   # Descomente para intervalo customizado
-# DATE_UNTIL  = "2025-04-30"
+# Periodos que serao buscados da API real
+PERIODOS = [
+    ("d7",  "last_7d"),
+    ("d14", "last_14d"),
+    ("d30", "last_30d"),
+    ("d90", "last_90d"),
+]
 # ──────────────────────────────────────────────────────────────────────────────
 
 NOMES_PAIS = {
@@ -59,50 +62,41 @@ def api_get(endpoint, params=None):
     return r.json()
 
 
-def montar_time_range():
-    """Retorna dict de date_preset ou time_range para a API."""
-    # Se quiser range customizado, use:
-    # return {"time_range": json.dumps({"since": DATE_SINCE, "until": DATE_UNTIL})}
-    return {"date_preset": DATE_PRESET}
-
-
-def buscar_conjuntos():
-    """Metrica por conjunto de anuncios (adset level)."""
+def buscar_conjuntos(date_preset):
     campos = "adset_name,campaign_name,spend,impressions,clicks,cpc,ctr,cpm,reach,actions"
     params = {
         "level": "adset",
         "fields": campos,
         "limit": 200,
-        **montar_time_range(),
+        "date_preset": date_preset,
     }
     dados = []
     resp = api_get(f"{AD_ACCOUNT_ID}/insights", params)
     dados.extend(resp.get("data", []))
-    # Paginacao
     while resp.get("paging", {}).get("next"):
         resp = requests.get(resp["paging"]["next"], timeout=30).json()
         dados.extend(resp.get("data", []))
     return dados
 
 
-def buscar_idades():
+def buscar_idades(date_preset):
     params = {
         "level": "account",
         "fields": "spend,impressions,clicks",
         "breakdowns": "age",
         "limit": 20,
-        **montar_time_range(),
+        "date_preset": date_preset,
     }
     return api_get(f"{AD_ACCOUNT_ID}/insights", params).get("data", [])
 
 
-def buscar_paises():
+def buscar_paises(date_preset):
     params = {
         "level": "account",
         "fields": "spend,impressions,clicks",
         "breakdowns": "country",
         "limit": 50,
-        **montar_time_range(),
+        "date_preset": date_preset,
     }
     return api_get(f"{AD_ACCOUNT_ID}/insights", params).get("data", [])
 
@@ -141,7 +135,7 @@ def processar(conjuntos_raw, idades_raw, paises_raw):
             "impressoes": impressoes,
             "cliques":    cliques,
             "cpc":        round(cpc_raw, 2) if cpc_raw else None,
-            "ctr":        round(ctr_raw, 2),     # percentual: 1.88 = 1.88%
+            "ctr":        round(ctr_raw, 2),
             "cpm":        round(cpm_raw, 2) if cpm_raw else None,
             "alcance":    alcance,
             "conv":       round(conv, 1) if conv is not None else None,
@@ -152,7 +146,6 @@ def processar(conjuntos_raw, idades_raw, paises_raw):
 
     campanhas.sort(key=lambda x: x["gasto"], reverse=True)
 
-    # Idades
     ORDEM_FAIXAS = ["13-17","18-24","25-34","35-44","45-54","55-64","65+"]
     idades_map = {}
     for i in idades_raw:
@@ -174,7 +167,6 @@ def processar(conjuntos_raw, idades_raw, paises_raw):
                 "cliques":    d["cliques"],
             })
 
-    # Paises — agrupar e pegar top 7
     geos_map = {}
     for p in paises_raw:
         codigo = p.get("country", "??")
@@ -227,27 +219,22 @@ def main():
         print("  ATENCAO: Configure ACCESS_TOKEN e AD_ACCOUNT_ID neste arquivo antes de executar.")
         return
 
-    print("Buscando conjuntos de anuncios...")
-    conjuntos = buscar_conjuntos()
-    print(f"  {len(conjuntos)} conjuntos")
+    resultado = {}
 
-    print("Buscando faixas etarias...")
-    idades = buscar_idades()
-    print(f"  {len(idades)} faixas")
-
-    print("Buscando paises...")
-    paises = buscar_paises()
-    print(f"  {len(paises)} paises")
-
-    print("\nProcessando...")
-    dados = processar(conjuntos, idades, paises)
-    print(f"  Gasto total:  R$ {dados['totalGasto']:,.2f}")
-    print(f"  Impressoes:   {dados['totalImpressoes']:,}")
-    print(f"  Cliques:      {dados['totalCliques']:,}")
-    print(f"  Campanhas:    {len(dados['campanhas'])}")
+    for chave, preset in PERIODOS:
+        print(f"Buscando periodo {preset}...")
+        conjuntos = buscar_conjuntos(preset)
+        idades    = buscar_idades(preset)
+        paises    = buscar_paises(preset)
+        dados_periodo = processar(conjuntos, idades, paises)
+        resultado[chave] = dados_periodo
+        print(f"  Gasto: R$ {dados_periodo['totalGasto']:,.2f} | "
+              f"Impressoes: {dados_periodo['totalImpressoes']:,} | "
+              f"Cliques: {dados_periodo['totalCliques']:,} | "
+              f"Conjuntos: {len(dados_periodo['campanhas'])}")
 
     print(f"\nAtualizando {ARQUIVO_DASH}...")
-    atualizar_html(dados)
+    atualizar_html(resultado)
     print("\nMeta Ads atualizado com sucesso!")
 
 
