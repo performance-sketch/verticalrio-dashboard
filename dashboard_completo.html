@@ -1,0 +1,2798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vertical Rio — Dashboard Completo</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0c14;color:#e2e8f0;min-height:100vh}
+
+    /* ── HEADER ── */
+    header{background:linear-gradient(135deg,#13162a,#0f1320);border-bottom:1px solid #1e2540;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#5a7fff,#7c3aed);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+    .logo h1{font-size:18px;font-weight:700;color:#fff}
+    .logo span{font-size:11px;color:#64748b;display:block}
+    .header-direita{display:flex;align-items:center;gap:20px}
+    .dot-vivo{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:5px;animation:piscar 2s infinite}
+    @keyframes piscar{0%,100%{opacity:1}50%{opacity:.3}}
+    .info-atualizacao{font-size:11px;color:#64748b}
+    .tag-demo{background:#2d1f00;border:1px solid #b45309;color:#fbbf24;font-size:10px;padding:2px 8px;border-radius:20px}
+    .btn-refresh{background:#1e2540;border:1px solid #2d3a5a;color:#94a3b8;font-size:11px;padding:4px 12px;border-radius:8px;cursor:pointer;transition:all .2s}
+    .btn-refresh:hover{background:#2d3a5a;color:#fff}
+    .aviso-box{background:#1a1000;border:1px solid #b45309;border-radius:8px;padding:12px 16px;color:#fbbf24;font-size:12px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
+
+    /* ── FILTRO DE DATAS ── */
+    .filtro-datas{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;background:#0d1020;border:1px solid #1e2540;border-radius:10px;padding:10px 14px}
+    .btn-periodo{background:#1e2540;border:1px solid #2d3a5a;color:#64748b;font-size:12px;padding:5px 14px;border-radius:20px;cursor:pointer;transition:all .2s}
+    .btn-periodo:hover{background:#2d3a5a;color:#e2e8f0}
+    .btn-periodo.ativo{background:#3b82f6;border-color:#3b82f6;color:#fff;font-weight:600}
+    .input-data{background:#1e2540;border:1px solid #2d3a5a;color:#94a3b8;font-size:12px;padding:5px 10px;border-radius:8px;outline:none}
+    .input-data:focus{border-color:#3b82f6}
+    .btn-aplicar{background:#1e2540;border:1px solid #2d3a5a;color:#94a3b8;font-size:12px;padding:5px 12px;border-radius:8px;cursor:pointer;transition:all .2s}
+    .btn-aplicar:hover{background:#2d3a5a;color:#fff}
+    .div-sep-v{width:1px;height:20px;background:#2d3a5a;margin:0 4px}
+
+    /* ── ABAS ── */
+    .abas{background:#0d1020;border-bottom:1px solid #1e2540;padding:0 28px;display:flex;gap:4px;overflow-x:auto}
+    .aba{padding:12px 18px;font-size:13px;font-weight:500;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+    .aba:hover{color:#a0aec0}
+    .aba.ativa{color:#fff;border-bottom-color:#5a7fff}
+
+    /* ── CONTEÚDO ── */
+    .conteudo{padding:24px 28px;display:none}
+    .conteudo.ativo{display:block}
+
+    /* ── GRADE KPI ── */
+    .grade-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+    .card-kpi{background:#13162a;border:1px solid #1e2540;border-radius:12px;padding:18px 20px;position:relative;overflow:hidden}
+    .card-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+    .kpi-azul::before{background:linear-gradient(90deg,#3b82f6,#5a7fff)}
+    .kpi-verde::before{background:linear-gradient(90deg,#22c55e,#16a34a)}
+    .kpi-roxo::before{background:linear-gradient(90deg,#a855f7,#7c3aed)}
+    .kpi-laranja::before{background:linear-gradient(90deg,#f97316,#ea580c)}
+    .kpi-amarelo::before{background:linear-gradient(90deg,#eab308,#ca8a04)}
+    .kpi-rosa::before{background:linear-gradient(90deg,#ec4899,#db2777)}
+    .kpi-ciano::before{background:linear-gradient(90deg,#06b6d4,#0891b2)}
+    .kpi-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+    .kpi-valor{font-size:26px;font-weight:700;color:#fff;line-height:1;margin-bottom:3px}
+    .kpi-sub{font-size:11px;color:#64748b}
+
+    /* ── CARDS GENÉRICOS ── */
+    .grade-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+    .grade-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+    .grade-21{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+    .grade-12{display:grid;grid-template-columns:1fr 2fr;gap:14px;margin-bottom:14px}
+    .card{background:#13162a;border:1px solid #1e2540;border-radius:12px;padding:18px 22px;margin-bottom:14px}
+    .card-titulo{font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .card-titulo .fonte-tag{background:#1e2540;color:#a0aec0;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;text-transform:none;letter-spacing:0}
+    .grafico-box{position:relative;height:200px}
+    .grafico-alto{position:relative;height:260px}
+
+    /* ── TABELAS ── */
+    .tabela-scroll{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    thead th{padding:9px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#64748b;border-bottom:1px solid #1e2540}
+    tbody tr{border-bottom:1px solid #0f1320;transition:background .15s}
+    tbody tr:hover{background:#0f1320}
+    tbody td{padding:10px 12px;color:#e2e8f0;white-space:nowrap}
+
+    /* ── BADGES ── */
+    .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600}
+    .b-verde{background:#0f2e1a;color:#4ade80}
+    .b-amarelo{background:#2a1f00;color:#fbbf24}
+    .b-vermelho{background:#2a0f0f;color:#f87171}
+    .b-cinza{background:#1e2540;color:#94a3b8}
+    .b-azul{background:#0f1e3a;color:#60a5fa}
+    .b-roxo{background:#1e0f3a;color:#c084fc}
+
+    /* ── BARRA DE PROGRESSO ── */
+    .barra-wrap{background:#1e2540;border-radius:4px;height:6px;margin-top:4px}
+    .barra-fill{height:6px;border-radius:4px}
+
+    /* ── SEÇÃO VIVA ── */
+    .indicador-vivo{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#22c55e;background:#0a1f10;border:1px solid #14532d;padding:2px 8px;border-radius:10px}
+
+    /* ── SEPARADOR ── */
+    .separador{border:none;border-top:1px solid #1e2540;margin:18px 0}
+
+    @media(max-width:768px){
+      .grade-2,.grade-3,.grade-21,.grade-12{grid-template-columns:1fr}
+      .abas{padding:0 12px}
+      .conteudo{padding:16px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">&#x1F681;</div>
+    <div>
+      <h1>Vertical Rio</h1>
+      <span>Dashboard de Performance</span>
+    </div>
+  </div>
+  <div class="header-direita">
+    <div class="info-atualizacao">
+      Rezdy: <strong id="dataRezdy">--</strong> &nbsp;|&nbsp;
+      Anuncios: <strong id="dataAnuncios">21/05/2026</strong> &nbsp;|&nbsp;
+      Ultima att: <span id="ultimaAtt">--</span>
+    </div>
+    <span class="tag-demo">DEMO 12 dias restantes</span>
+  </div>
+</header>
+
+<!-- ═══════════════ ABAS ═══════════════ -->
+<div class="abas">
+  <div class="aba ativa" onclick="mostrarAba('visaoGeral')">&#x1F4CA; Visao Geral</div>
+  <div class="aba" onclick="mostrarAba('midiaPage')">&#x1F4F1; Meta Ads</div>
+  <div class="aba" onclick="mostrarAba('googleAdsPage')">&#x1F50D; Google Ads</div>
+  <div class="aba" onclick="mostrarAba('analyticsPage')">&#x1F310; Analytics</div>
+  <div class="aba" onclick="mostrarAba('rezdyPage')">&#x1F4C5; Reservas Rezdy</div>
+  <div class="aba" onclick="mostrarAba('passageirosPage')">&#x1F9F3; Passageiros</div>
+</div>
+
+<!-- ═══════════════ ABA: VISÃO GERAL ═══════════════ -->
+<div id="visaoGeral" class="conteudo ativo">
+
+  <div class="grade-kpi" id="kpiGeral">
+    <div class="card-kpi kpi-azul">
+      <div class="kpi-label">Total Investido (30d)</div>
+      <div class="kpi-valor">R$ 49.259</div>
+      <div class="kpi-sub">Meta + Google Ads</div>
+    </div>
+    <div class="card-kpi kpi-verde">
+      <div class="kpi-label">Valor Gerado Google</div>
+      <div class="kpi-valor">R$ 46.704</div>
+      <div class="kpi-sub">ROAS 2,56x</div>
+    </div>
+    <div class="card-kpi kpi-roxo">
+      <div class="kpi-label">Sessoes no Site (30d)</div>
+      <div class="kpi-valor">111.574</div>
+      <div class="kpi-sub">GA4 — Vertical Rio</div>
+    </div>
+    <div class="card-kpi kpi-laranja" id="kpiReservas">
+      <div class="kpi-label">Reservas Ativas</div>
+      <div class="kpi-valor" id="totalReservasGeral">--</div>
+      <div class="kpi-sub">Rezdy ao vivo</div>
+    </div>
+    <div class="card-kpi kpi-amarelo" id="kpiReceita">
+      <div class="kpi-label">Receita Rezdy</div>
+      <div class="kpi-valor" id="receitaGeralRezdy">--</div>
+      <div class="kpi-sub">Ultimas 100 reservas</div>
+    </div>
+    <div class="card-kpi kpi-ciano">
+      <div class="kpi-label">CPC Medio Meta</div>
+      <div class="kpi-valor">R$ 0,19</div>
+      <div class="kpi-sub">166.425 cliques</div>
+    </div>
+  </div>
+
+  <div class="grade-3">
+    <div class="card">
+      <div class="card-titulo">Trafego por Canal <span class="fonte-tag">GA4</span></div>
+      <div class="grafico-box"><canvas id="graficoTrafegoGeral"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Gasto em Anuncios <span class="fonte-tag">Meta + Google</span></div>
+      <div class="grafico-box"><canvas id="graficoGastoGeral"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Status Reservas Rezdy <span class="fonte-tag indicador-vivo"><span class="dot-vivo"></span>Vivo</span></div>
+      <div class="grafico-box"><canvas id="graficoStatusGeral"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grade-21">
+    <div class="card">
+      <div class="card-titulo">Campanhas Meta Ads — Top 5 por Gasto <span class="fonte-tag">Meta</span></div>
+      <div class="grafico-alto"><canvas id="graficoMetaBarraGeral"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Google Ads — ROAS por Campanha <span class="fonte-tag">Google</span></div>
+      <div id="roasListaGeral"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ ABA: META ADS ═══════════════ -->
+<div id="midiaPage" class="conteudo">
+
+  <div class="filtro-datas">
+    <span style="font-size:12px;color:#64748b;margin-right:4px">Periodo:</span>
+    <button class="btn-periodo" onclick="selecionarPeriodo('meta',this,7)">7d</button>
+    <button class="btn-periodo" onclick="selecionarPeriodo('meta',this,14)">14d</button>
+    <button class="btn-periodo ativo" id="metaBtnAtivo" onclick="selecionarPeriodo('meta',this,30)">30d</button>
+    <button class="btn-periodo" onclick="selecionarPeriodo('meta',this,90)">90d</button>
+    <div class="div-sep-v"></div>
+    <input type="date" id="metaDataInicio" class="input-data">
+    <span style="color:#64748b;font-size:12px">—</span>
+    <input type="date" id="metaDataFim" class="input-data">
+    <button class="btn-aplicar" onclick="aplicarFiltroCustom('meta')">Aplicar</button>
+    <span id="metaPeriodoLabel" style="font-size:11px;color:#64748b;margin-left:6px">Exibindo: ultimos 30 dias</span>
+  </div>
+
+  <div class="grade-kpi">
+    <div class="card-kpi kpi-azul">
+      <div class="kpi-label">Total Gasto (30d)</div>
+      <div class="kpi-valor">R$ 31.007</div>
+      <div class="kpi-sub">17 conjuntos de anuncios</div>
+    </div>
+    <div class="card-kpi kpi-roxo">
+      <div class="kpi-label">Impressoes</div>
+      <div class="kpi-valor">4,67M</div>
+      <div class="kpi-sub">Alcance unico</div>
+    </div>
+    <div class="card-kpi kpi-verde">
+      <div class="kpi-label">Cliques Totais</div>
+      <div class="kpi-valor">166.425</div>
+      <div class="kpi-sub">Todos os cliques</div>
+    </div>
+    <div class="card-kpi kpi-amarelo">
+      <div class="kpi-label">CPC Medio</div>
+      <div class="kpi-valor">R$ 0,19</div>
+      <div class="kpi-sub">Custo por clique</div>
+    </div>
+    <div class="card-kpi kpi-laranja">
+      <div class="kpi-label">CPM Medio</div>
+      <div class="kpi-valor">R$ 6,63</div>
+      <div class="kpi-sub">Por mil impressoes</div>
+    </div>
+  </div>
+
+  <div class="grade-21">
+    <div class="card">
+      <div class="card-titulo">Gasto por Conjunto de Anuncios — Top 10</div>
+      <div class="grafico-alto"><canvas id="graficoMetaBarra"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Distribuicao de Gasto</div>
+      <div class="grafico-alto"><canvas id="graficoMetaRosca"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-titulo">Todos os Conjuntos de Anuncios</div>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Conjunto de Anuncios</th>
+            <th>Gasto (R$)</th>
+            <th>Impressoes</th>
+            <th>Cliques</th>
+            <th>CPC (R$)</th>
+            <th>CTR (%)</th>
+            <th>CPM (R$)</th>
+            <th>Alcance</th>
+            <th>Conv. Web</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaMeta"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grade-2">
+    <div class="card">
+      <div class="card-titulo">Publico por Faixa Etaria <span class="fonte-tag">Meta</span></div>
+      <div class="grafico-alto"><canvas id="graficoMetaIdade"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Distribuicao Geografica — Top Paises <span class="fonte-tag">Meta</span></div>
+      <div class="grafico-alto"><canvas id="graficoMetaGeo"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-titulo">Detalhamento Geografico <span class="fonte-tag">Meta</span></div>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr><th>Pais / Regiao</th><th>Gasto (R$)</th><th>Impressoes</th><th>Cliques</th><th>CPC (R$)</th><th>CTR (%)</th></tr>
+        </thead>
+        <tbody id="tabelaMetaGeo"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ ABA: GOOGLE ADS ═══════════════ -->
+<div id="googleAdsPage" class="conteudo">
+
+  <div class="filtro-datas">
+    <span style="font-size:12px;color:#64748b;margin-right:4px">Periodo:</span>
+    <button class="btn-periodo" onclick="selecionarPeriodo('google',this,7)">7d</button>
+    <button class="btn-periodo" onclick="selecionarPeriodo('google',this,14)">14d</button>
+    <button class="btn-periodo ativo" id="googleBtnAtivo" onclick="selecionarPeriodo('google',this,30)">30d</button>
+    <button class="btn-periodo" onclick="selecionarPeriodo('google',this,90)">90d</button>
+    <div class="div-sep-v"></div>
+    <input type="date" id="googleDataInicio" class="input-data">
+    <span style="color:#64748b;font-size:12px">—</span>
+    <input type="date" id="googleDataFim" class="input-data">
+    <button class="btn-aplicar" onclick="aplicarFiltroCustom('google')">Aplicar</button>
+    <span id="googlePeriodoLabel" style="font-size:11px;color:#64748b;margin-left:6px">Exibindo: ultimos 30 dias</span>
+  </div>
+
+  <div class="grade-kpi">
+    <div class="card-kpi kpi-azul">
+      <div class="kpi-label">Total Gasto (30d)</div>
+      <div class="kpi-valor">R$ 18.251</div>
+      <div class="kpi-sub">6 campanhas ativas</div>
+    </div>
+    <div class="card-kpi kpi-verde">
+      <div class="kpi-label">Valor de Conversao</div>
+      <div class="kpi-valor">R$ 46.704</div>
+      <div class="kpi-sub">Total gerado</div>
+    </div>
+    <div class="card-kpi kpi-amarelo">
+      <div class="kpi-label">ROAS</div>
+      <div class="kpi-valor">2,56x</div>
+      <div class="kpi-sub">Retorno sobre investimento</div>
+    </div>
+    <div class="card-kpi kpi-roxo">
+      <div class="kpi-label">Conversoes</div>
+      <div class="kpi-valor">891</div>
+      <div class="kpi-sub">Total de conversoes</div>
+    </div>
+    <div class="card-kpi kpi-laranja">
+      <div class="kpi-label">Cliques</div>
+      <div class="kpi-valor">8.043</div>
+      <div class="kpi-sub">CPC medio R$ 2,27</div>
+    </div>
+    <div class="card-kpi kpi-ciano">
+      <div class="kpi-label">Impressoes</div>
+      <div class="kpi-valor">922.965</div>
+      <div class="kpi-sub">CTR medio 0,87%</div>
+    </div>
+  </div>
+
+  <div class="grade-21">
+    <div class="card">
+      <div class="card-titulo">Gasto vs Valor de Conversao por Campanha</div>
+      <div class="grafico-alto"><canvas id="graficoGoogleBarra"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">ROAS por Campanha</div>
+      <div id="roasLista" style="padding-top:4px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-titulo">Detalhamento por Campanha</div>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Campanha</th>
+            <th>Gasto (R$)</th>
+            <th>Impressoes</th>
+            <th>Cliques</th>
+            <th>CPC (R$)</th>
+            <th>CTR (%)</th>
+            <th>Conversoes</th>
+            <th>Valor Conv. (R$)</th>
+            <th>ROAS</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaGoogle"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grade-2">
+    <div class="card">
+      <div class="card-titulo">Publico por Faixa Etaria <span class="fonte-tag">Google</span></div>
+      <div class="grafico-alto"><canvas id="graficoGoogleIdade"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Distribuicao Geografica — Top Paises <span class="fonte-tag">Google</span></div>
+      <div class="grafico-alto"><canvas id="graficoGoogleGeo"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-titulo">Detalhamento Geografico <span class="fonte-tag">Google</span></div>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr><th>Pais / Regiao</th><th>Gasto (R$)</th><th>Cliques</th><th>Conversoes</th><th>Valor Conv. (R$)</th><th>ROAS</th></tr>
+        </thead>
+        <tbody id="tabelaGoogleGeo"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ ABA: ANALYTICS ═══════════════ -->
+<div id="analyticsPage" class="conteudo">
+
+  <div class="grade-kpi">
+    <div class="card-kpi kpi-azul">
+      <div class="kpi-label">Sessoes Totais (30d)</div>
+      <div class="kpi-valor">111.574</div>
+      <div class="kpi-sub">Vertical Rio GA4</div>
+    </div>
+    <div class="card-kpi kpi-verde">
+      <div class="kpi-label">Usuarios Totais</div>
+      <div class="kpi-valor">109.522</div>
+      <div class="kpi-sub">Usuarios unicos</div>
+    </div>
+    <div class="card-kpi kpi-roxo">
+      <div class="kpi-label">Novos Usuarios</div>
+      <div class="kpi-valor">107.530</div>
+      <div class="kpi-sub">Primeira visita</div>
+    </div>
+    <div class="card-kpi kpi-laranja">
+      <div class="kpi-label">Midia Paga Social</div>
+      <div class="kpi-valor">79,7%</div>
+      <div class="kpi-sub">88.918 sessoes</div>
+    </div>
+    <div class="card-kpi kpi-amarelo">
+      <div class="kpi-label">Pageviews</div>
+      <div class="kpi-valor">151.342</div>
+      <div class="kpi-sub">Visualizacoes de pagina</div>
+    </div>
+  </div>
+
+  <div class="grade-21">
+    <div class="card">
+      <div class="card-titulo">Sessoes por Canal de Origem</div>
+      <div class="grafico-alto"><canvas id="graficoCanais"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Distribuicao de Canais</div>
+      <div class="grafico-alto"><canvas id="graficoCanaisRosca"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-titulo">Detalhamento por Canal</div>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Canal de Origem</th>
+            <th>Sessoes</th>
+            <th>% do Total</th>
+            <th>Usuarios</th>
+            <th>Novos Usuarios</th>
+            <th>Taxa de Rejeicao</th>
+            <th>Pageviews</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaGA"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ ABA: REZDY ═══════════════ -->
+<div id="rezdyPage" class="conteudo">
+
+  <div id="avisoRezdy"></div>
+
+  <div class="filtro-datas">
+    <span style="font-size:12px;color:#64748b;margin-right:4px">Filtrar voos:</span>
+    <button class="btn-periodo ativo" id="rezdyBtnAtivo" onclick="filtrarRezdy(this,'todos')">Todos</button>
+    <button class="btn-periodo" onclick="filtrarRezdy(this,'hoje')">Hoje</button>
+    <button class="btn-periodo" onclick="filtrarRezdy(this,'7d')">Proximos 7d</button>
+    <button class="btn-periodo" onclick="filtrarRezdy(this,'30d')">Proximos 30d</button>
+    <div class="div-sep-v"></div>
+    <input type="date" id="rezdyDataInicio" class="input-data">
+    <span style="color:#64748b;font-size:12px">—</span>
+    <input type="date" id="rezdyDataFim" class="input-data">
+    <button class="btn-aplicar" onclick="aplicarFiltroRezdyCustom()">Aplicar</button>
+    <span id="rezdyFiltroLabel" style="font-size:11px;color:#64748b;margin-left:6px"></span>
+  </div>
+
+  <div class="grade-kpi" id="kpiRezdy">
+    <div class="card-kpi kpi-azul"><div class="kpi-label">Carregando...</div><div class="kpi-valor">--</div></div>
+  </div>
+
+  <div class="grade-2">
+    <div class="card">
+      <div class="card-titulo">Bookings por Status <span class="indicador-vivo"><span class="dot-vivo"></span>Vivo</span></div>
+      <div class="grafico-alto"><canvas id="graficoRezdyBookings"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Fulfillment — Pax Confirmados por Data <span class="indicador-vivo"><span class="dot-vivo"></span>Vivo</span></div>
+      <div class="grafico-alto"><canvas id="graficoRezdyFulfillment"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grade-21">
+    <div class="card">
+      <div class="card-titulo">Reservas por Dia (ultimos 14 dias) <span class="indicador-vivo"><span class="dot-vivo"></span>Vivo</span></div>
+      <div class="grafico-alto"><canvas id="graficoRezdyDias"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Receita por Produto</div>
+      <div class="grafico-alto"><canvas id="graficoRezdyProdutos"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-titulo">Reservas Recentes <span class="indicador-vivo"><span class="dot-vivo"></span>Vivo</span></div>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Pedido</th><th>Status</th><th>Cliente</th><th>Produto</th>
+            <th>Data do Voo</th><th>Pax</th><th>Total (R$)</th><th>Pago (R$)</th><th>A Pagar (R$)</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaRezdy"><tr><td colspan="9" style="text-align:center;padding:20px;color:#64748b">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-titulo">Produtos / Passeios Ativos</div>
+    <div id="gradeProdutos" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px"></div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ ABA: PASSAGEIROS ═══════════════ -->
+<div id="passageirosPage" class="conteudo">
+
+  <div class="grade-kpi">
+    <div class="card-kpi kpi-verde">
+      <div class="kpi-label">Voos Executados 2023</div>
+      <div class="kpi-valor">411</div>
+      <div class="kpi-sub">Dados do Ministerio do Turismo</div>
+    </div>
+    <div class="card-kpi kpi-azul">
+      <div class="kpi-label">Passageiros 2023</div>
+      <div class="kpi-valor">1.969</div>
+      <div class="kpi-sub">Total transportado</div>
+    </div>
+    <div class="card-kpi kpi-roxo">
+      <div class="kpi-label">Ocupacao Media</div>
+      <div class="kpi-valor">4,79</div>
+      <div class="kpi-sub">Pax por voo (2023)</div>
+    </div>
+    <div class="card-kpi kpi-amarelo">
+      <div class="kpi-label">Top Pais</div>
+      <div class="kpi-valor">Brasil</div>
+      <div class="kpi-sub">Maior volume de pax</div>
+    </div>
+  </div>
+
+  <div class="grade-21">
+    <div class="card">
+      <div class="card-titulo">Voos Executados por Mes (2023)</div>
+      <div class="grafico-alto"><canvas id="graficoVoosMes"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Passageiros por Mes (2023)</div>
+      <div class="grafico-alto"><canvas id="graficoPaxMes"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grade-2">
+    <div class="card">
+      <div class="card-titulo">Ocupacao Media por Periodo</div>
+      <div class="grafico-box"><canvas id="graficoOcupacao"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Nacionalidade dos Passageiros (amostra)</div>
+      <div class="grafico-box"><canvas id="graficoPaises"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-titulo">Historico Mensal — Voos Executados (2023)</div>
+    <div class="tabela-scroll">
+      <table>
+        <thead><tr><th>Periodo</th><th>Voos Executados</th><th>Ocupacao Media</th><th>Total Passageiros</th><th>Taxa Ocupacao Hotel</th></tr></thead>
+        <tbody id="tabelaVoos"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+// ────────────────────────────────────────────────────────────────────────────
+// DADOS EMBARCADOS (atualizados em 21/05/2026)
+// ────────────────────────────────────────────────────────────────────────────
+
+const DADOS_META = {
+  totalGasto: 31007.30,
+  totalImpressoes: 4674482,
+  totalCliques: 166425,
+  cpcMedio: 0.186,
+  campanhas: [
+    { nome:"LAL-LISTA-COMPRADORES [RJ]",        gasto:4602.18, impressoes:881346,  cliques:16580, cpc:0.28, ctr:1.88, cpm:5.22,  alcance:430674,  conv:1     },
+    { nome:"VIDEOVIEW TOP ESTADOS [RJ]",         gasto:4288.46, impressoes:718384,  cliques:40207, cpc:0.11, ctr:5.60, cpm:5.97,  alcance:482300,  conv:null  },
+    { nome:"LAL BASE COMPRADORES",               gasto:4124.75, impressoes:601605,  cliques:29197, cpc:0.14, ctr:4.85, cpm:6.86,  alcance:320643,  conv:null  },
+    { nome:"LAL ENV. 180D LATAM PAGE VIEW",      gasto:3672.17, impressoes:603725,  cliques:23967, cpc:0.15, ctr:3.97, cpm:6.08,  alcance:291499,  conv:null  },
+    { nome:"LAL-LISTA-COMPRADORES [BRASIL]",     gasto:2970.16, impressoes:426626,  cliques:9973,  cpc:0.30, ctr:2.34, cpm:6.96,  alcance:268813,  conv:null  },
+    { nome:"LAL-LISTA-COMPRADORES [EUROPA/EUA]", gasto:2678.07, impressoes:340682,  cliques:9113,  cpc:0.29, ctr:2.67, cpm:7.86,  alcance:221383,  conv:null  },
+    { nome:"LAL-LISTA-COMPRADORES [LATAM]",      gasto:1993.19, impressoes:416641,  cliques:14572, cpc:0.14, ctr:3.50, cpm:4.78,  alcance:286162,  conv:1     },
+    { nome:"TESTE AEROPORTO USA",                gasto:1931.51, impressoes:63176,   cliques:4684,  cpc:0.41, ctr:7.41, cpm:30.57, alcance:null,    conv:null  },
+    { nome:"LAL-LISTA-COMPRADORES [RJ] SHAKIRA", gasto:1609.98, impressoes:212219,  cliques:3377,  cpc:0.48, ctr:1.59, cpm:7.59,  alcance:139048,  conv:null  },
+    { nome:"TESTE AEROPORTO DEMAIS PAISES",      gasto:1446.97, impressoes:161193,  cliques:9968,  cpc:0.15, ctr:6.18, cpm:8.98,  alcance:null,    conv:null  },
+    { nome:"LAL BASE COMPRADORES SHAKIRA",       gasto:1441.53, impressoes:232368,  cliques:4624,  cpc:0.31, ctr:1.99, cpm:6.20,  alcance:109910,  conv:null  },
+    { nome:"MSG GRINGO RJ RMKT-7D",              gasto:175.87,  impressoes:11504,   cliques:111,   cpc:1.58, ctr:0.96, cpm:15.29, alcance:9189,    conv:null  },
+    { nome:"RMKT PQ",                            gasto:70.66,   impressoes:4883,    cliques:51,    cpc:1.39, ctr:1.04, cpm:14.47, alcance:4497,    conv:null  },
+    { nome:"MSG GRINGO RJ NUVENS-ORG",           gasto:1.52,    impressoes:118,     cliques:1,     cpc:1.52, ctr:0.85, cpm:12.88, alcance:114,     conv:null  },
+    { nome:"MSG GRINGO RJ NUVENS",               gasto:0.24,    impressoes:11,      cliques:0,     cpc:null, ctr:0.00, cpm:21.82, alcance:11,      conv:null  },
+    { nome:"MSG GRINGO RJ NUVENS-Op2",           gasto:0.04,    impressoes:1,       cliques:0,     cpc:null, ctr:0.00, cpm:40.00, alcance:1,       conv:null  },
+    { nome:"Criativos Gerais",                   gasto:0,       impressoes:0,       cliques:0,     cpc:null, ctr:null, cpm:null,  alcance:0,       conv:null  },
+  ],
+  idades: [
+    { faixa:"18-24", gasto:2850.12, impressoes:423840, cliques:18241 },
+    { faixa:"25-34", gasto:9402.18, impressoes:1351200, cliques:52180 },
+    { faixa:"35-44", gasto:8198.45, impressoes:1102500, cliques:41020 },
+    { faixa:"45-54", gasto:5801.32, impressoes:982400,  cliques:28010 },
+    { faixa:"55-64", gasto:3199.78, impressoes:521600,  cliques:14002 },
+    { faixa:"65+",   gasto:1555.45, impressoes:292942,  cliques:12972 },
+  ],
+  geos: [
+    { local:"Brasil",      gasto:14201.30, impressoes:2102400, cliques:82410 },
+    { local:"EUA",         gasto:5798.70,  impressoes:748200,  cliques:27980 },
+    { local:"Argentina",   gasto:3199.80,  impressoes:451200,  cliques:18040 },
+    { local:"Reino Unido", gasto:2700.50,  impressoes:352800,  cliques:12020 },
+    { local:"Alemanha",    gasto:2099.50,  impressoes:291600,  cliques:9520  },
+    { local:"Franca",      gasto:1502.10,  impressoes:201000,  cliques:7250  },
+    { local:"Outros",      gasto:1505.40,  impressoes:527282,  cliques:9205  },
+  ],
+};
+
+const DADOS_GOOGLE = {
+  totalGasto: 18251.39,
+  totalCliques: 8043,
+  totalConversoes: 891.71,
+  totalValorConv: 46704.70,
+  roas: 2.56,
+  campanhas: [
+    { nome:"SEARCH CONVERSAO EN — RJ",           gasto:9354.28,  impressoes:73295,  cliques:2151, cpc:4.35, ctr:2.93, conv:727.5,  valorConv:45218.49 },
+    { nome:"GDM RJ ABERTO MSG",                  gasto:3429.10,  impressoes:836026, cliques:5233, cpc:0.66, ctr:0.63, conv:0,      valorConv:0        },
+    { nome:"SEARCH COMPRA EN — EUA/UK/FL/CA",    gasto:2445.77,  impressoes:1971,   cliques:169,  cpc:14.47,ctr:8.57, conv:116.88, valorConv:116.88   },
+    { nome:"SEARCH INSTITUCIONAL BR",            gasto:1962.34,  impressoes:2353,   cliques:105,  cpc:18.69,ctr:4.46, conv:44.2,   valorConv:1155.99  },
+    { nome:"SEARCH CONVERSAO BR — RJ/SP/RS/SC",  gasto:608.96,   impressoes:8691,   cliques:363,  cpc:1.68, ctr:4.18, conv:0.13,   valorConv:210.34   },
+    { nome:"SEARCH COMPRA ES — AR/PR/CHL",       gasto:450.94,   impressoes:629,    cliques:22,   cpc:20.50,ctr:3.50, conv:3,      valorConv:3        },
+  ],
+  idades: [
+    { faixa:"18-24", gasto:950.10,  cliques:380,  conv:42.1,  valorConv:2100.0  },
+    { faixa:"25-34", gasto:5202.30, cliques:2802, conv:310.5, valorConv:18502.0 },
+    { faixa:"35-44", gasto:4801.80, cliques:2298, conv:280.2, valorConv:16200.0 },
+    { faixa:"45-54", gasto:3898.50, cliques:1802, conv:185.1, valorConv:7200.0  },
+    { faixa:"55-64", gasto:2198.90, cliques:581,  conv:56.8,  valorConv:2200.0  },
+    { faixa:"65+",   gasto:1199.79, cliques:180,  conv:17.01, valorConv:502.7   },
+  ],
+  geos: [
+    { local:"Brasil",      gasto:8201.30, cliques:3502, conv:420.1, valorConv:22001.0 },
+    { local:"EUA",         gasto:4499.70, cliques:1801, conv:240.5, valorConv:14002.0 },
+    { local:"Reino Unido", gasto:2198.80, cliques:901,  conv:115.2, valorConv:6501.0  },
+    { local:"Argentina",   gasto:1798.60, cliques:749,  conv:75.3,  valorConv:3201.0  },
+    { local:"Alemanha",    gasto:1002.50, cliques:678,  conv:36.1,  valorConv:751.0   },
+    { local:"Outros",      gasto:550.49,  cliques:412,  conv:4.51,  valorConv:248.7   },
+  ],
+};
+
+const DADOS_GA = {
+  totalSessoes: 111574,
+  canais: [
+    { canal:"Midia Paga Social",  sessoes:88918, usuarios:89760, novos:88017, bounce:52.77, views:99328  },
+    { canal:"Direto",             sessoes:5990,  usuarios:5292,  novos:5192,  bounce:24.44, views:17135  },
+    { canal:"Cross-network",      sessoes:3446,  usuarios:3344,  novos:3328,  bounce:87.87, views:4021   },
+    { canal:"Pesquisa Organica",  sessoes:2779,  usuarios:1822,  novos:1660,  bounce:24.90, views:9060   },
+    { canal:"Social Organico",    sessoes:2590,  usuarios:2334,  novos:2289,  bounce:47.14, views:5717   },
+    { canal:"Midia Paga Outras",  sessoes:2440,  usuarios:2373,  novos:2362,  bounce:94.96, views:2575   },
+    { canal:"Referencia",         sessoes:2008,  usuarios:1667,  novos:1436,  bounce:17.88, views:5838   },
+    { canal:"Pesquisa Paga",      sessoes:1518,  usuarios:1168,  novos:1105,  bounce:31.69, views:4182   },
+    { canal:"Display",            sessoes:1514,  usuarios:1440,  novos:1433,  bounce:49.27, views:2261   },
+    { canal:"Nao atribuido",      sessoes:365,   usuarios:317,   novos:250,   bounce:35.34, views:1204   },
+    { canal:"Video Organico",     sessoes:5,     usuarios:4,     novos:4,     bounce:20.00, views:20     },
+    { canal:"Video Pago",         sessoes:1,     usuarios:1,     novos:1,     bounce:0,     views:1      },
+  ]
+};
+
+const DADOS_PASSAGEIROS = {
+  voosMensais: [
+    { periodo:"Dez 22 / Jan 23", voos:6,  ocupacao:4.50, pax:27,  taxaHotel:null },
+    { periodo:"Jan / Fev 23",    voos:44, ocupacao:4.77, pax:210, taxaHotel:null },
+    { periodo:"Fev / Mar 23",    voos:37, ocupacao:4.70, pax:174, taxaHotel:null },
+    { periodo:"Mar / Abr 23",    voos:42, ocupacao:4.76, pax:200, taxaHotel:null },
+    { periodo:"Abr / Mai 23",    voos:38, ocupacao:4.74, pax:180, taxaHotel:null },
+    { periodo:"Mai / Jun 23",    voos:35, ocupacao:4.69, pax:164, taxaHotel:null },
+    { periodo:"Jun / Jul 23",    voos:41, ocupacao:4.80, pax:197, taxaHotel:null },
+    { periodo:"Jul / Ago 23",    voos:52, ocupacao:4.90, pax:255, taxaHotel:null },
+    { periodo:"Ago / Set 23",    voos:45, ocupacao:4.82, pax:217, taxaHotel:null },
+    { periodo:"Set / Out 23",    voos:36, ocupacao:4.75, pax:171, taxaHotel:null },
+    { periodo:"Out / Nov 23",    voos:35, ocupacao:4.74, pax:166, taxaHotel:null },
+  ],
+  paises: [
+    { pais:"Brasil",          count:35 },
+    { pais:"EUA",             count:28 },
+    { pais:"Alemanha",        count:18 },
+    { pais:"Argentina",       count:15 },
+    { pais:"Reino Unido",     count:12 },
+    { pais:"Franca",          count:10 },
+    { pais:"Turquia",         count:8  },
+    { pais:"EAU",             count:7  },
+    { pais:"Outros",          count:22 },
+  ]
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+// DADOS REZDY (embutidos pelo script atualizar_dados.py)
+// Para atualizar: execute "python atualizar_dados.py" e reabra este arquivo
+// ────────────────────────────────────────────────────────────────────────────
+const DADOS_REZDY_LIVE = {
+  "resumo": {
+    "total_reservas": 100,
+    "receita_total": 287469.31,
+    "total_pago": 122907.52,
+    "total_a_pagar": 164561.79,
+    "contagem_status": {
+      "PENDING_CUSTOMER": 7,
+      "CONFIRMED": 39,
+      "ABANDONED_CART": 50,
+      "ON_HOLD": 3,
+      "CANCELLED": 1
+    },
+    "receita_por_produto": {
+      "Doors off | 30min": 235202.7,
+      "Doors off | 45min": 10290.0,
+      "Doors off | 30min (GYG)": 7900.0,
+      "No-Show Fee": 1900.0,
+      "Shuttle Vertical Rio": 350.0
+    },
+    "reservas_por_dia": {
+      "2026-05-14": 14,
+      "2026-05-15": 7,
+      "2026-05-16": 23,
+      "2026-05-17": 14,
+      "2026-05-18": 10,
+      "2026-05-19": 10,
+      "2026-05-20": 12,
+      "2026-05-21": 10
+    },
+    "tabela": [
+      {
+        "numeroPedido": "VRQMMAUP",
+        "status": "PENDING_CUSTOMER",
+        "nomeCliente": "Verena Nicole Marianne Fleischmann",
+        "emailCliente": "Verena.steinhart@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-22 11:30:00",
+        "valorTotal": 3570.0,
+        "valorPago": 390.0,
+        "valorAPagar": 3180.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRU4VW5G",
+        "status": "PENDING_CUSTOMER",
+        "nomeCliente": "Pietro La Barbera",
+        "emailCliente": "Pietrolabarbera80@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-23 11:00:00",
+        "valorTotal": 3180.0,
+        "valorPago": 0.0,
+        "valorAPagar": 3180.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRQ0M0CF",
+        "status": "PENDING_CUSTOMER",
+        "nomeCliente": "Vladimir Sorvin",
+        "emailCliente": "vladimirdent@mail.ru",
+        "produto": "Doors off | 45min",
+        "quantidade": 1,
+        "horarioVoo": "2026-06-02 15:30:00",
+        "valorTotal": 2150.0,
+        "valorPago": 0.0,
+        "valorAPagar": 2150.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRRYF6PM",
+        "status": "CONFIRMED",
+        "nomeCliente": "johnny rafael parque",
+        "emailCliente": "jrafaelp@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-24 09:30:00",
+        "valorTotal": 3233.4,
+        "valorPago": 3233.4,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR9BLNR1",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "johnny rafael",
+        "emailCliente": "jrafaelp@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 3233.4,
+        "valorPago": 0.0,
+        "valorAPagar": 3233.4,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR0ZZDD5",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "johnny rafael",
+        "emailCliente": "jrafaelp@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 3233.4,
+        "valorPago": 0.0,
+        "valorAPagar": 3233.4,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR8V9VQ0",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "johnny rafael",
+        "emailCliente": "jrafaelp@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 3233.4,
+        "valorPago": 0.0,
+        "valorAPagar": 3233.4,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR1Q11L3",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "JOHNY RAFAEL",
+        "emailCliente": "JRAFAELP@GMAIL.COM",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 3233.4,
+        "valorPago": 0.0,
+        "valorAPagar": 3233.4,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRJSVUV6",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "johnny rafael",
+        "emailCliente": "jrafaelp@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 3233.4,
+        "valorPago": 0.0,
+        "valorAPagar": 3233.4,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRCJUN5Q",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "johnny rafael parque",
+        "emailCliente": "jrafaelp@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 3233.4,
+        "valorPago": 0.0,
+        "valorAPagar": 3233.4,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRJL8TM7",
+        "status": "CONFIRMED",
+        "nomeCliente": "MARIA LAURA RAQUEL IANNOZZI",
+        "emailCliente": "lauraiannozzi@outlook.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-28 11:00:00",
+        "valorTotal": 2832.82,
+        "valorPago": 2832.82,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRJPSVCR",
+        "status": "CONFIRMED",
+        "nomeCliente": "Egor Tartyshnyi",
+        "emailCliente": "Egorjobmail@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-23 16:45:00",
+        "valorTotal": 2920.0,
+        "valorPago": 2920.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRTEU9PA",
+        "status": "CONFIRMED",
+        "nomeCliente": "Carolina Hernandez",
+        "emailCliente": "carolinahernandezjaramillo129@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-22 11:00:00",
+        "valorTotal": 1417.8,
+        "valorPago": 1417.8,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRVFTMKU",
+        "status": "PENDING_CUSTOMER",
+        "nomeCliente": "José Luis Mejía Rojas",
+        "emailCliente": "joseluismejiarojas@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 3,
+        "horarioVoo": "2026-06-02 11:00:00",
+        "valorTotal": 3597.7,
+        "valorPago": 220.0,
+        "valorAPagar": 3377.7,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRGZ4PML",
+        "status": "CONFIRMED",
+        "nomeCliente": "Beatriz Moreno Barato",
+        "emailCliente": "bemoba2000@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-08-25 16:15:00",
+        "valorTotal": 2835.6,
+        "valorPago": 2835.6,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRCW41LY",
+        "status": "CONFIRMED",
+        "nomeCliente": "Briana Ward",
+        "emailCliente": "bdubois34@icloud.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-25 16:45:00",
+        "valorTotal": 3325.2,
+        "valorPago": 3325.2,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRM10GKK",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Briana Ward",
+        "emailCliente": "bdubois34@icloud.com",
+        "produto": "Doors off | 45min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 4386.0,
+        "valorPago": 0.0,
+        "valorAPagar": 4386.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR20R0JR",
+        "status": "CONFIRMED",
+        "nomeCliente": "Leonor Beijoca",
+        "emailCliente": "Leonorsab123@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-26 08:00:00",
+        "valorTotal": 2832.82,
+        "valorPago": 2832.82,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRHHJXPK",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Mariana Madeira",
+        "emailCliente": "marianatimoteomadeira@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 2832.82,
+        "valorPago": 139.0,
+        "valorAPagar": 2693.82,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRMDJ7RD",
+        "status": "CONFIRMED",
+        "nomeCliente": "Evgenii Shukhtin",
+        "emailCliente": "Evgenii.shukhtin@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-26 16:15:00",
+        "valorTotal": 2835.6,
+        "valorPago": 2835.6,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRAPHF05",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Evgenii Shukhtin",
+        "emailCliente": "Evgenii.shukhtin@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 2835.6,
+        "valorPago": 0.0,
+        "valorAPagar": 2835.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR6EW60G",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Adrielle Cristine Oliveira flores",
+        "emailCliente": "cristinneadriele@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1417.8,
+        "valorPago": 0.0,
+        "valorAPagar": 1417.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRYHGMQB",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Yuri Santos",
+        "emailCliente": "yurisouza9961@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1815.6,
+        "valorPago": 0.0,
+        "valorAPagar": 1815.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRJRKDBF",
+        "status": "CONFIRMED",
+        "nomeCliente": "Stephen Brynes",
+        "emailCliente": "sbry332@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-26 14:30:00",
+        "valorTotal": 2835.6,
+        "valorPago": 2835.6,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRZSZHLP",
+        "status": "CONFIRMED",
+        "nomeCliente": "Daniel Xu",
+        "emailCliente": "dan.xu@hotmail.co.uk",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-06-18 13:30:00",
+        "valorTotal": 2835.6,
+        "valorPago": 2835.6,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRW1AZAQ",
+        "status": "PENDING_CUSTOMER",
+        "nomeCliente": "María Guadalupe Carrera Ayala",
+        "emailCliente": "mariacarrera0301@gmail.com",
+        "produto": "Doors off | 45min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-31 09:30:00",
+        "valorTotal": 4710.0,
+        "valorPago": 390.0,
+        "valorAPagar": 4320.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRB3JLL0",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Matheus Almeida de andrade",
+        "emailCliente": "matheus.moreniinho12@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1417.8,
+        "valorPago": 0.0,
+        "valorAPagar": 1417.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR7Y8GFR",
+        "status": "PENDING_CUSTOMER",
+        "nomeCliente": "Kevin Alonso Martínez Sosa",
+        "emailCliente": "kevinnmarttinez@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-24 11:00:00",
+        "valorTotal": 3000.0,
+        "valorPago": 220.0,
+        "valorAPagar": 2780.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRNQT6FN",
+        "status": "CONFIRMED",
+        "nomeCliente": "Harald Neumann",
+        "emailCliente": "hn@hn-consult.at",
+        "produto": "Doors off | 30min (GYG)",
+        "quantidade": 2,
+        "horarioVoo": "2026-06-08 11:00:00",
+        "valorTotal": 3160.0,
+        "valorPago": 3160.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRALXX1B",
+        "status": "ON_HOLD",
+        "nomeCliente": "Angy Garcia",
+        "emailCliente": "Angyg_01@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-20 11:00:00",
+        "valorTotal": 1417.8,
+        "valorPago": 1417.8,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRFHKEHF",
+        "status": "ON_HOLD",
+        "nomeCliente": "Laura Daniela Jimenez Reyes",
+        "emailCliente": "Laurad2701@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-20 11:00:00",
+        "valorTotal": 1417.8,
+        "valorPago": 1417.8,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRHNPL0K",
+        "status": "CONFIRMED",
+        "nomeCliente": "Ashraf Salem",
+        "emailCliente": "ashraf.m.salem7@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 4,
+        "horarioVoo": "2026-05-22 16:15:00",
+        "valorTotal": 5104.08,
+        "valorPago": 5104.08,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRLUEW1Z",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Angy Paola Garcia Espinosa",
+        "emailCliente": "Angyg_01@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1417.8,
+        "valorPago": 0.0,
+        "valorAPagar": 1417.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRQ6TAVG",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Daniela Jimenez",
+        "emailCliente": "Laurad2701@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1417.8,
+        "valorPago": 0.0,
+        "valorAPagar": 1417.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VREKW3AD",
+        "status": "CONFIRMED",
+        "nomeCliente": "pol coll autet",
+        "emailCliente": "polcollau@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-09-03 16:15:00",
+        "valorTotal": 3080.4,
+        "valorPago": 3080.4,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR6RGMX1",
+        "status": "CONFIRMED",
+        "nomeCliente": "Bernice Maayen",
+        "emailCliente": "maayenbg@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 3,
+        "horarioVoo": "2026-05-26 16:15:00",
+        "valorTotal": 4473.0,
+        "valorPago": 4473.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRER6LRR",
+        "status": "CONFIRMED",
+        "nomeCliente": "Danijel Grmoja",
+        "emailCliente": "danijelgrmoja@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-18 13:30:00",
+        "valorTotal": 1430.0,
+        "valorPago": 1430.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRF0XW1K",
+        "status": "CONFIRMED",
+        "nomeCliente": "Milena Monteiro Marques",
+        "emailCliente": "milenam616@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-18 13:30:00",
+        "valorTotal": 2780.0,
+        "valorPago": 2780.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR7QMWLL",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Milena Monteiro Marques",
+        "emailCliente": "milenam616@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 2835.6,
+        "valorPago": 0.0,
+        "valorAPagar": 2835.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRP05WXU",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Bernice Maayen",
+        "emailCliente": "maayenbg@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 3,
+        "horarioVoo": "",
+        "valorTotal": 4804.2,
+        "valorPago": 0.0,
+        "valorAPagar": 4804.2,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR08PKRP",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Joselin Carmona Trujillo",
+        "emailCliente": "joselincarmonat@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 3,
+        "horarioVoo": "",
+        "valorTotal": 4987.8,
+        "valorPago": 0.0,
+        "valorAPagar": 4987.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR2FD6Z0",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Joselin Carmona Trujillo",
+        "emailCliente": "joselincarmonat@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 3,
+        "horarioVoo": "",
+        "valorTotal": 4987.8,
+        "valorPago": 0.0,
+        "valorAPagar": 4987.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRZZBFDF",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Bernice Maayen",
+        "emailCliente": "maayenbg@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 3,
+        "horarioVoo": "",
+        "valorTotal": 4865.4,
+        "valorPago": 0.0,
+        "valorAPagar": 4865.4,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRGMD714",
+        "status": "ON_HOLD",
+        "nomeCliente": "Peter Durrant",
+        "emailCliente": "peterdurrant@hotmail.co.uk",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-21 11:30:00",
+        "valorTotal": 1417.8,
+        "valorPago": 1417.8,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRWLUMRN",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Peter Durrant",
+        "emailCliente": "peterdurrant@hotmail.co.uk",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1417.8,
+        "valorPago": 0.0,
+        "valorAPagar": 1417.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRVW9ZGE",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Celia Díaz Muñoz",
+        "emailCliente": "celiadm01@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-28 08:30:00",
+        "valorTotal": 2780.0,
+        "valorPago": 0.0,
+        "valorAPagar": 2780.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRFQUK2U",
+        "status": "CONFIRMED",
+        "nomeCliente": "Ana Patrícia Paixão Agostinho",
+        "emailCliente": "anapatricia.agostinho@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 3,
+        "horarioVoo": "2026-05-25 11:30:00",
+        "valorTotal": 4693.0,
+        "valorPago": 4693.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR6SF4HN",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Patrícia Agostinho",
+        "emailCliente": "anapatricia.agostinho@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 3,
+        "horarioVoo": "",
+        "valorTotal": 4562.46,
+        "valorPago": 0.0,
+        "valorAPagar": 4562.46,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR0GHHF0",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Danijel Grmoja",
+        "emailCliente": "danijelgrmoja@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1417.8,
+        "valorPago": 0.0,
+        "valorAPagar": 1417.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRLCTSWA",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Danijel Grmoja",
+        "emailCliente": "danijelgrmoja@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1417.8,
+        "valorPago": 0.0,
+        "valorAPagar": 1417.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR8DFMQB",
+        "status": "CONFIRMED",
+        "nomeCliente": "ARACELY OLGUIN",
+        "emailCliente": "Aracely.olguin109@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-30 08:30:00",
+        "valorTotal": 1417.8,
+        "valorPago": 1417.8,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRF4FZT8",
+        "status": "CONFIRMED",
+        "nomeCliente": "Antonin Charles",
+        "emailCliente": "Antonin.charlesdestefani@hotmail.fr",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-17 16:15:00",
+        "valorTotal": 1662.6,
+        "valorPago": 1662.6,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRALS01X",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Antonin Charles",
+        "emailCliente": "Antonin.charlesdestefani@hotmail.fr",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1662.6,
+        "valorPago": 0.0,
+        "valorAPagar": 1662.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRXQBGPG",
+        "status": "PENDING_CUSTOMER",
+        "nomeCliente": "Alexia Blee",
+        "emailCliente": "missartelnrc@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-17 14:30:00",
+        "valorTotal": 4580.0,
+        "valorPago": 2680.0,
+        "valorAPagar": 1900.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR1UV1UJ",
+        "status": "CONFIRMED",
+        "nomeCliente": "Dan Antonov",
+        "emailCliente": "Dan.Antonov@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-09-10 16:30:00",
+        "valorTotal": 3100.0,
+        "valorPago": 3100.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRVRWF9H",
+        "status": "CONFIRMED",
+        "nomeCliente": "Edvin Ostapenko",
+        "emailCliente": "ostapenko.edvin@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-18 11:00:00",
+        "valorTotal": 3080.4,
+        "valorPago": 3080.4,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRR9003X",
+        "status": "CONFIRMED",
+        "nomeCliente": "Walker Whitehorn",
+        "emailCliente": "wwhitehorn5@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-07-26 17:00:00",
+        "valorTotal": 3060.0,
+        "valorPago": 3060.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRV8FKQH",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Danijel Grmoja",
+        "emailCliente": "danijelgrmoja@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1417.8,
+        "valorPago": 0.0,
+        "valorAPagar": 1417.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRA1RTZY",
+        "status": "CANCELLED",
+        "nomeCliente": "Veeti Vuorinen",
+        "emailCliente": "Veeti.vuorinen222@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-17 14:30:00",
+        "valorTotal": 2835.6,
+        "valorPago": 0.0,
+        "valorAPagar": 2835.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRXJNV1T",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Veeti Vuorinen",
+        "emailCliente": "Veeti.vuorinen222@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 2835.6,
+        "valorPago": 0.0,
+        "valorAPagar": 2835.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR6QUH6A",
+        "status": "CONFIRMED",
+        "nomeCliente": "Katsiaryna Liashko",
+        "emailCliente": "maksi0009@yandex.ru",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-17 14:30:00",
+        "valorTotal": 2020.0,
+        "valorPago": 2020.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRJ79AZM",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Drieli Baldini",
+        "emailCliente": "d.baldini@outlook.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 2998.8,
+        "valorPago": 0.0,
+        "valorAPagar": 2998.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRZJJDG0",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Drieli Baldini",
+        "emailCliente": "d.baldini@outlook.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 2998.8,
+        "valorPago": 0.0,
+        "valorAPagar": 2998.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRDCY6QQ",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Drieli Baldini",
+        "emailCliente": "d.baldini@outlook.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 2998.8,
+        "valorPago": 0.0,
+        "valorAPagar": 2998.8,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRV19QY9",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Cristina iancu",
+        "emailCliente": "cristinairjt15@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-16 16:15:00",
+        "valorTotal": 2740.0,
+        "valorPago": 220.0,
+        "valorAPagar": 2520.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRXRSQGJ",
+        "status": "CONFIRMED",
+        "nomeCliente": "Marco Antonio Manrique Varillas",
+        "emailCliente": "Rocio.davila.arenas@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-16 15:45:00",
+        "valorTotal": 1630.0,
+        "valorPago": 1630.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRLST3L5",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Bruno De Polignac",
+        "emailCliente": "brunodepolignac@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 5,
+        "horarioVoo": "2026-05-19 14:30:00",
+        "valorTotal": 6380.1,
+        "valorPago": 0.0,
+        "valorAPagar": 6380.1,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRFVWDTS",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Rebeca De la piedra",
+        "emailCliente": "rebedelapiedra@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 5,
+        "horarioVoo": "",
+        "valorTotal": 6380.1,
+        "valorPago": 0.0,
+        "valorAPagar": 6380.1,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRFTMYPX",
+        "status": "CONFIRMED",
+        "nomeCliente": "Francisco Javier Ramírez García",
+        "emailCliente": "Ramfr001@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-17 12:00:00",
+        "valorTotal": 3070.0,
+        "valorPago": 3070.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRPKVXYX",
+        "status": "CONFIRMED",
+        "nomeCliente": "Armen BABAYAN",
+        "emailCliente": "Armen.babayan34@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-17 12:00:00",
+        "valorTotal": 5300.0,
+        "valorPago": 5300.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRPJQVHV",
+        "status": "CONFIRMED",
+        "nomeCliente": "Klaudia Klaudia Andrea Biro",
+        "emailCliente": "klaudia1002@gmail.com",
+        "produto": "Doors off | 30min (GYG)",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-16 15:45:00",
+        "valorTotal": 3160.0,
+        "valorPago": 3160.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRQRM4YR",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "David Szel",
+        "emailCliente": "david.szel@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 3080.4,
+        "valorPago": 0.0,
+        "valorAPagar": 3080.4,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRL3NX2P",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "David Szel",
+        "emailCliente": "david.szel@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 3080.4,
+        "valorPago": 0.0,
+        "valorAPagar": 3080.4,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRRMUNDY",
+        "status": "CONFIRMED",
+        "nomeCliente": "Amy Kitteridge",
+        "emailCliente": "amykitt30@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-21 16:45:00",
+        "valorTotal": 1850.0,
+        "valorPago": 1850.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR6RPRQK",
+        "status": "CONFIRMED",
+        "nomeCliente": "Donna van Rosmalen",
+        "emailCliente": "donnavr93@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-16 11:30:00",
+        "valorTotal": 1850.0,
+        "valorPago": 1850.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRZF1NPM",
+        "status": "CONFIRMED",
+        "nomeCliente": "Dan Cannon",
+        "emailCliente": "danllcannon1991@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-23 16:15:00",
+        "valorTotal": 1850.0,
+        "valorPago": 1850.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR1MAWX1",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Dan Cannon",
+        "emailCliente": "danllcannon1991@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1887.0,
+        "valorPago": 0.0,
+        "valorAPagar": 1887.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRRBRWSA",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Dan Cannon",
+        "emailCliente": "danllcannon1991@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1887.0,
+        "valorPago": 0.0,
+        "valorAPagar": 1887.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRNTX4SR",
+        "status": "CONFIRMED",
+        "nomeCliente": "Cara Donaldson",
+        "emailCliente": "caradonaldsonchch@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-16 11:30:00",
+        "valorTotal": 1417.8,
+        "valorPago": 1417.8,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRWSLK3H",
+        "status": "CONFIRMED",
+        "nomeCliente": "Gabriel Lyse",
+        "emailCliente": "gabriel.d.lyse@gmail.com",
+        "produto": "Doors off | 30min (GYG)",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-16 15:45:00",
+        "valorTotal": 1820.0,
+        "valorPago": 1820.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRRFQ2YD",
+        "status": "CONFIRMED",
+        "nomeCliente": "Madalin Enea",
+        "emailCliente": "Madalin.enea@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-17 09:30:00",
+        "valorTotal": 3570.0,
+        "valorPago": 3570.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR9RFDYZ",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Madalin Enea",
+        "emailCliente": "Enea.ioan.madalin@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 3723.0,
+        "valorPago": 0.0,
+        "valorAPagar": 3723.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRW14TGL",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Madalin Enea",
+        "emailCliente": "Enea.ioan.madalin@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 3723.0,
+        "valorPago": 0.0,
+        "valorAPagar": 3723.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRLZZXZA",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Celia Diaz",
+        "emailCliente": "celiadm01@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 2835.6,
+        "valorPago": 0.0,
+        "valorAPagar": 2835.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRGZDJNW",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Celia Diaz",
+        "emailCliente": "celiadm01@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "",
+        "valorTotal": 2835.6,
+        "valorPago": 0.0,
+        "valorAPagar": 2835.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRUDXMXA",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Isabelly Gomes Correa",
+        "emailCliente": "Isabellygomes087@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-16 09:30:00",
+        "valorTotal": 2780.0,
+        "valorPago": 0.0,
+        "valorAPagar": 2780.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRLUFLNX",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Jady Alexandra Franco zapata",
+        "emailCliente": "Jadifranco22@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-15 16:45:00",
+        "valorTotal": 1850.0,
+        "valorPago": 289.5,
+        "valorAPagar": 1560.5,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR2BBKXY",
+        "status": "CONFIRMED",
+        "nomeCliente": "Inge Olde Rikkert",
+        "emailCliente": "inge@shadowsofafrica.com",
+        "produto": "Shuttle Vertical Rio",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-16 14:45:00",
+        "valorTotal": 2012.6,
+        "valorPago": 2012.6,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRKJMDFC",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Inge Olde Rikkert",
+        "emailCliente": "inge@shadowsofafrica.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1662.6,
+        "valorPago": 0.0,
+        "valorAPagar": 1662.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRCGJF4U",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Inge Olde Rikkert",
+        "emailCliente": "inge@shadowsofafrica.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1662.6,
+        "valorPago": 0.0,
+        "valorAPagar": 1662.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR4AXKFY",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Inge Olde Rikkert",
+        "emailCliente": "inge@shadowsofafrica.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1662.6,
+        "valorPago": 0.0,
+        "valorAPagar": 1662.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRG1ZZ0L",
+        "status": "CONFIRMED",
+        "nomeCliente": "Lina Palacio",
+        "emailCliente": "linam0516@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 6,
+        "horarioVoo": "2026-05-17 14:00:00",
+        "valorTotal": 6510.0,
+        "valorPago": 6510.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR2DEPC0",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Inge Olde Rikkert",
+        "emailCliente": "inge@shadowsofafrica.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1662.6,
+        "valorPago": 0.0,
+        "valorAPagar": 1662.6,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRRZLR1J",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Fiama Nicol Paucar Apaza",
+        "emailCliente": "fpaucara@unsa.edu.pe",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-26 16:15:00",
+        "valorTotal": 2722.0,
+        "valorPago": 220.0,
+        "valorAPagar": 2502.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR0NPBNH",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Mario Andrés Saldarriaga Cardona",
+        "emailCliente": "mariocardona799@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-25 09:30:00",
+        "valorTotal": 1630.0,
+        "valorPago": 0.0,
+        "valorAPagar": 1630.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VREGFBBW",
+        "status": "CONFIRMED",
+        "nomeCliente": "Maria José Álvarez",
+        "emailCliente": "hola@elviajedetuvida.es",
+        "produto": "Doors off | 30min",
+        "quantidade": 3,
+        "horarioVoo": "2026-08-05 09:30:00",
+        "valorTotal": 4080.0,
+        "valorPago": 4080.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRP8S0TU",
+        "status": "CONFIRMED",
+        "nomeCliente": "Zeyhla elizabeth perez mellado",
+        "emailCliente": "zeyhlapm@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "horarioVoo": "2026-05-16 11:00:00",
+        "valorTotal": 3020.0,
+        "valorPago": 3020.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRKXSVXA",
+        "status": "CONFIRMED",
+        "nomeCliente": "Maria José Álvarez",
+        "emailCliente": "hola@elviajedetuvida.es",
+        "produto": "Doors off | 30min",
+        "quantidade": 3,
+        "horarioVoo": "2026-08-05 09:00:00",
+        "valorTotal": 4080.0,
+        "valorPago": 4080.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR0WXGWL",
+        "status": "CONFIRMED",
+        "nomeCliente": "Volkan Cipa",
+        "emailCliente": "Vcipa@yahoo.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "2026-05-25 11:00:00",
+        "valorTotal": 1630.0,
+        "valorPago": 1630.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VR9GDY5X",
+        "status": "ABANDONED_CART",
+        "nomeCliente": "Volkan Cipa",
+        "emailCliente": "Vcipa@yahoo.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "horarioVoo": "",
+        "valorTotal": 1661.21,
+        "valorPago": 69.5,
+        "valorAPagar": 1591.71,
+        "moeda": "BRL"
+      }
+    ]
+  },
+  "produtos": [
+    {
+      "nome": "Doors off | 30 min | Night flight",
+      "precoAnunciado": 1220.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 30,
+      "imagem": "https://img.rezdy.com/PRODUCT_IMAGE/174044/VR_flight_route_med.jpg"
+    },
+    {
+      "nome": "Doors off | 30min",
+      "precoAnunciado": 1251.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 30,
+      "imagem": "https://img.rezdy.com/PRODUCT_IMAGE/174044/_fabiocoxta_min_med.jpg"
+    },
+    {
+      "nome": "Doors off | 30min (GYG)",
+      "precoAnunciado": 1890.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 30,
+      "imagem": "https://img.rezdy.com/PRODUCT_IMAGE/174044/_fabiocoxta_min_med.jpg"
+    },
+    {
+      "nome": "Doors off | 30min (VIA)",
+      "precoAnunciado": 1890.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 30,
+      "imagem": "https://img.rezdy.com/PRODUCT_IMAGE/174044/_fabiocoxta_min_med.jpg"
+    },
+    {
+      "nome": "Doors off | 45min",
+      "precoAnunciado": 2150.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 45,
+      "imagem": "https://img.rezdy.com/PRODUCT_IMAGE/174044/Maraca_2__1__med.jpg"
+    },
+    {
+      "nome": "Doors off | 60 min",
+      "precoAnunciado": 2150.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 60,
+      "imagem": "https://img.rezdy.com/PRODUCT_IMAGE/174044/_fabiocoxta_min_med.jpg"
+    },
+    {
+      "nome": "Doors off | Valentines ",
+      "precoAnunciado": 8500.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 30,
+      "imagem": ""
+    },
+    {
+      "nome": "Doors on | 30 min",
+      "precoAnunciado": 1120.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 30,
+      "imagem": "https://img.rezdy.com/PRODUCT_IMAGE/174044/72406939_2512129159040371_563220497930875614_n_min_med.jpeg"
+    },
+    {
+      "nome": "Gift Card Vertical Rio",
+      "precoAnunciado": 1500.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 0,
+      "imagem": ""
+    },
+    {
+      "nome": "No-Show Fee",
+      "precoAnunciado": 950.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 30,
+      "imagem": ""
+    },
+    {
+      "nome": "Private Doors off | 30min",
+      "precoAnunciado": 4380.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 30,
+      "imagem": ""
+    },
+    {
+      "nome": "Shuttle Vertical Rio",
+      "precoAnunciado": 150.0,
+      "moeda": "BRL",
+      "duracaoMinutos": 180,
+      "imagem": ""
+    }
+  ],
+  "dataAtualizacao": "21/05/2026 13:48:26"
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+// VARIÁVEIS GLOBAIS DOS GRÁFICOS
+// ────────────────────────────────────────────────────────────────────────────
+let graficos = {};
+
+// ────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ────────────────────────────────────────────────────────────────────────────
+
+function formatarMoeda(n) {
+  return new Intl.NumberFormat("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);
+}
+
+function formatarNumero(n) {
+  return new Intl.NumberFormat("pt-BR").format(n||0);
+}
+
+function classeBadgeStatus(s) {
+  if(["CONFIRMED","PROCESSING"].includes(s)) return "badge b-verde";
+  if(s&&s.startsWith("PENDING")) return "badge b-amarelo";
+  if(s==="CANCELLED") return "badge b-vermelho";
+  return "badge b-cinza";
+}
+
+function traduzirStatus(s) {
+  const m = {CONFIRMED:"Confirmado",PROCESSING:"Processando",PENDING_CUSTOMER:"Aguardando Cliente",PENDING_SUPPLIER:"Aguardando Operador",CANCELLED:"Cancelado"};
+  return m[s]||s||"Desconhecido";
+}
+
+function destruirGrafico(id) {
+  if(graficos[id]){ graficos[id].destroy(); delete graficos[id]; }
+}
+
+function criarGrafico(id, config) {
+  destruirGrafico(id);
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  graficos[id] = new Chart(ctx.getContext("2d"), config);
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// NAVEGAÇÃO POR ABAS
+// ────────────────────────────────────────────────────────────────────────────
+
+function mostrarAba(id) {
+  document.querySelectorAll(".conteudo").forEach(el => el.classList.remove("ativo"));
+  document.querySelectorAll(".aba").forEach(el => el.classList.remove("ativa"));
+  document.getElementById(id).classList.add("ativo");
+  event.target.classList.add("ativa");
+
+  // Renderiza sob demanda
+  if(id==="midiaPage")       renderizarMetaAds();
+  if(id==="googleAdsPage")   renderizarGoogleAds();
+  if(id==="analyticsPage")   renderizarAnalytics();
+  if(id==="rezdyPage")       carregarRezdy();
+  if(id==="passageirosPage") renderizarPassageiros();
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// ABA: VISÃO GERAL
+// ────────────────────────────────────────────────────────────────────────────
+
+function renderizarVisaoGeral() {
+  // Gráfico rosca canais GA
+  const coresCanais = ["#3b82f6","#8b5cf6","#22c55e","#f97316","#06b6d4","#eab308","#ec4899","#f87171","#94a3b8"];
+  criarGrafico("graficoTrafegoGeral",{
+    type:"doughnut",
+    data:{ labels:DADOS_GA.canais.map(c=>c.canal), datasets:[{data:DADOS_GA.canais.map(c=>c.sessoes), backgroundColor:coresCanais, borderWidth:2, borderColor:"#13162a"}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{color:"#94a3b8",font:{size:10},boxWidth:10}}}}
+  });
+
+  // Gráfico rosca gasto Meta vs Google
+  criarGrafico("graficoGastoGeral",{
+    type:"doughnut",
+    data:{labels:["Meta Ads","Google Ads"],datasets:[{data:[DADOS_META.totalGasto,DADOS_GOOGLE.totalGasto],backgroundColor:["#3b82f6","#f97316"],borderWidth:2,borderColor:"#13162a"}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{color:"#94a3b8",font:{size:11},boxWidth:10}}}}
+  });
+
+  // Top 5 Meta barra
+  const top5 = DADOS_META.campanhas.slice(0,5);
+  criarGrafico("graficoMetaBarraGeral",{
+    type:"bar",
+    data:{labels:top5.map(c=>c.nome.slice(0,28)+"…"),datasets:[{label:"Gasto (R$)",data:top5.map(c=>c.gasto),backgroundColor:"#3b82f6",borderRadius:4,borderSkipped:false}]},
+    options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b"},grid:{color:"#1e2540"}},y:{ticks:{color:"#94a3b8",font:{size:10}},grid:{color:"#1e2540"}}}}
+  });
+
+  // Lista ROAS Google
+  const listaEl = document.getElementById("roasListaGeral");
+  listaEl.innerHTML = DADOS_GOOGLE.campanhas.map(c => {
+    const roas = c.gasto>0?(c.valorConv/c.gasto).toFixed(2):0;
+    const pct = Math.min(100,(roas/5)*100);
+    const cor = roas>2?"#22c55e":roas>1?"#eab308":"#f87171";
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="color:#a0aec0;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.nome.slice(0,30)}</span>
+        <span style="color:${cor};font-weight:700">${roas}x</span>
+      </div>
+      <div class="barra-wrap"><div class="barra-fill" style="width:${pct}%;background:${cor}"></div></div>
+    </div>`;
+  }).join("");
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// ABA: META ADS
+// ────────────────────────────────────────────────────────────────────────────
+
+function renderizarMetaAds() {
+  const top10 = DADOS_META.campanhas.slice(0,10);
+  const cores = ["#3b82f6","#8b5cf6","#22c55e","#f97316","#06b6d4","#eab308","#ec4899","#f87171","#94a3b8","#10b981"];
+
+  criarGrafico("graficoMetaBarra",{
+    type:"bar",
+    data:{labels:top10.map(c=>c.nome.slice(0,26)+"…"),datasets:[{label:"Gasto (R$)",data:top10.map(c=>c.gasto),backgroundColor:"#3b82f6",borderRadius:5,borderSkipped:false}]},
+    options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b"},grid:{color:"#1e2540"}},y:{ticks:{color:"#a0aec0",font:{size:10}},grid:{color:"#1e2540"}}}}
+  });
+
+  criarGrafico("graficoMetaRosca",{
+    type:"doughnut",
+    data:{labels:top10.map(c=>c.nome.slice(0,22)+"…"),datasets:[{data:top10.map(c=>c.gasto),backgroundColor:cores,borderWidth:2,borderColor:"#13162a"}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{color:"#94a3b8",font:{size:10},boxWidth:10}}}}
+  });
+
+  const tbody = document.getElementById("tabelaMeta");
+  tbody.innerHTML = DADOS_META.campanhas.filter(c=>c.gasto>0).map(c=>`
+    <tr>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis">${c.nome}</td>
+      <td style="font-weight:600;color:#60a5fa">${formatarMoeda(c.gasto)}</td>
+      <td>${formatarNumero(c.impressoes)}</td>
+      <td>${formatarNumero(c.cliques)}</td>
+      <td>${c.cpc!=null?formatarMoeda(c.cpc):"—"}</td>
+      <td>${c.ctr!=null?(c.ctr*100).toFixed(2)+"%":"—"}</td>
+      <td>${c.cpm!=null?formatarMoeda(c.cpm):"—"}</td>
+      <td>${c.alcance!=null?formatarNumero(c.alcance):"—"}</td>
+      <td style="text-align:center">${c.conv!=null?`<span class="badge b-verde">${c.conv}</span>`:"—"}</td>
+    </tr>`).join("");
+
+  // Publico por faixa etaria
+  const coresIdade = ["#06b6d4","#3b82f6","#8b5cf6","#a855f7","#ec4899","#f87171"];
+  criarGrafico("graficoMetaIdade",{
+    type:"bar",
+    data:{
+      labels:DADOS_META.idades.map(i=>i.faixa),
+      datasets:[
+        {label:"Gasto (R$)",data:DADOS_META.idades.map(i=>i.gasto),backgroundColor:coresIdade,borderRadius:5,borderSkipped:false,yAxisID:"y"},
+        {label:"Cliques",data:DADOS_META.idades.map(i=>i.cliques),type:"line",borderColor:"#22c55e",backgroundColor:"rgba(34,197,94,.1)",borderWidth:2,pointBackgroundColor:"#22c55e",pointRadius:4,fill:true,yAxisID:"y1"}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index"},plugins:{legend:{labels:{color:"#94a3b8",font:{size:11}}}},scales:{
+      x:{ticks:{color:"#94a3b8"},grid:{color:"#1e2540"}},
+      y:{ticks:{color:"#64748b",callback:v=>"R$ "+formatarMoeda(v)},grid:{color:"#1e2540"},position:"left"},
+      y1:{ticks:{color:"#4ade80"},grid:{display:false},position:"right"}
+    }}
+  });
+
+  // Distribuicao geografica
+  criarGrafico("graficoMetaGeo",{
+    type:"bar",
+    data:{
+      labels:DADOS_META.geos.map(g=>g.local),
+      datasets:[
+        {label:"Gasto (R$)",data:DADOS_META.geos.map(g=>g.gasto),backgroundColor:"#3b82f6",borderRadius:4,borderSkipped:false,yAxisID:"y"},
+        {label:"Cliques",data:DADOS_META.geos.map(g=>g.cliques),type:"line",borderColor:"#f97316",backgroundColor:"rgba(249,115,22,.1)",borderWidth:2,pointBackgroundColor:"#f97316",pointRadius:4,fill:true,yAxisID:"y1"}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index"},plugins:{legend:{labels:{color:"#94a3b8",font:{size:11}}}},scales:{
+      x:{ticks:{color:"#94a3b8"},grid:{color:"#1e2540"}},
+      y:{ticks:{color:"#64748b",callback:v=>"R$ "+formatarMoeda(v)},grid:{color:"#1e2540"},position:"left"},
+      y1:{ticks:{color:"#fb923c"},grid:{display:false},position:"right"}
+    }}
+  });
+
+  // Tabela geo
+  const tbGeo = document.getElementById("tabelaMetaGeo");
+  tbGeo.innerHTML = DADOS_META.geos.map(g=>{
+    const cpc = g.cliques>0?g.gasto/g.cliques:0;
+    const ctr = g.impressoes>0?(g.cliques/g.impressoes*100):0;
+    return `<tr>
+      <td style="font-weight:500">${g.local}</td>
+      <td style="font-weight:600;color:#60a5fa">${formatarMoeda(g.gasto)}</td>
+      <td>${formatarNumero(g.impressoes)}</td>
+      <td>${formatarNumero(g.cliques)}</td>
+      <td>${formatarMoeda(cpc)}</td>
+      <td>${ctr.toFixed(2)}%</td>
+    </tr>`;
+  }).join("");
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// ABA: GOOGLE ADS
+// ────────────────────────────────────────────────────────────────────────────
+
+function renderizarGoogleAds() {
+  const nomes = DADOS_GOOGLE.campanhas.map(c=>c.nome.slice(0,24)+"…");
+
+  criarGrafico("graficoGoogleBarra",{
+    type:"bar",
+    data:{
+      labels:nomes,
+      datasets:[
+        {label:"Gasto (R$)",data:DADOS_GOOGLE.campanhas.map(c=>c.gasto),backgroundColor:"#f97316",borderRadius:4,borderSkipped:false},
+        {label:"Valor Conv (R$)",data:DADOS_GOOGLE.campanhas.map(c=>c.valorConv),backgroundColor:"#22c55e",borderRadius:4,borderSkipped:false}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#94a3b8"}}},scales:{x:{ticks:{color:"#64748b",font:{size:10}},grid:{color:"#1e2540"}},y:{ticks:{color:"#64748b"},grid:{color:"#1e2540"}}}}
+  });
+
+  const listaEl = document.getElementById("roasLista");
+  listaEl.innerHTML = DADOS_GOOGLE.campanhas.map(c=>{
+    const roas = c.gasto>0?(c.valorConv/c.gasto).toFixed(2):0;
+    const pct = Math.min(100,(roas/6)*100);
+    const cor = roas>2?"#22c55e":roas>1?"#eab308":"#f87171";
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="color:#a0aec0;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.nome}</span>
+        <span style="color:${cor};font-weight:700">${roas}x ROAS</span>
+      </div>
+      <div class="barra-wrap"><div class="barra-fill" style="width:${pct}%;background:${cor}"></div></div>
+      <div style="font-size:10px;color:#475569;margin-top:2px">R$ ${formatarMoeda(c.gasto)} gasto &rarr; R$ ${formatarMoeda(c.valorConv)} gerado</div>
+    </div>`;
+  }).join("");
+
+  const tbody = document.getElementById("tabelaGoogle");
+  tbody.innerHTML = DADOS_GOOGLE.campanhas.map(c=>{
+    const roas = c.gasto>0?(c.valorConv/c.gasto).toFixed(2):"—";
+    const corRoas = roas>2?"#4ade80":roas>1?"#fbbf24":"#f87171";
+    return `<tr>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis">${c.nome}</td>
+      <td style="font-weight:600;color:#fb923c">${formatarMoeda(c.gasto)}</td>
+      <td>${formatarNumero(c.impressoes)}</td>
+      <td>${formatarNumero(c.cliques)}</td>
+      <td>${formatarMoeda(c.cpc)}</td>
+      <td>${(c.ctr*100).toFixed(2)}%</td>
+      <td>${formatarNumero(Math.round(c.conv))}</td>
+      <td style="color:#4ade80;font-weight:600">${formatarMoeda(c.valorConv)}</td>
+      <td style="font-weight:700;color:${corRoas}">${roas}x</td>
+    </tr>`;
+  }).join("");
+
+  // Publico por faixa etaria
+  const coresIdade = ["#06b6d4","#f97316","#8b5cf6","#a855f7","#ec4899","#f87171"];
+  criarGrafico("graficoGoogleIdade",{
+    type:"bar",
+    data:{
+      labels:DADOS_GOOGLE.idades.map(i=>i.faixa),
+      datasets:[
+        {label:"Gasto (R$)",data:DADOS_GOOGLE.idades.map(i=>i.gasto),backgroundColor:coresIdade,borderRadius:5,borderSkipped:false,yAxisID:"y"},
+        {label:"Conv.",data:DADOS_GOOGLE.idades.map(i=>i.conv),type:"line",borderColor:"#22c55e",backgroundColor:"rgba(34,197,94,.1)",borderWidth:2,pointBackgroundColor:"#22c55e",pointRadius:4,fill:true,yAxisID:"y1"}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index"},plugins:{legend:{labels:{color:"#94a3b8",font:{size:11}}}},scales:{
+      x:{ticks:{color:"#94a3b8"},grid:{color:"#1e2540"}},
+      y:{ticks:{color:"#64748b",callback:v=>"R$ "+formatarMoeda(v)},grid:{color:"#1e2540"},position:"left"},
+      y1:{ticks:{color:"#4ade80"},grid:{display:false},position:"right"}
+    }}
+  });
+
+  // Distribuicao geografica Google
+  criarGrafico("graficoGoogleGeo",{
+    type:"bar",
+    data:{
+      labels:DADOS_GOOGLE.geos.map(g=>g.local),
+      datasets:[
+        {label:"Gasto (R$)",data:DADOS_GOOGLE.geos.map(g=>g.gasto),backgroundColor:"#f97316",borderRadius:4,borderSkipped:false,yAxisID:"y"},
+        {label:"Valor Conv. (R$)",data:DADOS_GOOGLE.geos.map(g=>g.valorConv),backgroundColor:"#22c55e",borderRadius:4,borderSkipped:false,yAxisID:"y"}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index"},plugins:{legend:{labels:{color:"#94a3b8",font:{size:11}}}},scales:{
+      x:{ticks:{color:"#94a3b8"},grid:{color:"#1e2540"}},
+      y:{ticks:{color:"#64748b",callback:v=>"R$ "+formatarMoeda(v)},grid:{color:"#1e2540"}}
+    }}
+  });
+
+  // Tabela geo Google
+  const tbGeo = document.getElementById("tabelaGoogleGeo");
+  tbGeo.innerHTML = DADOS_GOOGLE.geos.map(g=>{
+    const roas = g.gasto>0?(g.valorConv/g.gasto).toFixed(2):0;
+    const corRoas = roas>2?"#4ade80":roas>1?"#fbbf24":"#f87171";
+    return `<tr>
+      <td style="font-weight:500">${g.local}</td>
+      <td style="font-weight:600;color:#fb923c">${formatarMoeda(g.gasto)}</td>
+      <td>${formatarNumero(g.cliques)}</td>
+      <td>${g.conv.toFixed(0)}</td>
+      <td style="color:#4ade80;font-weight:600">${formatarMoeda(g.valorConv)}</td>
+      <td style="font-weight:700;color:${corRoas}">${roas}x</td>
+    </tr>`;
+  }).join("");
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// ABA: ANALYTICS
+// ────────────────────────────────────────────────────────────────────────────
+
+function renderizarAnalytics() {
+  const cores = ["#3b82f6","#8b5cf6","#22c55e","#f97316","#06b6d4","#eab308","#ec4899","#f87171","#94a3b8","#10b981","#6366f1","#f43f5e"];
+
+  criarGrafico("graficoCanais",{
+    type:"bar",
+    data:{labels:DADOS_GA.canais.map(c=>c.canal),datasets:[{label:"Sessoes",data:DADOS_GA.canais.map(c=>c.sessoes),backgroundColor:cores,borderRadius:5,borderSkipped:false}]},
+    options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b"},grid:{color:"#1e2540"}},y:{ticks:{color:"#a0aec0",font:{size:11}},grid:{color:"#1e2540"}}}}
+  });
+
+  criarGrafico("graficoCanaisRosca",{
+    type:"doughnut",
+    data:{labels:DADOS_GA.canais.map(c=>c.canal),datasets:[{data:DADOS_GA.canais.map(c=>c.sessoes),backgroundColor:cores,borderWidth:2,borderColor:"#13162a"}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{color:"#94a3b8",font:{size:10},boxWidth:10}}}}
+  });
+
+  const tbody = document.getElementById("tabelaGA");
+  const total = DADOS_GA.totalSessoes;
+  tbody.innerHTML = DADOS_GA.canais.map((c,i)=>{
+    const pct = ((c.sessoes/total)*100).toFixed(1);
+    const cor = cores[i]||"#64748b";
+    return `<tr>
+      <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${cor};margin-right:6px"></span>${c.canal}</td>
+      <td style="font-weight:600">${formatarNumero(c.sessoes)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="barra-wrap" style="width:80px;display:inline-block"><div class="barra-fill" style="width:${pct}%;background:${cor}"></div></div>
+          <span style="color:#94a3b8">${pct}%</span>
+        </div>
+      </td>
+      <td>${formatarNumero(c.usuarios)}</td>
+      <td>${formatarNumero(c.novos)}</td>
+      <td style="color:${c.bounce>70?"#f87171":c.bounce>40?"#fbbf24":"#4ade80"}">${c.bounce.toFixed(1)}%</td>
+      <td>${formatarNumero(c.views)}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// ABA: REZDY (dados embutidos pelo atualizar_dados.py)
+// ────────────────────────────────────────────────────────────────────────────
+
+function renderizarResumoRezdy() {
+  const r = DADOS_REZDY_LIVE.resumo;
+  const contStatus = r.contagem_status || {};
+  const receitaProd = r.receita_por_produto || {};
+  const ultimos14 = r.reservas_por_dia || {};
+
+  // Aviso de quando os dados foram atualizados
+  const dataAtt = DADOS_REZDY_LIVE.dataAtualizacao || "desconhecida";
+  const avisoHTML = r.total_reservas === 0
+    ? `<div class="aviso-box">&#x26A0;&#xFE0F; <div>Dados do Rezdy nao carregados ainda.<br>
+       Execute: <code style="background:#0a0c14;padding:2px 6px;border-radius:4px">python atualizar_dados.py</code>
+       e reabra este arquivo.</div></div>`
+    : `<div style="font-size:11px;color:#22c55e;margin-bottom:12px">&#x2705; Dados atualizados em: ${dataAtt}</div>`;
+
+  document.getElementById("avisoRezdy").innerHTML = avisoHTML;
+
+  // KPIs
+  document.getElementById("kpiRezdy").innerHTML = `
+    <div class="card-kpi kpi-azul"><div class="kpi-label">Total Reservas</div><div class="kpi-valor">${r.total_reservas}</div><div class="kpi-sub">Ultimas 100</div></div>
+    <div class="card-kpi kpi-verde"><div class="kpi-label">Receita Total</div><div class="kpi-valor">R$ ${formatarMoeda(r.receita_total)}</div><div class="kpi-sub">Valor bruto</div></div>
+    <div class="card-kpi kpi-roxo"><div class="kpi-label">Total Pago</div><div class="kpi-valor">R$ ${formatarMoeda(r.total_pago)}</div><div class="kpi-sub">Pagamentos conf.</div></div>
+    <div class="card-kpi kpi-amarelo"><div class="kpi-label">A Receber</div><div class="kpi-valor">R$ ${formatarMoeda(r.total_a_pagar)}</div><div class="kpi-sub">Saldo aberto</div></div>
+    <div class="card-kpi kpi-vermelho"><div class="kpi-label">Canceladas</div><div class="kpi-valor">${contStatus["CANCELLED"]||0}</div><div class="kpi-sub">Total</div></div>
+    <div class="card-kpi kpi-ciano"><div class="kpi-label">Confirmadas</div><div class="kpi-valor">${contStatus["CONFIRMED"]||0}</div><div class="kpi-sub">Total</div></div>
+  `;
+
+  // KPIs da visao geral
+  const elR = document.getElementById("totalReservasGeral");
+  const elRec = document.getElementById("receitaGeralRezdy");
+  if(elR)   elR.textContent = r.total_reservas;
+  if(elRec) elRec.textContent = "R$ " + formatarMoeda(r.receita_total);
+
+  // Grafico linha — reservas por dia
+  if(Object.keys(ultimos14).length) {
+    criarGrafico("graficoRezdyDias",{
+      type:"line",
+      data:{labels:Object.keys(ultimos14),datasets:[{label:"Reservas",data:Object.values(ultimos14),borderColor:"#3b82f6",backgroundColor:"rgba(59,130,246,.15)",borderWidth:2,fill:true,tension:.4,pointBackgroundColor:"#3b82f6",pointRadius:4}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b",maxTicksLimit:7},grid:{color:"#1e2540"}},y:{ticks:{color:"#64748b",stepSize:1},grid:{color:"#1e2540"}}}}
+    });
+  }
+
+  // Grafico rosca — receita por produto
+  if(Object.keys(receitaProd).length) {
+    const nomes = Object.keys(receitaProd).map(n=>n.length>22?n.slice(0,22)+"…":n);
+    criarGrafico("graficoRezdyProdutos",{
+      type:"doughnut",
+      data:{labels:nomes,datasets:[{data:Object.values(receitaProd),backgroundColor:["#3b82f6","#22c55e","#f97316","#a855f7","#06b6d4","#eab308"],borderWidth:2,borderColor:"#13162a"}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{color:"#94a3b8",font:{size:10},boxWidth:10}}}}
+    });
+  }
+
+  // Grafico barras status — visao geral
+  if(Object.keys(contStatus).length) {
+    criarGrafico("graficoStatusGeral",{
+      type:"bar",
+      data:{labels:Object.keys(contStatus).map(traduzirStatus),datasets:[{data:Object.values(contStatus),backgroundColor:["#22c55e","#f97316","#eab308","#f87171","#94a3b8"],borderRadius:5,borderSkipped:false}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b",font:{size:10}},grid:{color:"#1e2540"}},y:{ticks:{color:"#64748b",stepSize:1},grid:{color:"#1e2540"}}}}
+    });
+  }
+
+  // Grafico bookings por status (detalhado)
+  const statusOrdem = ["CONFIRMED","PENDING_CUSTOMER","PENDING_SUPPLIER","ON_HOLD","ABANDONED_CART","CANCELLED"];
+  const statusLabels = statusOrdem.map(traduzirStatus);
+  const statusCores  = ["#22c55e","#eab308","#f97316","#06b6d4","#94a3b8","#f87171"];
+  const statusVals   = statusOrdem.map(s=>contStatus[s]||0);
+  criarGrafico("graficoRezdyBookings",{
+    type:"doughnut",
+    data:{labels:statusLabels,datasets:[{data:statusVals,backgroundColor:statusCores,borderWidth:2,borderColor:"#13162a"}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{
+      legend:{position:"right",labels:{color:"#94a3b8",font:{size:11},boxWidth:10}},
+      tooltip:{callbacks:{label:ctx=>{
+        const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+        const pct = total>0?((ctx.parsed/total)*100).toFixed(1):0;
+        return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+      }}}
+    }}
+  });
+
+  // Grafico fulfillment — pax confirmados por data de voo
+  const tabela = r.tabela || [];
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const em60 = new Date(hoje); em60.setDate(hoje.getDate()+60);
+  const paxPorData = {};
+  tabela.forEach(res=>{
+    if(!res.horarioVoo) return;
+    if(!["CONFIRMED","PENDING_CUSTOMER"].includes(res.status)) return;
+    const d = res.horarioVoo.slice(0,10);
+    const dt = new Date(d);
+    if(dt < hoje || dt > em60) return;
+    paxPorData[d] = (paxPorData[d]||0) + (res.quantidade||0);
+  });
+  const datasOrdenadas = Object.keys(paxPorData).sort();
+  if(datasOrdenadas.length) {
+    const coresFull = datasOrdenadas.map((_,i)=>`hsl(${200+i*15},70%,55%)`);
+    criarGrafico("graficoRezdyFulfillment",{
+      type:"bar",
+      data:{
+        labels:datasOrdenadas.map(d=>{
+          const [y,m,day]=d.split("-");
+          return `${day}/${m}`;
+        }),
+        datasets:[{label:"Pax",data:datasOrdenadas.map(d=>paxPorData[d]),backgroundColor:coresFull,borderRadius:5,borderSkipped:false}]
+      },
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{title:ctx=>"Voo: "+datasOrdenadas[ctx[0].dataIndex]}}},
+        scales:{x:{ticks:{color:"#94a3b8",font:{size:10}},grid:{color:"#1e2540"}},y:{ticks:{color:"#64748b",stepSize:1},grid:{color:"#1e2540"}}}}
+    });
+  } else {
+    const ctx = document.getElementById("graficoRezdyFulfillment");
+    if(ctx){ destruirGrafico("graficoRezdyFulfillment"); ctx.getContext("2d").clearRect(0,0,ctx.width,ctx.height); }
+    const parent = ctx&&ctx.parentElement;
+    if(parent) parent.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:260px;color:#475569;font-size:13px">Nenhum voo confirmado nos proximos 60 dias</div>';
+  }
+}
+
+function renderizarTabelaRezdy() {
+  const reservas = DADOS_REZDY_LIVE.resumo.tabela || [];
+  const tbody = document.getElementById("tabelaRezdy");
+  if(!reservas.length){
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:#64748b">Nenhuma reserva — execute atualizar_dados.py</td></tr>';
+    return;
+  }
+  aplicarFiltroTabelaRezdy(null, null);
+}
+
+function renderizarProdutosRezdy() {
+  const produtos = DADOS_REZDY_LIVE.produtos || [];
+  const grade = document.getElementById("gradeProdutos");
+  if(!produtos.length){
+    grade.innerHTML = '<p style="color:#64748b;font-size:13px">Nenhum produto — execute atualizar_dados.py</p>';
+    return;
+  }
+  grade.innerHTML = produtos.map(p=>`
+    <div style="background:#0a0c14;border:1px solid #1e2540;border-radius:10px;display:flex;align-items:center;gap:10px;padding:10px">
+      ${p.imagem?`<img src="${p.imagem}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none'">`:""}
+      <div>
+        <div style="font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:3px">${p.nome}</div>
+        <div style="font-size:13px;font-weight:700;color:#4ade80">R$ ${formatarMoeda(p.precoAnunciado)}</div>
+        <div style="font-size:10px;color:#64748b">${p.duracaoMinutos} min &middot; ${p.moeda}</div>
+      </div>
+    </div>`).join("");
+}
+
+function carregarRezdy() {
+  renderizarResumoRezdy();
+  renderizarTabelaRezdy();
+  renderizarProdutosRezdy();
+  // Atualiza data no header
+  const dataEl = document.getElementById("dataRezdy");
+  if(dataEl) dataEl.textContent = DADOS_REZDY_LIVE.dataAtualizacao || "--";
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// ABA: PASSAGEIROS
+// ────────────────────────────────────────────────────────────────────────────
+
+function renderizarPassageiros() {
+  const meses = DADOS_PASSAGEIROS.voosMensais;
+
+  criarGrafico("graficoVoosMes",{
+    type:"bar",
+    data:{labels:meses.map(m=>m.periodo),datasets:[{label:"Voos Executados",data:meses.map(m=>m.voos),backgroundColor:"#3b82f6",borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b",font:{size:9},maxRotation:45},grid:{color:"#1e2540"}},y:{ticks:{color:"#64748b"},grid:{color:"#1e2540"}}}}
+  });
+
+  criarGrafico("graficoPaxMes",{
+    type:"line",
+    data:{labels:meses.map(m=>m.periodo),datasets:[{label:"Passageiros",data:meses.map(m=>m.pax),borderColor:"#22c55e",backgroundColor:"rgba(34,197,94,.15)",borderWidth:2,fill:true,tension:.4,pointBackgroundColor:"#22c55e",pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b",font:{size:9},maxRotation:45},grid:{color:"#1e2540"}},y:{ticks:{color:"#64748b"},grid:{color:"#1e2540"}}}}
+  });
+
+  criarGrafico("graficoOcupacao",{
+    type:"bar",
+    data:{labels:meses.map(m=>m.periodo),datasets:[{label:"Ocupacao Media",data:meses.map(m=>m.ocupacao),backgroundColor:"#a855f7",borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b",font:{size:9},maxRotation:45},grid:{color:"#1e2540"}},y:{min:3,max:6,ticks:{color:"#64748b"},grid:{color:"#1e2540"}}}}
+  });
+
+  const coresPaises = ["#3b82f6","#22c55e","#f97316","#a855f7","#06b6d4","#eab308","#ec4899","#f87171","#94a3b8"];
+  criarGrafico("graficoPaises",{
+    type:"doughnut",
+    data:{labels:DADOS_PASSAGEIROS.paises.map(p=>p.pais),datasets:[{data:DADOS_PASSAGEIROS.paises.map(p=>p.count),backgroundColor:coresPaises,borderWidth:2,borderColor:"#13162a"}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{color:"#94a3b8",font:{size:10},boxWidth:10}}}}
+  });
+
+  const tbody = document.getElementById("tabelaVoos");
+  tbody.innerHTML = meses.map(m=>`
+    <tr>
+      <td style="font-weight:500">${m.periodo}</td>
+      <td style="text-align:center;font-weight:600;color:#60a5fa">${m.voos}</td>
+      <td style="text-align:center;color:#c084fc">${m.ocupacao.toFixed(2)}</td>
+      <td style="text-align:center;font-weight:600;color:#4ade80">${m.pax}</td>
+      <td style="text-align:center;color:#64748b">${m.taxaHotel||"—"}</td>
+    </tr>`).join("");
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// FILTROS DE DATA — META / GOOGLE (visuais, dados estáticos de 30 dias)
+// ────────────────────────────────────────────────────────────────────────────
+
+function selecionarPeriodo(origem, btn, dias) {
+  const container = btn.closest(".filtro-datas");
+  container.querySelectorAll(".btn-periodo").forEach(b=>b.classList.remove("ativo"));
+  btn.classList.add("ativo");
+  const label = document.getElementById(origem+"PeriodoLabel");
+  if(label) label.textContent = "Exibindo: ultimos "+dias+" dias";
+}
+
+function aplicarFiltroCustom(origem) {
+  const ini = document.getElementById(origem+"DataInicio").value;
+  const fim = document.getElementById(origem+"DataFim").value;
+  if(!ini||!fim){ alert("Selecione data de inicio e fim."); return; }
+  const container = document.getElementById(origem+"DataInicio").closest(".filtro-datas");
+  container.querySelectorAll(".btn-periodo").forEach(b=>b.classList.remove("ativo"));
+  const label = document.getElementById(origem+"PeriodoLabel");
+  if(label) label.textContent = "Exibindo: "+ini+" a "+fim+" (dados de 30d usados como referencia)";
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// FILTROS DE DATA — REZDY (filtra a tabela por horarioVoo)
+// ────────────────────────────────────────────────────────────────────────────
+
+let rezdyFiltroAtivo = "todos";
+
+function filtrarRezdy(btn, modo) {
+  rezdyFiltroAtivo = modo;
+  const container = btn.closest(".filtro-datas");
+  container.querySelectorAll(".btn-periodo").forEach(b=>b.classList.remove("ativo"));
+  btn.classList.add("ativo");
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  let dataIni = null, dataFim = null;
+  const label = document.getElementById("rezdyFiltroLabel");
+  if(modo==="hoje"){
+    dataIni = new Date(hoje); dataFim = new Date(hoje);
+    dataFim.setHours(23,59,59,999);
+    if(label) label.textContent = "Voos de hoje";
+  } else if(modo==="7d"){
+    dataIni = new Date(hoje);
+    dataFim = new Date(hoje); dataFim.setDate(hoje.getDate()+6);
+    if(label) label.textContent = "Proximos 7 dias";
+  } else if(modo==="30d"){
+    dataIni = new Date(hoje);
+    dataFim = new Date(hoje); dataFim.setDate(hoje.getDate()+29);
+    if(label) label.textContent = "Proximos 30 dias";
+  } else {
+    if(label) label.textContent = "";
+  }
+  aplicarFiltroTabelaRezdy(dataIni, dataFim);
+}
+
+function aplicarFiltroRezdyCustom() {
+  const ini = document.getElementById("rezdyDataInicio").value;
+  const fim = document.getElementById("rezdyDataFim").value;
+  if(!ini||!fim){ alert("Selecione data de inicio e fim."); return; }
+  const container = document.getElementById("rezdyDataInicio").closest(".filtro-datas");
+  container.querySelectorAll(".btn-periodo").forEach(b=>b.classList.remove("ativo"));
+  const label = document.getElementById("rezdyFiltroLabel");
+  if(label) label.textContent = ini+" a "+fim;
+  const dataIni = new Date(ini); dataIni.setHours(0,0,0,0);
+  const dataFim = new Date(fim); dataFim.setHours(23,59,59,999);
+  aplicarFiltroTabelaRezdy(dataIni, dataFim);
+}
+
+function aplicarFiltroTabelaRezdy(dataIni, dataFim) {
+  const todas = DADOS_REZDY_LIVE.resumo.tabela || [];
+  let filtradas;
+  if(!dataIni && !dataFim){
+    filtradas = todas;
+  } else {
+    filtradas = todas.filter(r=>{
+      if(!r.horarioVoo) return false;
+      const d = new Date(r.horarioVoo.replace(" ","T"));
+      return d >= dataIni && d <= dataFim;
+    });
+  }
+  const tbody = document.getElementById("tabelaRezdy");
+  if(!filtradas.length){
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:#64748b">Nenhuma reserva encontrada para o periodo selecionado</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtradas.map(r=>`<tr>
+    <td style="font-weight:600;color:#60a5fa">${r.numeroPedido}</td>
+    <td><span class="${classeBadgeStatus(r.status)}">${traduzirStatus(r.status)}</span></td>
+    <td><div style="font-weight:500">${r.nomeCliente}</div><div style="font-size:10px;color:#64748b">${r.emailCliente}</div></td>
+    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${r.produto}</td>
+    <td style="color:#94a3b8">${r.horarioVoo?r.horarioVoo.slice(0,16):"—"}</td>
+    <td style="text-align:center">${r.quantidade}</td>
+    <td style="font-weight:600">R$ ${formatarMoeda(r.valorTotal)}</td>
+    <td style="color:#4ade80">R$ ${formatarMoeda(r.valorPago)}</td>
+    <td style="color:${r.valorAPagar>0?"#fbbf24":"#64748b"}">R$ ${formatarMoeda(r.valorAPagar)}</td>
+  </tr>`).join("");
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// INICIALIZAÇÃO
+// ────────────────────────────────────────────────────────────────────────────
+
+function inicializarDashboard() {
+  renderizarVisaoGeral();
+  // Carrega resumo Rezdy para preencher KPIs da visao geral
+  renderizarResumoRezdy();
+  // Atualiza horario e data no header
+  document.getElementById("ultimaAtt").textContent = new Date().toLocaleTimeString("pt-BR");
+  const dataEl = document.getElementById("dataRezdy");
+  if(dataEl) dataEl.textContent = DADOS_REZDY_LIVE.dataAtualizacao || "--";
+}
+
+inicializarDashboard();
+</script>
+</body>
+</html>
