@@ -640,46 +640,303 @@
 // ────────────────────────────────────────────────────────────────────────────
 
 const DADOS_META = {
-  totalGasto: 31007.30,
-  totalImpressoes: 4674482,
-  totalCliques: 166425,
-  cpcMedio: 0.186,
-  campanhas: [
-    { nome:"LAL-LISTA-COMPRADORES [RJ]",        gasto:4602.18, impressoes:881346,  cliques:16580, cpc:0.28, ctr:1.88, cpm:5.22,  alcance:430674,  conv:1     },
-    { nome:"VIDEOVIEW TOP ESTADOS [RJ]",         gasto:4288.46, impressoes:718384,  cliques:40207, cpc:0.11, ctr:5.60, cpm:5.97,  alcance:482300,  conv:null  },
-    { nome:"LAL BASE COMPRADORES",               gasto:4124.75, impressoes:601605,  cliques:29197, cpc:0.14, ctr:4.85, cpm:6.86,  alcance:320643,  conv:null  },
-    { nome:"LAL ENV. 180D LATAM PAGE VIEW",      gasto:3672.17, impressoes:603725,  cliques:23967, cpc:0.15, ctr:3.97, cpm:6.08,  alcance:291499,  conv:null  },
-    { nome:"LAL-LISTA-COMPRADORES [BRASIL]",     gasto:2970.16, impressoes:426626,  cliques:9973,  cpc:0.30, ctr:2.34, cpm:6.96,  alcance:268813,  conv:null  },
-    { nome:"LAL-LISTA-COMPRADORES [EUROPA/EUA]", gasto:2678.07, impressoes:340682,  cliques:9113,  cpc:0.29, ctr:2.67, cpm:7.86,  alcance:221383,  conv:null  },
-    { nome:"LAL-LISTA-COMPRADORES [LATAM]",      gasto:1993.19, impressoes:416641,  cliques:14572, cpc:0.14, ctr:3.50, cpm:4.78,  alcance:286162,  conv:1     },
-    { nome:"TESTE AEROPORTO USA",                gasto:1931.51, impressoes:63176,   cliques:4684,  cpc:0.41, ctr:7.41, cpm:30.57, alcance:null,    conv:null  },
-    { nome:"LAL-LISTA-COMPRADORES [RJ] SHAKIRA", gasto:1609.98, impressoes:212219,  cliques:3377,  cpc:0.48, ctr:1.59, cpm:7.59,  alcance:139048,  conv:null  },
-    { nome:"TESTE AEROPORTO DEMAIS PAISES",      gasto:1446.97, impressoes:161193,  cliques:9968,  cpc:0.15, ctr:6.18, cpm:8.98,  alcance:null,    conv:null  },
-    { nome:"LAL BASE COMPRADORES SHAKIRA",       gasto:1441.53, impressoes:232368,  cliques:4624,  cpc:0.31, ctr:1.99, cpm:6.20,  alcance:109910,  conv:null  },
-    { nome:"MSG GRINGO RJ RMKT-7D",              gasto:175.87,  impressoes:11504,   cliques:111,   cpc:1.58, ctr:0.96, cpm:15.29, alcance:9189,    conv:null  },
-    { nome:"RMKT PQ",                            gasto:70.66,   impressoes:4883,    cliques:51,    cpc:1.39, ctr:1.04, cpm:14.47, alcance:4497,    conv:null  },
-    { nome:"MSG GRINGO RJ NUVENS-ORG",           gasto:1.52,    impressoes:118,     cliques:1,     cpc:1.52, ctr:0.85, cpm:12.88, alcance:114,     conv:null  },
-    { nome:"MSG GRINGO RJ NUVENS",               gasto:0.24,    impressoes:11,      cliques:0,     cpc:null, ctr:0.00, cpm:21.82, alcance:11,      conv:null  },
-    { nome:"MSG GRINGO RJ NUVENS-Op2",           gasto:0.04,    impressoes:1,       cliques:0,     cpc:null, ctr:0.00, cpm:40.00, alcance:1,       conv:null  },
-    { nome:"Criativos Gerais",                   gasto:0,       impressoes:0,       cliques:0,     cpc:null, ctr:null, cpm:null,  alcance:0,       conv:null  },
+  "totalGasto": 31007.3,
+  "totalImpressoes": 4674482,
+  "totalCliques": 166425,
+  "cpcMedio": 0.186,
+  "campanhas": [
+    {
+      "nome": "🟢[LAL-LISTA-COMPRADORES][RJ]",
+      "gasto": 4602.18,
+      "impressoes": 881346,
+      "cliques": 16580,
+      "cpc": 0.28,
+      "ctr": 1.88,
+      "cpm": 5.22,
+      "alcance": 430674,
+      "conv": 1.0
+    },
+    {
+      "nome": "[VIDEOVIEW] [TOP ESTADOS] [RJ]",
+      "gasto": 4288.46,
+      "impressoes": 718384,
+      "cliques": 40207,
+      "cpc": 0.11,
+      "ctr": 5.6,
+      "cpm": 5.97,
+      "alcance": 482300,
+      "conv": null
+    },
+    {
+      "nome": "[LAL] [BASE COMPRADORES]",
+      "gasto": 4124.75,
+      "impressoes": 601605,
+      "cliques": 29197,
+      "cpc": 0.14,
+      "ctr": 4.85,
+      "cpm": 6.86,
+      "alcance": 320643,
+      "conv": null
+    },
+    {
+      "nome": "[LAL ENVOLVIMENTO 180D] [LATAM] [PAGE VIEW]",
+      "gasto": 3672.17,
+      "impressoes": 603725,
+      "cliques": 23967,
+      "cpc": 0.15,
+      "ctr": 3.97,
+      "cpm": 6.08,
+      "alcance": 291499,
+      "conv": null
+    },
+    {
+      "nome": "🟢[LAL-LISTA-COMPRADORES][BRASIL]",
+      "gasto": 2970.16,
+      "impressoes": 426626,
+      "cliques": 9973,
+      "cpc": 0.3,
+      "ctr": 2.34,
+      "cpm": 6.96,
+      "alcance": 268813,
+      "conv": null
+    },
+    {
+      "nome": "🟢[LAL-LISTA-COMPRADORES][EUROPA/EUA]",
+      "gasto": 2678.07,
+      "impressoes": 340682,
+      "cliques": 9113,
+      "cpc": 0.29,
+      "ctr": 2.67,
+      "cpm": 7.86,
+      "alcance": 221383,
+      "conv": null
+    },
+    {
+      "nome": "[LAL-LISTA-COMPRADORES][LATAM]",
+      "gasto": 1993.19,
+      "impressoes": 416641,
+      "cliques": 14572,
+      "cpc": 0.14,
+      "ctr": 3.5,
+      "cpm": 4.78,
+      "alcance": 286162,
+      "conv": 1.0
+    },
+    {
+      "nome": "🟢[LAL-LISTA-COMPRADORES][RJ] [SHAKIRA]",
+      "gasto": 1609.98,
+      "impressoes": 212219,
+      "cliques": 3377,
+      "cpc": 0.48,
+      "ctr": 1.59,
+      "cpm": 7.59,
+      "alcance": 139048,
+      "conv": null
+    },
+    {
+      "nome": "[TESTE] [AEROPORTO USA] [LAL BASE COMPRADORES]",
+      "gasto": 1457.28,
+      "impressoes": 53339,
+      "cliques": 4194,
+      "cpc": 0.35,
+      "ctr": 7.86,
+      "cpm": 27.32,
+      "alcance": 40855,
+      "conv": null
+    },
+    {
+      "nome": "[TESTE] [AEROPORTO DEMAIS PAISES] [LAL BASE COMPRADORES]",
+      "gasto": 1445.25,
+      "impressoes": 161023,
+      "cliques": 9958,
+      "cpc": 0.15,
+      "ctr": 6.18,
+      "cpm": 8.98,
+      "alcance": 108612,
+      "conv": null
+    },
+    {
+      "nome": "[LAL] [BASE COMPRADORES] [SHAKIRA]",
+      "gasto": 1441.53,
+      "impressoes": 232368,
+      "cliques": 4624,
+      "cpc": 0.31,
+      "ctr": 1.99,
+      "cpm": 6.2,
+      "alcance": 109910,
+      "conv": null
+    },
+    {
+      "nome": "[TESTE] [AEROPORTO USA] [LAL BASE COMPRADORES]",
+      "gasto": 474.23,
+      "impressoes": 9837,
+      "cliques": 490,
+      "cpc": 0.97,
+      "ctr": 4.98,
+      "cpm": 48.21,
+      "alcance": 7711,
+      "conv": null
+    },
+    {
+      "nome": "[MSG][GRINGO][RJ][RMKT-7D]",
+      "gasto": 175.87,
+      "impressoes": 11504,
+      "cliques": 111,
+      "cpc": 1.58,
+      "ctr": 0.96,
+      "cpm": 15.29,
+      "alcance": 9189,
+      "conv": null
+    },
+    {
+      "nome": "[RMKT][PQ]",
+      "gasto": 70.66,
+      "impressoes": 4883,
+      "cliques": 51,
+      "cpc": 1.39,
+      "ctr": 1.04,
+      "cpm": 14.47,
+      "alcance": 4497,
+      "conv": null
+    },
+    {
+      "nome": "[TESTE] [AEROPORTO DEMAIS PAISES] [LAL BASE COMPRADORES]",
+      "gasto": 1.72,
+      "impressoes": 170,
+      "cliques": 10,
+      "cpc": 0.17,
+      "ctr": 5.88,
+      "cpm": 10.12,
+      "alcance": 167,
+      "conv": null
+    },
+    {
+      "nome": "[MSG][GRINGO][RJ][NUVENS-ORG]",
+      "gasto": 1.52,
+      "impressoes": 118,
+      "cliques": 1,
+      "cpc": 1.52,
+      "ctr": 0.85,
+      "cpm": 12.88,
+      "alcance": 114,
+      "conv": null
+    },
+    {
+      "nome": "[MSG][GRINGO][RJ][NUVENS]",
+      "gasto": 0.24,
+      "impressoes": 11,
+      "cliques": 0,
+      "cpc": null,
+      "ctr": 0.0,
+      "cpm": 21.82,
+      "alcance": 11,
+      "conv": null
+    },
+    {
+      "nome": "[MSG][GRINGO][RJ][NUVENS-Op2]",
+      "gasto": 0.04,
+      "impressoes": 1,
+      "cliques": 0,
+      "cpc": null,
+      "ctr": 0.0,
+      "cpm": 40.0,
+      "alcance": 1,
+      "conv": null
+    },
+    {
+      "nome": "[MSG][GRINGO][RJ][NUVENS-ORG] [Criativos Gerais]",
+      "gasto": 0.0,
+      "impressoes": 0,
+      "cliques": 0,
+      "cpc": null,
+      "ctr": 0.0,
+      "cpm": null,
+      "alcance": 0,
+      "conv": null
+    }
   ],
-  idades: [
-    { faixa:"18-24", gasto:2850.12, impressoes:423840, cliques:18241 },
-    { faixa:"25-34", gasto:9402.18, impressoes:1351200, cliques:52180 },
-    { faixa:"35-44", gasto:8198.45, impressoes:1102500, cliques:41020 },
-    { faixa:"45-54", gasto:5801.32, impressoes:982400,  cliques:28010 },
-    { faixa:"55-64", gasto:3199.78, impressoes:521600,  cliques:14002 },
-    { faixa:"65+",   gasto:1555.45, impressoes:292942,  cliques:12972 },
+  "idades": [
+    {
+      "faixa": "18-24",
+      "gasto": 2792.66,
+      "impressoes": 672897,
+      "cliques": 15084
+    },
+    {
+      "faixa": "25-34",
+      "gasto": 13982.93,
+      "impressoes": 2547534,
+      "cliques": 74484
+    },
+    {
+      "faixa": "35-44",
+      "gasto": 6228.74,
+      "impressoes": 774134,
+      "cliques": 31172
+    },
+    {
+      "faixa": "45-54",
+      "gasto": 3375.59,
+      "impressoes": 310597,
+      "cliques": 16614
+    },
+    {
+      "faixa": "55-64",
+      "gasto": 2355.69,
+      "impressoes": 196600,
+      "cliques": 14087
+    },
+    {
+      "faixa": "65+",
+      "gasto": 2271.1,
+      "impressoes": 172636,
+      "cliques": 14982
+    }
   ],
-  geos: [
-    { local:"Brasil",      gasto:14201.30, impressoes:2102400, cliques:82410 },
-    { local:"EUA",         gasto:5798.70,  impressoes:748200,  cliques:27980 },
-    { local:"Argentina",   gasto:3199.80,  impressoes:451200,  cliques:18040 },
-    { local:"Reino Unido", gasto:2700.50,  impressoes:352800,  cliques:12020 },
-    { local:"Alemanha",    gasto:2099.50,  impressoes:291600,  cliques:9520  },
-    { local:"Franca",      gasto:1502.10,  impressoes:201000,  cliques:7250  },
-    { local:"Outros",      gasto:1505.40,  impressoes:527282,  cliques:9205  },
-  ],
+  "geos": [
+    {
+      "local": "Brasil",
+      "gasto": 19241.41,
+      "impressoes": 3084442,
+      "cliques": 103968
+    },
+    {
+      "local": "EUA",
+      "gasto": 1959.42,
+      "impressoes": 73533,
+      "cliques": 4756
+    },
+    {
+      "local": "Portugal",
+      "gasto": 1083.0,
+      "impressoes": 149377,
+      "cliques": 5035
+    },
+    {
+      "local": "Colombia",
+      "gasto": 1081.06,
+      "impressoes": 188551,
+      "cliques": 7168
+    },
+    {
+      "local": "EC",
+      "gasto": 991.54,
+      "impressoes": 189269,
+      "cliques": 6973
+    },
+    {
+      "local": "Argentina",
+      "gasto": 987.18,
+      "impressoes": 155934,
+      "cliques": 6529
+    },
+    {
+      "local": "Peru",
+      "gasto": 920.37,
+      "impressoes": 145167,
+      "cliques": 6443
+    }
+  ]
 };
 
 const DADOS_GOOGLE = {

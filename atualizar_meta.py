@@ -29,15 +29,15 @@ import re
 from datetime import datetime
 
 # ─── CONFIGURACAO ─────────────────────────────────────────────────────────────
-ACCESS_TOKEN  = "SEU_TOKEN_AQUI"           # Token de acesso da Meta API
-AD_ACCOUNT_ID = "act_XXXXXXXXXXXXXXXXX"    # Ex: act_123456789012345
+ACCESS_TOKEN  = "EAASW2NZCdwiwBRjZBpgb4Unpo2rqHB8iSJfZAt3BkkHB3pxrkevSo0UYx5RnF5hN7dnZCUV5yqwuPtfVUqhE3gAyOcfbLvYVhmMb5Cq1OAZBtJQ9cCRQAIce6wU7QNiX1iy11KH8tELm38U8HKTZCIgriWrUZBUdP4l60xZB4zxDgJVyZAC2bllLHsyDHnos83noLfm9SX14s0ZCmAP0iLTZBAw5OShUTb84yf4AgQCz201"
+AD_ACCOUNT_ID = "act_2613909812239242"
 ARQUIVO_DASH  = "dashboard_completo.html"
 API_VERSION   = "v19.0"
 BASE_URL      = f"https://graph.facebook.com/{API_VERSION}"
 
 # Intervalo de datas — opcoes: last_7_days, last_14_days, last_30_days,
 #   last_90_days, this_month, last_month, ou usar since/until abaixo
-DATE_PRESET   = "last_30_days"
+DATE_PRESET   = "last_30d"
 # DATE_SINCE  = "2025-04-01"   # Descomente para intervalo customizado
 # DATE_UNTIL  = "2025-04-30"
 # ──────────────────────────────────────────────────────────────────────────────
