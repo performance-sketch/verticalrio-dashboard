@@ -189,41 +189,41 @@
       <div class="kpi-valor" id="kpiTotalInvestido">R$ 49.259</div>
       <div class="kpi-sub">Meta + Google Ads</div>
     </div>
+    <div class="card-kpi kpi-laranja" draggable="true">
+      <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
+      <div class="kpi-label" id="kpiLabelGoogleInvest">Investimento Google (30d)</div>
+      <div class="kpi-valor" id="kpiGeralGoogleGasto">R$ 18.251</div>
+      <div class="kpi-sub">Google Ads</div>
+    </div>
     <div class="card-kpi kpi-rosa" draggable="true">
       <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="kpi-label" id="kpiLabelMetaInvest">Investimento Meta (30d)</div>
       <div class="kpi-valor" id="kpiMetaInvestGeral">R$ 31.007</div>
       <div class="kpi-sub">Meta Ads</div>
     </div>
-    <div class="card-kpi kpi-verde" draggable="true">
-      <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
-      <div class="kpi-label">Valor Gerado Google</div>
-      <div class="kpi-valor" id="kpiValorGoogle">R$ 46.704</div>
-      <div class="kpi-sub">ROAS 2,56x</div>
-    </div>
     <div class="card-kpi kpi-roxo" draggable="true">
       <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="kpi-label" id="kpiLabelSessoes">Sessoes no Site (30d)</div>
       <div class="kpi-valor" id="kpiSessoes">111.574</div>
-      <div class="kpi-sub">GA4 — Vertical Rio</div>
+      <div class="kpi-sub">GA4 &#x2014; Vertical Rio</div>
     </div>
-    <div class="card-kpi kpi-laranja" id="kpiReservas" draggable="true">
+    <div class="card-kpi kpi-verde" draggable="true">
       <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
-      <div class="kpi-label">Reservas Ativas</div>
+      <div class="kpi-label">Bookings</div>
       <div class="kpi-valor" id="totalReservasGeral">--</div>
       <div class="kpi-sub">Rezdy ao vivo</div>
     </div>
-    <div class="card-kpi kpi-amarelo" id="kpiReceita" draggable="true">
+    <div class="card-kpi kpi-amarelo" draggable="true">
       <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
-      <div class="kpi-label">Receita Rezdy</div>
-      <div class="kpi-valor" id="receitaGeralRezdy">--</div>
-      <div class="kpi-sub">Ultimas 100 reservas</div>
+      <div class="kpi-label">Receita Fulfillments</div>
+      <div class="kpi-valor" id="kpiReceitaFulfill">--</div>
+      <div class="kpi-sub">Confirmados (Rezdy)</div>
     </div>
     <div class="card-kpi kpi-ciano" draggable="true">
       <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
-      <div class="kpi-label">CPC Medio Meta</div>
-      <div class="kpi-valor">R$ 0,19</div>
-      <div class="kpi-sub" id="kpiCpcSub">166.425 cliques</div>
+      <div class="kpi-label">N&#xBA; Fulfillments</div>
+      <div class="kpi-valor" id="kpiFulfillCount">--</div>
+      <div class="kpi-sub">Confirmados (Rezdy)</div>
     </div>
   </div>
 
@@ -2318,19 +2318,41 @@ function reRenderAbaAtiva() {
 
 function atualizarKpisGeral() {
   const f = fatorEscala();
+
+  // Total investido (Meta + Google) — escala com filtro
   const totalInv = (DADOS_META.totalGasto + DADOS_GOOGLE.totalGasto) * f;
   const el1 = document.getElementById("kpiTotalInvestido");
   if(el1) el1.textContent = "R$ " + formatarNumero(Math.round(totalInv));
+
+  // Investimento Google — escala com filtro
+  const elGG = document.getElementById("kpiGeralGoogleGasto");
+  if(elGG) elGG.textContent = "R$ " + formatarNumero(Math.round(DADOS_GOOGLE.totalGasto*f));
+
+  // Investimento Meta — escala com filtro
   const elMeta = document.getElementById("kpiMetaInvestGeral");
   if(elMeta) elMeta.textContent = "R$ " + formatarNumero(Math.round(DADOS_META.totalGasto*f));
-  const el2 = document.getElementById("kpiValorGoogle");
-  if(el2) el2.textContent = "R$ " + formatarNumero(Math.round(DADOS_GOOGLE.totalValorConv*f));
+
+  // Sessoes no Site — escala com filtro
   const el3 = document.getElementById("kpiSessoes");
   if(el3) el3.textContent = formatarNumero(Math.round(DADOS_GA.totalSessoes*f));
-  const el4 = document.getElementById("kpiCpcSub");
-  if(el4) el4.textContent = formatarNumero(Math.round(DADOS_META.totalCliques*f))+" cliques";
+
+  // Bookings + Fulfillments — dados reais do Rezdy (nao escalam)
+  const tabela = DADOS_REZDY_LIVE.resumo.tabela || [];
+  const elBook = document.getElementById("totalReservasGeral");
+  if(elBook) elBook.textContent = DADOS_REZDY_LIVE.resumo.total_reservas || tabela.length;
+
+  const confirmed = tabela.filter(r => r.status === "CONFIRMED");
+  const recFull = confirmed.reduce((s,r) => s + (r.valorTotal||0), 0);
+  const elRecFull = document.getElementById("kpiReceitaFulfill");
+  if(elRecFull) elRecFull.textContent = "R$ " + formatarMoeda(recFull);
+  const elFull = document.getElementById("kpiFulfillCount");
+  if(elFull) elFull.textContent = confirmed.length;
+
+  // Labels com periodo selecionado
   const lbl1 = document.getElementById("kpiLabelInvestido");
   if(lbl1) lbl1.textContent = "Total Investido ("+FILTRO.dias+"d)";
+  const lblGG = document.getElementById("kpiLabelGoogleInvest");
+  if(lblGG) lblGG.textContent = "Investimento Google ("+FILTRO.dias+"d)";
   const lblMeta = document.getElementById("kpiLabelMetaInvest");
   if(lblMeta) lblMeta.textContent = "Investimento Meta ("+FILTRO.dias+"d)";
   const lbl3 = document.getElementById("kpiLabelSessoes");
@@ -2685,9 +2707,16 @@ function renderizarResumoRezdy() { try {
 
   // KPIs da visao geral
   const elR = document.getElementById("totalReservasGeral");
-  const elRec = document.getElementById("receitaGeralRezdy");
-  if(elR)   elR.textContent = r.total_reservas;
-  if(elRec) elRec.textContent = "R$ " + formatarMoeda(r.receita_total);
+  if(elR) elR.textContent = r.total_reservas;
+
+  // Receita e contagem de fulfillments (apenas CONFIRMED)
+  const tabelaFull = r.tabela || [];
+  const confirmedFull = tabelaFull.filter(x => x.status === "CONFIRMED");
+  const recFull = confirmedFull.reduce((s,x) => s + (x.valorTotal||0), 0);
+  const elRecFull = document.getElementById("kpiReceitaFulfill");
+  if(elRecFull) elRecFull.textContent = "R$ " + formatarMoeda(recFull);
+  const elFull = document.getElementById("kpiFulfillCount");
+  if(elFull) elFull.textContent = confirmedFull.length;
 
   // Grafico linha — reservas por dia
   if(Object.keys(ultimos14).length) {
