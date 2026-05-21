@@ -124,6 +124,13 @@
       .abas{padding:0 12px}
       .conteudo{padding:16px}
     }
+    /* ── DRAG & DROP ── */
+    .card-kpi[draggable=true],.card[draggable=true]{cursor:grab;transition:opacity .15s,transform .15s,border-color .15s,box-shadow .15s}
+    .card-kpi[draggable=true]:active,.card[draggable=true]:active{cursor:grabbing}
+    .card-kpi.arrastando,.card.arrastando{opacity:.3;transform:scale(.96);border-style:dashed}
+    .card-kpi.drag-sobre,.card.drag-sobre{border-color:#5a7fff!important;box-shadow:0 0 0 2px rgba(90,127,255,.35)!important}
+    .drag-hint{position:absolute;top:6px;right:8px;font-size:11px;color:#1e2540;opacity:0;transition:opacity .2s;pointer-events:none;letter-spacing:1px}
+    .card-kpi:hover .drag-hint,.card:hover .drag-hint{opacity:1;color:#475569}
   </style>
 </head>
 <body>
@@ -176,32 +183,44 @@
 <div id="visaoGeral" class="conteudo ativo">
 
   <div class="grade-kpi" id="kpiGeral">
-    <div class="card-kpi kpi-azul">
+    <div class="card-kpi kpi-azul" draggable="true">
+      <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="kpi-label" id="kpiLabelInvestido">Total Investido (30d)</div>
       <div class="kpi-valor" id="kpiTotalInvestido">R$ 49.259</div>
       <div class="kpi-sub">Meta + Google Ads</div>
     </div>
-    <div class="card-kpi kpi-verde">
+    <div class="card-kpi kpi-rosa" draggable="true">
+      <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
+      <div class="kpi-label" id="kpiLabelMetaInvest">Investimento Meta (30d)</div>
+      <div class="kpi-valor" id="kpiMetaInvestGeral">R$ 31.007</div>
+      <div class="kpi-sub">Meta Ads</div>
+    </div>
+    <div class="card-kpi kpi-verde" draggable="true">
+      <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="kpi-label">Valor Gerado Google</div>
       <div class="kpi-valor" id="kpiValorGoogle">R$ 46.704</div>
       <div class="kpi-sub">ROAS 2,56x</div>
     </div>
-    <div class="card-kpi kpi-roxo">
+    <div class="card-kpi kpi-roxo" draggable="true">
+      <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="kpi-label" id="kpiLabelSessoes">Sessoes no Site (30d)</div>
       <div class="kpi-valor" id="kpiSessoes">111.574</div>
       <div class="kpi-sub">GA4 — Vertical Rio</div>
     </div>
-    <div class="card-kpi kpi-laranja" id="kpiReservas">
+    <div class="card-kpi kpi-laranja" id="kpiReservas" draggable="true">
+      <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="kpi-label">Reservas Ativas</div>
       <div class="kpi-valor" id="totalReservasGeral">--</div>
       <div class="kpi-sub">Rezdy ao vivo</div>
     </div>
-    <div class="card-kpi kpi-amarelo" id="kpiReceita">
+    <div class="card-kpi kpi-amarelo" id="kpiReceita" draggable="true">
+      <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="kpi-label">Receita Rezdy</div>
       <div class="kpi-valor" id="receitaGeralRezdy">--</div>
       <div class="kpi-sub">Ultimas 100 reservas</div>
     </div>
-    <div class="card-kpi kpi-ciano">
+    <div class="card-kpi kpi-ciano" draggable="true">
+      <span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="kpi-label">CPC Medio Meta</div>
       <div class="kpi-valor">R$ 0,19</div>
       <div class="kpi-sub" id="kpiCpcSub">166.425 cliques</div>
@@ -209,26 +228,26 @@
   </div>
 
   <div class="grade-3">
-    <div class="card">
+    <div class="card" draggable="true"><span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="card-titulo">Trafego por Canal <span class="fonte-tag">GA4</span></div>
       <div class="grafico-box"><canvas id="graficoTrafegoGeral"></canvas></div>
     </div>
-    <div class="card">
+    <div class="card" draggable="true"><span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="card-titulo">Gasto em Anuncios <span class="fonte-tag">Meta + Google</span></div>
       <div class="grafico-box"><canvas id="graficoGastoGeral"></canvas></div>
     </div>
-    <div class="card">
+    <div class="card" draggable="true"><span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="card-titulo">Status Reservas Rezdy <span class="fonte-tag indicador-vivo"><span class="dot-vivo"></span>Vivo</span></div>
       <div class="grafico-box"><canvas id="graficoStatusGeral"></canvas></div>
     </div>
   </div>
 
   <div class="grade-21">
-    <div class="card">
+    <div class="card" draggable="true"><span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="card-titulo">Campanhas Meta Ads — Top 5 por Gasto <span class="fonte-tag">Meta</span></div>
       <div class="grafico-alto"><canvas id="graficoMetaBarraGeral"></canvas></div>
     </div>
-    <div class="card">
+    <div class="card" draggable="true"><span class="drag-hint">&#x2B1D;&#x2B1D;</span>
       <div class="card-titulo">Google Ads — ROAS por Campanha <span class="fonte-tag">Google</span></div>
       <div id="roasListaGeral"></div>
     </div>
@@ -2290,6 +2309,7 @@ function reRenderAbaAtiva() {
     else if(id==="rezdyPage")    carregarRezdy();
     else if(id==="passageirosPage")renderizarPassageiros();
   } catch(e){ console.error("reRenderAbaAtiva:",e); }
+  habilitarDrag();
   // Sempre atualiza KPIs da visao geral se nao for ela a aba ativa
   if(id!=="visaoGeral") {
     try { atualizarKpisGeral(); } catch(e){}
@@ -2301,6 +2321,8 @@ function atualizarKpisGeral() {
   const totalInv = (DADOS_META.totalGasto + DADOS_GOOGLE.totalGasto) * f;
   const el1 = document.getElementById("kpiTotalInvestido");
   if(el1) el1.textContent = "R$ " + formatarNumero(Math.round(totalInv));
+  const elMeta = document.getElementById("kpiMetaInvestGeral");
+  if(elMeta) elMeta.textContent = "R$ " + formatarNumero(Math.round(DADOS_META.totalGasto*f));
   const el2 = document.getElementById("kpiValorGoogle");
   if(el2) el2.textContent = "R$ " + formatarNumero(Math.round(DADOS_GOOGLE.totalValorConv*f));
   const el3 = document.getElementById("kpiSessoes");
@@ -2309,6 +2331,8 @@ function atualizarKpisGeral() {
   if(el4) el4.textContent = formatarNumero(Math.round(DADOS_META.totalCliques*f))+" cliques";
   const lbl1 = document.getElementById("kpiLabelInvestido");
   if(lbl1) lbl1.textContent = "Total Investido ("+FILTRO.dias+"d)";
+  const lblMeta = document.getElementById("kpiLabelMetaInvest");
+  if(lblMeta) lblMeta.textContent = "Investimento Meta ("+FILTRO.dias+"d)";
   const lbl3 = document.getElementById("kpiLabelSessoes");
   if(lbl3) lbl3.textContent = "Sessoes no Site ("+FILTRO.dias+"d)";
 }
@@ -2928,9 +2952,78 @@ function aplicarFiltroTabelaRezdy(dataIni, dataFim) {
 // INICIALIZAÇÃO
 // ────────────────────────────────────────────────────────────────────────────
 
+// ────────────────────────────────────────────────────────────────────────────
+// DRAG & DROP — reordenar cards dentro de cada grade
+// ────────────────────────────────────────────────────────────────────────────
+
+function initDragDrop() {
+  const grids = document.querySelectorAll('.grade-kpi,.grade-2,.grade-3,.grade-21,.grade-12');
+  grids.forEach(grid => {
+    let src = null;
+
+    grid.addEventListener('dragstart', e => {
+      const card = e.target.closest('.card-kpi,.card');
+      if(!card || !grid.contains(card)) return;
+      src = card;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain','');
+      setTimeout(() => { if(src) src.classList.add('arrastando'); }, 0);
+    });
+
+    grid.addEventListener('dragend', () => {
+      if(src) src.classList.remove('arrastando');
+      grid.querySelectorAll('.drag-sobre').forEach(c => c.classList.remove('drag-sobre'));
+      src = null;
+    });
+
+    grid.addEventListener('dragover', e => {
+      e.preventDefault();
+      const tgt = e.target.closest('.card-kpi,.card');
+      if(!tgt || !grid.contains(tgt) || tgt === src) return;
+      grid.querySelectorAll('.drag-sobre').forEach(c => c.classList.remove('drag-sobre'));
+      tgt.classList.add('drag-sobre');
+    });
+
+    grid.addEventListener('dragleave', e => {
+      if(!grid.contains(e.relatedTarget)) {
+        grid.querySelectorAll('.drag-sobre').forEach(c => c.classList.remove('drag-sobre'));
+      }
+    });
+
+    grid.addEventListener('drop', e => {
+      e.preventDefault();
+      const tgt = e.target.closest('.card-kpi,.card');
+      if(!tgt || !grid.contains(tgt) || tgt === src || !src) return;
+      tgt.classList.remove('drag-sobre');
+      const rect = tgt.getBoundingClientRect();
+      // Para grade-kpi (horizontal) usa X; para listas verticais usa Y
+      const useX = grid.classList.contains('grade-kpi');
+      const after = useX ? e.clientX > rect.left + rect.width/2
+                         : e.clientY > rect.top  + rect.height/2;
+      grid.insertBefore(src, after ? tgt.nextSibling : tgt);
+    });
+  });
+}
+
+function habilitarDrag() {
+  document.querySelectorAll('.grade-kpi .card-kpi, .grade-2 .card, .grade-3 .card, .grade-21 .card, .grade-12 .card').forEach(c => {
+    if(!c.getAttribute('draggable')) {
+      c.setAttribute('draggable','true');
+      if(!c.querySelector('.drag-hint')) {
+        const hint = document.createElement('span');
+        hint.className = 'drag-hint';
+        hint.innerHTML = '&#x2B1D;&#x2B1D;';
+        c.insertBefore(hint, c.firstChild);
+      }
+    }
+  });
+}
+
 function inicializarDashboard() {
   try { renderizarVisaoGeral(); }    catch(e){ console.error("visaoGeral:",e); }
   try { renderizarResumoRezdy(); }   catch(e){ console.error("resumoRezdy:",e); }
+  initDragDrop();
+  habilitarDrag();
   const elAtt = document.getElementById("ultimaAtt");
   if(elAtt) elAtt.textContent = new Date().toLocaleTimeString("pt-BR");
   const dataEl = document.getElementById("dataRezdy");
