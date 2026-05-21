@@ -1,33 +1,16 @@
 """
 atualizar_meta.py
 =================
-Busca dados reais da Meta Ads API para 4 periodos (7d, 14d, 30d, 90d)
-e atualiza o dashboard_completo.html.
+Busca dados reais da Meta Ads API e atualiza o dashboard_completo.html.
+  - 4 periodos predefinidos: 7d, 14d, 30d, 90d (com campanhas, idades, paises)
+  - Totais diarios dos ultimos 365 dias (para ranges customizados no dashboard)
 Execute: python atualizar_meta.py
-
-─── COMO OBTER O TOKEN ───────────────────────────────────────────────────────
-1. Acesse https://business.facebook.com → Configuracoes → Usuarios do sistema
-2. Crie um Usuario do Sistema Admin e gere um token com permissoes:
-     ads_read, ads_management, business_management
-3. Ou use o Graph API Explorer em https://developers.facebook.com/tools/explorer/
-   e gere um User Token com ads_read.
-4. Para token de longa duracao (nao expira em 1h):
-   POST https://graph.facebook.com/oauth/access_token
-     grant_type=fb_exchange_token
-     client_id={APP_ID}
-     client_secret={APP_SECRET}
-     fb_exchange_token={TOKEN_CURTO}
-
-─── COMO ENCONTRAR O AD ACCOUNT ID ──────────────────────────────────────────
-  Meta Business Suite → Configuracoes → Contas de Anuncios → ID da Conta
-  Formato: act_123456789012345
-──────────────────────────────────────────────────────────────────────────────
 """
 
 import requests
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # ─── CONFIGURACAO ─────────────────────────────────────────────────────────────
 ACCESS_TOKEN  = "EAASW2NZCdwiwBRjZBpgb4Unpo2rqHB8iSJfZAt3BkkHB3pxrkevSo0UYx5RnF5hN7dnZCUV5yqwuPtfVUqhE3gAyOcfbLvYVhmMb5Cq1OAZBtJQ9cCRQAIce6wU7QNiX1iy11KH8tELm38U8HKTZCIgriWrUZBUdP4l60xZB4zxDgJVyZAC2bllLHsyDHnos83noLfm9SX14s0ZCmAP0iLTZBAw5OShUTb84yf4AgQCz201"
@@ -36,7 +19,6 @@ ARQUIVO_DASH  = "dashboard_completo.html"
 API_VERSION   = "v19.0"
 BASE_URL      = f"https://graph.facebook.com/{API_VERSION}"
 
-# Periodos que serao buscados da API real
 PERIODOS = [
     ("d7",  "last_7d"),
     ("d14", "last_14d"),
@@ -62,14 +44,9 @@ def api_get(endpoint, params=None):
     return r.json()
 
 
-def buscar_conjuntos(date_preset):
+def buscar_conjuntos(date_params):
     campos = "adset_name,campaign_name,spend,impressions,clicks,cpc,ctr,cpm,reach,actions"
-    params = {
-        "level": "adset",
-        "fields": campos,
-        "limit": 200,
-        "date_preset": date_preset,
-    }
+    params = {"level": "adset", "fields": campos, "limit": 200, **date_params}
     dados = []
     resp = api_get(f"{AD_ACCOUNT_ID}/insights", params)
     dados.extend(resp.get("data", []))
@@ -79,26 +56,53 @@ def buscar_conjuntos(date_preset):
     return dados
 
 
-def buscar_idades(date_preset):
+def buscar_idades(date_params):
     params = {
-        "level": "account",
-        "fields": "spend,impressions,clicks",
-        "breakdowns": "age",
-        "limit": 20,
-        "date_preset": date_preset,
+        "level": "account", "fields": "spend,impressions,clicks",
+        "breakdowns": "age", "limit": 20, **date_params,
     }
     return api_get(f"{AD_ACCOUNT_ID}/insights", params).get("data", [])
 
 
-def buscar_paises(date_preset):
+def buscar_paises(date_params):
+    params = {
+        "level": "account", "fields": "spend,impressions,clicks",
+        "breakdowns": "country", "limit": 50, **date_params,
+    }
+    return api_get(f"{AD_ACCOUNT_ID}/insights", params).get("data", [])
+
+
+def buscar_diario():
+    """Totais diarios dos ultimos 365 dias para suportar ranges customizados."""
+    hoje = datetime.now()
+    inicio = hoje - timedelta(days=365)
     params = {
         "level": "account",
         "fields": "spend,impressions,clicks",
-        "breakdowns": "country",
-        "limit": 50,
-        "date_preset": date_preset,
+        "time_range": json.dumps({
+            "since": inicio.strftime("%Y-%m-%d"),
+            "until":  hoje.strftime("%Y-%m-%d"),
+        }),
+        "time_increment": 1,
+        "limit": 500,
     }
-    return api_get(f"{AD_ACCOUNT_ID}/insights", params).get("data", [])
+    dados = []
+    resp = api_get(f"{AD_ACCOUNT_ID}/insights", params)
+    dados.extend(resp.get("data", []))
+    while resp.get("paging", {}).get("next"):
+        resp = requests.get(resp["paging"]["next"], timeout=30).json()
+        dados.extend(resp.get("data", []))
+
+    return [
+        {
+            "data":       d["date_start"],
+            "gasto":      round(float(d.get("spend") or 0), 2),
+            "impressoes": int(d.get("impressions") or 0),
+            "cliques":    int(d.get("clicks") or 0),
+        }
+        for d in dados
+        if float(d.get("spend") or 0) > 0
+    ]
 
 
 def extrair_conv(actions):
@@ -121,7 +125,6 @@ def processar(conjuntos_raw, idades_raw, paises_raw):
         gasto      = float(c.get("spend") or 0)
         impressoes = int(c.get("impressions") or 0)
         cliques    = int(c.get("clicks") or 0)
-        # CTR: Meta API retorna como percentual (ex: "1.88" = 1.88%)
         ctr_raw    = float(c.get("ctr") or 0)
         cpc_raw    = float(c.get("cpc") or 0) if c.get("cpc") else (gasto/cliques if cliques else None)
         cpm_raw    = float(c.get("cpm") or 0) if c.get("cpm") else None
@@ -223,15 +226,17 @@ def main():
 
     for chave, preset in PERIODOS:
         print(f"Buscando periodo {preset}...")
-        conjuntos = buscar_conjuntos(preset)
-        idades    = buscar_idades(preset)
-        paises    = buscar_paises(preset)
-        dados_periodo = processar(conjuntos, idades, paises)
+        dp = {"date_preset": preset}
+        dados_periodo = processar(buscar_conjuntos(dp), buscar_idades(dp), buscar_paises(dp))
         resultado[chave] = dados_periodo
         print(f"  Gasto: R$ {dados_periodo['totalGasto']:,.2f} | "
               f"Impressoes: {dados_periodo['totalImpressoes']:,} | "
-              f"Cliques: {dados_periodo['totalCliques']:,} | "
-              f"Conjuntos: {len(dados_periodo['campanhas'])}")
+              f"Cliques: {dados_periodo['totalCliques']:,}")
+
+    print("\nBuscando totais diarios (365 dias para ranges customizados)...")
+    diario = buscar_diario()
+    resultado["diario"] = diario
+    print(f"  {len(diario)} dias com gasto registrado")
 
     print(f"\nAtualizando {ARQUIVO_DASH}...")
     atualizar_html(resultado)
