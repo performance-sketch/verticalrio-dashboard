@@ -23901,24 +23901,26 @@ function aplicarFiltroTabelaRezdy(iniStr, fimStr) {
   const periodoLabel = iniStr ? `${iniStr} a ${fimStr}` : 'Todo o periodo';
 
   // ── KPIs ─────────────────────────────────────────────────────────
-  const pago      = filtradas.reduce((s,r)=>s+(r.valorPago||0),0);
-  const aReceber  = filtradas.reduce((s,r)=>s+(r.valorAPagar||0),0);
-  const contSt    = {};
+  const pago     = filtradas.reduce((s,r)=>s+(r.valorPago||0),0);
+  const aReceber = filtradas.reduce((s,r)=>s+(r.valorAPagar||0),0);
+  const contSt   = {};
   filtradas.forEach(r=>{ contSt[r.status]=(contSt[r.status]||0)+1; });
 
-  // Bookings e Fulfillments de ontem (sempre sobre dataset completo)
-  const addDaysStr = (d, n) => { const dt=new Date(d+"T12:00:00"); dt.setDate(dt.getDate()+n); return dt.toISOString().slice(0,10); };
-  const ontem = addDaysStr(new Date().toISOString().slice(0,10), -1);
-  const bookingsOntem    = todas.filter(r => r.dataCriacao === ontem).length;
-  const fulfillmentsOntem = todas.filter(r => r.dataFulfillment === ontem).length;
+  // Bookings e Fulfillments sempre contados pelo campo próprio no mesmo período
+  const bookingsPeriodo = iniStr
+    ? todas.filter(r => r.dataCriacao && r.dataCriacao >= iniStr && r.dataCriacao <= fimStr).length
+    : todas.length;
+  const fulfillmentsPeriodo = iniStr
+    ? todas.filter(r => r.dataFulfillment && r.dataFulfillment >= iniStr && r.dataFulfillment <= fimStr).length
+    : todas.filter(r => r.dataFulfillment).length;
 
   const elKpi = document.getElementById("kpiRezdy");
   if(elKpi) elKpi.innerHTML = `
-    <div class="card-kpi kpi-azul"><div class="kpi-label">Bookings Ontem</div><div class="kpi-valor">${bookingsOntem}</div><div class="kpi-sub">${ontem}</div></div>
-    <div class="card-kpi kpi-verde"><div class="kpi-label">Fulfillments Ontem</div><div class="kpi-valor">${fulfillmentsOntem}</div><div class="kpi-sub">${ontem}</div></div>
+    <div class="card-kpi kpi-azul"><div class="kpi-label">Bookings</div><div class="kpi-valor">${bookingsPeriodo}</div><div class="kpi-sub">${periodoLabel}</div></div>
+    <div class="card-kpi kpi-verde"><div class="kpi-label">Fulfillments</div><div class="kpi-valor">${fulfillmentsPeriodo}</div><div class="kpi-sub">${periodoLabel}</div></div>
     <div class="card-kpi kpi-roxo"><div class="kpi-label">Total Pago</div><div class="kpi-valor">R$ ${formatarMoeda(pago)}</div><div class="kpi-sub">${periodoLabel}</div></div>
-    <div class="card-kpi kpi-amarelo"><div class="kpi-label">A Receber</div><div class="kpi-valor">R$ ${formatarMoeda(aReceber)}</div><div class="kpi-sub">Saldo aberto</div></div>
-    <div class="card-kpi kpi-ciano"><div class="kpi-label">Confirmadas</div><div class="kpi-valor">${contSt["CONFIRMED"]||0}</div><div class="kpi-sub">${periodoLabel}</div></div>
+    <div class="card-kpi kpi-amarelo"><div class="kpi-label">A Receber</div><div class="kpi-valor">R$ ${formatarMoeda(aReceber)}</div><div class="kpi-sub">${periodoLabel}</div></div>
+    <div class="card-kpi kpi-ciano"><div class="kpi-label">Confirmados</div><div class="kpi-valor">${contSt["CONFIRMED"]||0}</div><div class="kpi-sub">${periodoLabel}</div></div>
   `;
 
   // ── Gráfico: Status (rosca) ────────────────────────────────────
