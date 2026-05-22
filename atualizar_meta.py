@@ -46,8 +46,8 @@ def api_get(endpoint, params=None):
 
 
 def buscar_conjuntos(date_params):
-    campos = "adset_name,campaign_name,spend,impressions,clicks,cpc,ctr,cpm,reach,actions"
-    params = {"level": "adset", "fields": campos, "limit": 200, **date_params}
+    campos = "campaign_name,spend,impressions,clicks,cpc,ctr,cpm,reach,actions"
+    params = {"level": "campaign", "fields": campos, "limit": 200, **date_params}
     dados = []
     resp = api_get(f"{AD_ACCOUNT_ID}/insights", params)
     dados.extend(resp.get("data", []))
@@ -131,7 +131,7 @@ def processar(conjuntos_raw, idades_raw, paises_raw):
         cpm_raw    = float(c.get("cpm") or 0) if c.get("cpm") else None
         alcance    = int(c.get("reach") or 0) if c.get("reach") else None
         conv       = extrair_conv(c.get("actions"))
-        nome       = c.get("adset_name") or c.get("campaign_name") or "Desconhecido"
+        nome       = c.get("campaign_name") or "Desconhecido"
 
         campanhas.append({
             "nome":       nome,
