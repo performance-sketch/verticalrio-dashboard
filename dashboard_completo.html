@@ -167,17 +167,11 @@
 <!-- === FILTRO GLOBAL DE DATA === -->
 <div id="filtroGlobal" style="margin:0 0 8px 0;background:#0f1225;border:1px solid #1e2540;border-radius:10px;padding:10px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:8px">
   <span style="font-size:12px;color:#64748b;font-weight:600">&#x1F4C5; Periodo:</span>
-  <button class="btn-periodo" onclick="aplicarFiltroGlobal(7,this)">7 dias</button>
-  <button class="btn-periodo" onclick="aplicarFiltroGlobal(14,this)">14 dias</button>
-  <button class="btn-periodo ativo" id="btnGlobal30" onclick="aplicarFiltroGlobal(30,this)">30 dias</button>
-  <button class="btn-periodo" onclick="aplicarFiltroGlobal(90,this)">90 dias</button>
-  <button class="btn-periodo" onclick="aplicarFiltroMax(this)">Maximo</button>
-  <div class="div-sep-v"></div>
   <input type="date" id="globalDataInicio" class="input-data">
   <span style="color:#64748b;font-size:12px">&mdash;</span>
   <input type="date" id="globalDataFim" class="input-data">
   <button class="btn-aplicar" onclick="aplicarFiltroGlobalCustom()">Aplicar</button>
-  <span id="globalPeriodoLabel" style="font-size:11px;color:#64748b;margin-left:8px">Exibindo: ultimos 30 dias</span>
+  <span id="globalPeriodoLabel" style="font-size:11px;color:#64748b;margin-left:8px">Selecione um periodo para filtrar</span>
 </div>
 
 <!-- ═══════════════ ABA: VISÃO GERAL ═══════════════ -->
@@ -23251,10 +23245,11 @@ function mostrarAba(id, btn) {
 // dias/30. Para Rezdy usa o filtro de horarioVoo ja existente.
 // ────────────────────────────────────────────────────────────────────────────
 
-const FILTRO = { dias: 30, ini: null, fim: null };
+const FILTRO = { dias: null, ini: null, fim: null };
 
 function fatorEscala() {
-  if (FILTRO.dias === 'max') return 12; // aprox. 1 ano para dados estaticos
+  if (FILTRO.dias === 'max') return 12;
+  if (!FILTRO.dias) return 1;
   return FILTRO.dias / 30;
 }
 
@@ -23286,12 +23281,12 @@ function agregarDiario(iniStr, fimStr) {
 // Retorna o bloco de dados Meta para o periodo selecionado (dados reais da API)
 function getMeta() {
   if (FILTRO.ini && FILTRO.fim) {
-    // Usa as strings brutas YYYY-MM-DD para evitar deslocamento de timezone
     const iniStr = FILTRO.iniStr || FILTRO.ini.toLocaleDateString('sv');
     const fimStr = FILTRO.fimStr || FILTRO.fim.toLocaleDateString('sv');
     return agregarDiario(iniStr, fimStr);
   }
   if (FILTRO.dias === 'max') return DADOS_META.max || DADOS_META.d90 || DADOS_META.d30;
+  if (!FILTRO.dias) return DADOS_META.d30 || DADOS_META;
   const key = 'd' + FILTRO.dias;
   return DADOS_META[key] || DADOS_META.d30 || DADOS_META;
 }
@@ -23907,20 +23902,25 @@ function aplicarFiltroTabelaRezdy(iniStr, fimStr) {
   const periodoLabel = iniStr ? `${iniStr} a ${fimStr}` : 'Todo o periodo';
 
   // ── KPIs ─────────────────────────────────────────────────────────
-  const receita   = filtradas.reduce((s,r)=>s+(r.valorTotal||0),0);
   const pago      = filtradas.reduce((s,r)=>s+(r.valorPago||0),0);
   const aReceber  = filtradas.reduce((s,r)=>s+(r.valorAPagar||0),0);
   const contSt    = {};
   filtradas.forEach(r=>{ contSt[r.status]=(contSt[r.status]||0)+1; });
 
+  // Bookings e Fulfillments de ontem (sempre sobre dataset completo)
+  const addDaysStr = (d, n) => { const dt=new Date(d+"T12:00:00"); dt.setDate(dt.getDate()+n); return dt.toISOString().slice(0,10); };
+  const ontem = addDaysStr(new Date().toISOString().slice(0,10), -1);
+  const todas  = DADOS_REZDY_LIVE.resumo.tabela || [];
+  const bookingsOntem    = todas.filter(r => r.dataCriacao === ontem).length;
+  const fulfillmentsOntem = todas.filter(r => r.dataFulfillment === ontem).length;
+
   const elKpi = document.getElementById("kpiRezdy");
   if(elKpi) elKpi.innerHTML = `
-    <div class="card-kpi kpi-azul"><div class="kpi-label">Total Reservas</div><div class="kpi-valor">${filtradas.length}</div><div class="kpi-sub">${periodoLabel}</div></div>
-    <div class="card-kpi kpi-verde"><div class="kpi-label">Receita Total</div><div class="kpi-valor">R$ ${formatarMoeda(receita)}</div><div class="kpi-sub">Valor bruto</div></div>
-    <div class="card-kpi kpi-roxo"><div class="kpi-label">Total Pago</div><div class="kpi-valor">R$ ${formatarMoeda(pago)}</div><div class="kpi-sub">Pagamentos conf.</div></div>
+    <div class="card-kpi kpi-azul"><div class="kpi-label">Bookings Ontem</div><div class="kpi-valor">${bookingsOntem}</div><div class="kpi-sub">${ontem}</div></div>
+    <div class="card-kpi kpi-verde"><div class="kpi-label">Fulfillments Ontem</div><div class="kpi-valor">${fulfillmentsOntem}</div><div class="kpi-sub">${ontem}</div></div>
+    <div class="card-kpi kpi-roxo"><div class="kpi-label">Total Pago</div><div class="kpi-valor">R$ ${formatarMoeda(pago)}</div><div class="kpi-sub">${periodoLabel}</div></div>
     <div class="card-kpi kpi-amarelo"><div class="kpi-label">A Receber</div><div class="kpi-valor">R$ ${formatarMoeda(aReceber)}</div><div class="kpi-sub">Saldo aberto</div></div>
-    <div class="card-kpi kpi-vermelho"><div class="kpi-label">Canceladas</div><div class="kpi-valor">${contSt["CANCELLED"]||0}</div><div class="kpi-sub">No periodo</div></div>
-    <div class="card-kpi kpi-ciano"><div class="kpi-label">Confirmadas</div><div class="kpi-valor">${contSt["CONFIRMED"]||0}</div><div class="kpi-sub">No periodo</div></div>
+    <div class="card-kpi kpi-ciano"><div class="kpi-label">Confirmadas</div><div class="kpi-valor">${contSt["CONFIRMED"]||0}</div><div class="kpi-sub">${periodoLabel}</div></div>
   `;
 
   // ── Gráfico: Status (rosca) ────────────────────────────────────
