@@ -8,6 +8,7 @@ Ordem:
   1. Meta Ads (atualizar_meta.py)
   2. Google Ads (atualizar_google.py)
   3. Rezdy (atualizar_dados.py)
+  4. Respond.io (atualizar_respondio.py)
 """
 
 import subprocess
@@ -28,9 +29,10 @@ print(f"\n{'='*55}")
 print(f"  ATUALIZANDO DASHBOARD — {inicio.strftime('%d/%m/%Y %H:%M')}")
 print(f"{'='*55}")
 
-ok_meta   = rodar("atualizar_meta.py")
-ok_google = rodar("atualizar_google.py")
-ok_rezdy  = rodar("atualizar_dados.py")
+ok_meta      = rodar("atualizar_meta.py")
+ok_google    = rodar("atualizar_google.py")
+ok_rezdy     = rodar("atualizar_dados.py")
+ok_respondio = rodar("atualizar_respondio.py")
 
 fim = datetime.now()
 duracao = (fim - inicio).seconds
@@ -38,8 +40,9 @@ duracao = (fim - inicio).seconds
 print(f"\n{'='*55}")
 print(f"  RESUMO")
 print(f"{'='*55}")
-print(f"  Meta Ads:   {'OK' if ok_meta   else 'ERRO — verifique token/conta'}")
-print(f"  Google Ads: {'OK' if ok_google else 'ERRO — verifique credenciais'}")
-print(f"  Rezdy:      {'OK' if ok_rezdy  else 'ERRO — verifique chave API'}")
-print(f"  Duracao:    {duracao}s")
+print(f"  Meta Ads:    {'OK' if ok_meta      else 'ERRO — verifique token/conta'}")
+print(f"  Google Ads:  {'OK' if ok_google    else 'ERRO — verifique credenciais'}")
+print(f"  Rezdy:       {'OK' if ok_rezdy     else 'ERRO — verifique chave API'}")
+print(f"  Respond.io:  {'OK' if ok_respondio else 'ERRO — verifique token e plano'}")
+print(f"  Duracao:     {duracao}s")
 print(f"\n  Abra: index.html\n")

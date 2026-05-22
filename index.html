@@ -162,6 +162,7 @@
   <div class="aba" onclick="mostrarAba('analyticsPage',this)">&#x1F310; Analytics</div>
   <div class="aba" onclick="mostrarAba('rezdyPage',this)">&#x1F4C5; Reservas Rezdy</div>
   <div class="aba" onclick="mostrarAba('passageirosPage',this)">&#x1F9F3; Passageiros</div>
+  <div class="aba" onclick="mostrarAba('respondioPage',this)">&#x1F4AC; Respond.io</div>
 </div>
 
 <!-- === FILTRO GLOBAL DE DATA === -->
@@ -619,6 +620,85 @@
         <tbody id="tabelaVoos"></tbody>
       </table>
     </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ RESPOND.IO PAGE ═══════════════ -->
+<div id="respondioPage" class="conteudo">
+
+  <!-- Header -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <div>
+      <h2 style="font-size:16px;font-weight:700;color:#e2e8f0;margin:0">&#x1F4AC; Respond.io — CRM &amp; Conversas</h2>
+      <span id="dataRespondio" style="font-size:11px;color:#475569">Aguardando primeira atualizacao</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="renderizarRespondio()" style="background:#1e2540;border:1px solid #334155;color:#94a3b8;font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer">&#x21BB; Atualizar</button>
+    </div>
+  </div>
+
+  <!-- Aviso sem dados -->
+  <div id="respondioAviso" style="display:none;background:#1a1500;border:1px solid #f59e0b;border-radius:8px;padding:14px 16px;margin-bottom:12px;font-size:12px;color:#fbbf24;line-height:1.8">
+    <strong>&#x26A0; Dados ainda nao carregados.</strong>
+    Execute <code style="background:#0f0e00;padding:1px 5px;border-radius:3px;font-size:11px">python atualizar_respondio.py</code> para conectar.
+    <span style="color:#64748b;margin-left:8px">Requer plano Growth ou superior no Respond.io.</span>
+  </div>
+
+  <!-- KPIs Linha 1: Conversas -->
+  <div style="margin-bottom:6px;font-size:11px;font-weight:700;color:#475569;letter-spacing:.05em;text-transform:uppercase">Conversas</div>
+  <div class="grade-kpi" id="respondioKpisConv" style="margin-bottom:12px"></div>
+
+  <!-- KPIs Linha 2: Contatos / Ciclo de Vida -->
+  <div style="margin-bottom:6px;font-size:11px;font-weight:700;color:#475569;letter-spacing:.05em;text-transform:uppercase">Contatos &amp; Ciclo de Vida</div>
+  <div class="grade-kpi" id="respondioKpiosLead" style="margin-bottom:12px"></div>
+
+  <!-- Row 1: Conversas por Dia + Origem -->
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="card">
+      <div class="card-titulo">&#x1F4C8; Conversas por Dia — ultimos 30 dias</div>
+      <div style="height:200px"><canvas id="graficoConvDia30"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">&#x1F30E; Origem das Conversas</div>
+      <div style="height:200px"><canvas id="graficoOrigem"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Row 2: Funil ciclo de vida + Conversas por canal -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="card" style="min-height:280px">
+      <div class="card-titulo">&#x1F3C6; Funil — Ciclo de Vida dos Contatos</div>
+      <div id="respondioFunil" style="padding:4px 0"></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">&#x1F4F1; Conversas por Canal</div>
+      <div style="height:240px"><canvas id="graficoCanal"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Row 3: Status aberto/fechado + Evolucao 90 dias -->
+  <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px">
+    <div class="card">
+      <div class="card-titulo">&#x1F7E2; Status das Conversas</div>
+      <div style="height:200px"><canvas id="graficoStatus"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">&#x1F4C5; Evolucao Ultimos 90 Dias</div>
+      <div style="height:200px"><canvas id="graficoConvDia90"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Row 4: Top Agentes -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-titulo">&#x1F464; Conversas por Agente</div>
+    <div id="respondioAgentes" style="padding:4px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px"></div>
+  </div>
+
+  <!-- Row 5: Tags -->
+  <div class="card">
+    <div class="card-titulo">&#x1F3F7; Distribuicao por Tag</div>
+    <div id="respondioTags" style="display:flex;flex-wrap:wrap;gap:8px;padding:8px 0"></div>
   </div>
 
 </div>
@@ -19576,6 +19656,29 @@ const DADOS_REZDY_LIVE = {
 };
 
 // ────────────────────────────────────────────────────────────────────────────
+// DADOS RESPOND.IO (embutidos pelo script atualizar_respondio.py)
+// Para atualizar: execute "python atualizar_respondio.py" e reabra este arquivo
+// ────────────────────────────────────────────────────────────────────────────
+const DADOS_RESPONDIO = {
+  "conversas": {
+    "totalConversas": 0,
+    "abertasHoje": 0,
+    "porDia": {},
+    "porDia30": {},
+    "porDia90": {},
+    "porOrigem": {},
+    "porCanal": {},
+    "porStatus": {}
+  },
+  "cicloDaVida": [],
+  "contagemEstagios": {},
+  "agentes": [],
+  "tags": [],
+  "canais": [],
+  "dataAtualizacao": "Aguardando primeira atualizacao"
+};
+
+// ────────────────────────────────────────────────────────────────────────────
 // VARIÁVEIS GLOBAIS DOS GRÁFICOS
 // ────────────────────────────────────────────────────────────────────────────
 let graficos = {};
@@ -19639,6 +19742,7 @@ function mostrarAba(id, btn) {
   if(id==="analyticsPage")   renderizarAnalytics();
   if(id==="rezdyPage")       carregarRezdy();
   if(id==="passageirosPage") renderizarPassageiros();
+  if(id==="respondioPage")  renderizarRespondio();
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -19754,6 +19858,7 @@ function reRenderAbaAtiva() {
     else if(id==="analyticsPage")renderizarAnalytics();
     else if(id==="rezdyPage")    carregarRezdy();
     else if(id==="passageirosPage")renderizarPassageiros();
+    else if(id==="respondioPage")  renderizarRespondio();
   } catch(e){ console.error("reRenderAbaAtiva:",e); }
   habilitarDrag();
   // Sempre atualiza KPIs da visao geral se nao for ela a aba ativa
@@ -20255,6 +20360,291 @@ function renderizarPassageiros() {
       <td style="text-align:center;color:#64748b">${m.taxaHotel||"—"}</td>
     </tr>`).join("");
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// RESPOND.IO
+// ────────────────────────────────────────────────────────────────────────────
+
+function renderizarRespondio() { try {
+  const D   = DADOS_RESPONDIO;
+  const cv  = D.conversas  || {};
+  const sem = !(cv.totalConversas || (D.cicloDaVida && D.cicloDaVida.length));
+
+  const CORES = ["#3b82f6","#f97316","#22c55e","#a855f7","#ec4899","#14b8a6","#f59e0b","#ef4444","#64748b","#06b6d4"];
+
+  const _destr = (k) => { if(graficos[k]){graficos[k].destroy();delete graficos[k];} };
+  const _vazio = (id,msg) => {
+    const c=document.getElementById(id); if(!c)return;
+    const ctx=c.getContext("2d"); ctx.clearRect(0,0,c.width,c.height);
+    ctx.fillStyle="#334155"; ctx.font="12px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(msg||"Sem dados", c.width/2, c.height/2);
+  };
+
+  // Aviso
+  const aviso = document.getElementById("respondioAviso");
+  if(aviso) aviso.style.display = sem ? "block" : "none";
+
+  // Data
+  const dataEl = document.getElementById("dataRespondio");
+  if(dataEl) dataEl.textContent = D.dataAtualizacao ? "Atualizado: "+D.dataAtualizacao : "Aguardando primeira atualizacao";
+
+  // ── KPIs Conversas ──────────────────────────────────────────────────────────
+  const statusObj   = cv.porStatus || {};
+  const abertas     = statusObj.open  || statusObj.opened  || statusObj.pending || 0;
+  const fechadas    = statusObj.close || statusObj.closed  || statusObj.resolved || 0;
+  const totalConv   = cv.totalConversas || (abertas + fechadas) || 0;
+  const pctFechadas = totalConv ? Math.round(fechadas/totalConv*100) : 0;
+
+  // conversas nos ultimos 30 dias a partir do porDia30
+  const conv30 = Object.values(cv.porDia30 || {}).reduce((s,v)=>s+v,0);
+  const conv90 = Object.values(cv.porDia90 || {}).reduce((s,v)=>s+v,0);
+
+  const topOrigem = Object.entries(cv.porOrigem||{}).sort((a,b)=>b[1]-a[1])[0];
+
+  const kpisConv = document.getElementById("respondioKpisConv");
+  if(kpisConv) kpisConv.innerHTML = `
+    <div class="card-kpi kpi-azul">
+      <div class="kpi-label">Total Conversas</div>
+      <div class="kpi-valor">${formatarNumero(totalConv)}</div>
+      <div class="kpi-sub">Historico completo</div>
+    </div>
+    <div class="card-kpi kpi-ciano">
+      <div class="kpi-label">Ultimos 30 dias</div>
+      <div class="kpi-valor">${formatarNumero(conv30)}</div>
+      <div class="kpi-sub">Novas conversas</div>
+    </div>
+    <div class="card-kpi kpi-verde">
+      <div class="kpi-label">Ultimos 90 dias</div>
+      <div class="kpi-valor">${formatarNumero(conv90)}</div>
+      <div class="kpi-sub">Novas conversas</div>
+    </div>
+    <div class="card-kpi kpi-roxo">
+      <div class="kpi-label">Em Aberto</div>
+      <div class="kpi-valor">${formatarNumero(abertas)}</div>
+      <div class="kpi-sub">Aguardando resposta</div>
+    </div>
+    <div class="card-kpi kpi-amarelo">
+      <div class="kpi-label">Fechadas</div>
+      <div class="kpi-valor">${formatarNumero(fechadas)}</div>
+      <div class="kpi-sub">Taxa: ${pctFechadas}% resolvidas</div>
+    </div>
+    <div class="card-kpi" style="background:#0f1a14;border:1px solid #22c55e33">
+      <div class="kpi-label">Principal Canal</div>
+      <div class="kpi-valor" style="font-size:13px;color:#4ade80">${topOrigem?topOrigem[0]:"—"}</div>
+      <div class="kpi-sub">${topOrigem?formatarNumero(topOrigem[1])+" conversas":"Sem dados"}</div>
+    </div>`;
+
+  // ── KPIs Ciclo de Vida ──────────────────────────────────────────────────────
+  const funil      = D.cicloDaVida || [];
+  const totalLeads = funil.filter(e=>!e.perdido&&!e.outro).reduce((s,e)=>s+e.total,0);
+  const newLead    = funil.find(e=>e.estagio==="New Lead");
+  const hotLead    = funil.find(e=>e.estagio==="Hot Lead");
+  const customer   = funil.find(e=>e.estagio==="Customer");
+  const coldLead   = funil.find(e=>e.estagio==="Cold Lead"||e.perdido);
+  const taxaConv   = (newLead&&newLead.total) ? Math.round((customer?.total||0)/newLead.total*100) : 0;
+
+  const kpisLead = document.getElementById("respondioKpiosLead");
+  if(kpisLead) kpisLead.innerHTML = `
+    <div class="card-kpi kpi-azul">
+      <div class="kpi-label">Total Contatos</div>
+      <div class="kpi-valor">${formatarNumero(totalLeads)}</div>
+      <div class="kpi-sub">No funil ativo</div>
+    </div>
+    <div class="card-kpi kpi-ciano">
+      <div class="kpi-label">New Lead</div>
+      <div class="kpi-valor">${formatarNumero(newLead?.total||0)}</div>
+      <div class="kpi-sub">Entrada no funil</div>
+    </div>
+    <div class="card-kpi kpi-amarelo">
+      <div class="kpi-label">Hot Lead</div>
+      <div class="kpi-valor">${formatarNumero(hotLead?.total||0)}</div>
+      <div class="kpi-sub">Alta intencao</div>
+    </div>
+    <div class="card-kpi kpi-verde">
+      <div class="kpi-label">Clientes</div>
+      <div class="kpi-valor">${formatarNumero(customer?.total||0)}</div>
+      <div class="kpi-sub">Compraram</div>
+    </div>
+    <div class="card-kpi" style="background:#150d0d;border:1px solid #ef444433">
+      <div class="kpi-label">Cold Lead</div>
+      <div class="kpi-valor" style="color:#f87171">${formatarNumero(coldLead?.total||0)}</div>
+      <div class="kpi-sub">Perdidos / inativos</div>
+    </div>
+    <div class="card-kpi kpi-roxo">
+      <div class="kpi-label">Taxa Conversao</div>
+      <div class="kpi-valor">${taxaConv}%</div>
+      <div class="kpi-sub">New Lead → Cliente</div>
+    </div>`;
+
+  // ── Grafico: Conversas por dia 30d ──────────────────────────────────────────
+  const pd30   = cv.porDia30 || {};
+  const ld30   = Object.keys(pd30).map(d=>d.slice(8,10)+"/"+d.slice(5,7));
+  const vd30   = Object.values(pd30);
+  _destr("convDia30");
+  const ctxD30 = document.getElementById("graficoConvDia30");
+  if(ctxD30 && ld30.length) {
+    graficos.convDia30 = new Chart(ctxD30, {
+      type:"line",
+      data:{labels:ld30,datasets:[{
+        label:"Conversas",data:vd30,
+        borderColor:"#3b82f6",backgroundColor:"rgba(59,130,246,0.12)",
+        tension:0.4,fill:true,pointRadius:2,pointHoverRadius:5
+      }]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:"#94a3b8",font:{size:10}}}},
+        scales:{
+          x:{ticks:{color:"#64748b",maxTicksLimit:10,font:{size:9}},grid:{color:"#1e2540"}},
+          y:{ticks:{color:"#64748b",font:{size:9}},grid:{color:"#1e2540"},beginAtZero:true}
+        }}
+    });
+  } else _vazio("graficoConvDia30","Sem dados — execute atualizar_respondio.py");
+
+  // ── Grafico: Origem doughnut ────────────────────────────────────────────────
+  const origens = Object.entries(cv.porOrigem||{}).sort((a,b)=>b[1]-a[1]).slice(0,9);
+  _destr("convOrigem");
+  const ctxOrig = document.getElementById("graficoOrigem");
+  if(ctxOrig && origens.length) {
+    graficos.convOrigem = new Chart(ctxOrig, {
+      type:"doughnut",
+      data:{labels:origens.map(o=>o[0]),datasets:[{data:origens.map(o=>o[1]),backgroundColor:CORES,borderWidth:2,borderColor:"#13162a"}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:"55%",
+        plugins:{legend:{position:"right",labels:{color:"#94a3b8",font:{size:10},boxWidth:10,padding:6}}}}
+    });
+  } else _vazio("graficoOrigem","Sem dados");
+
+  // ── Grafico: Por canal (horizontal bar) ─────────────────────────────────────
+  const canais = Object.entries(cv.porCanal||{}).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  _destr("convCanal");
+  const ctxCan = document.getElementById("graficoCanal");
+  if(ctxCan && canais.length) {
+    graficos.convCanal = new Chart(ctxCan, {
+      type:"bar",
+      data:{labels:canais.map(c=>c[0]),datasets:[{label:"Conversas",data:canais.map(c=>c[1]),backgroundColor:CORES,borderRadius:4,borderSkipped:false}]},
+      options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{color:"#64748b",font:{size:9}},grid:{color:"#1e2540"},beginAtZero:true},
+          y:{ticks:{color:"#94a3b8",font:{size:10}},grid:{color:"#1e2540"}}
+        }}
+    });
+  } else _vazio("graficoCanal","Sem dados");
+
+  // ── Grafico: Status (doughnut) ───────────────────────────────────────────────
+  const statusEntries = Object.entries(statusObj).filter(e=>e[1]>0);
+  const STATUS_CORES = {"open":"#f59e0b","opened":"#f59e0b","pending":"#f59e0b","close":"#22c55e","closed":"#22c55e","resolved":"#22c55e","reopen":"#3b82f6","spam":"#ef4444"};
+  _destr("convStatus");
+  const ctxSt = document.getElementById("graficoStatus");
+  if(ctxSt && statusEntries.length) {
+    graficos.convStatus = new Chart(ctxSt, {
+      type:"doughnut",
+      data:{
+        labels:statusEntries.map(e=>e[0]),
+        datasets:[{data:statusEntries.map(e=>e[1]),
+          backgroundColor:statusEntries.map(e=>STATUS_CORES[e[0]]||"#64748b"),
+          borderWidth:2,borderColor:"#13162a"}]
+      },
+      options:{responsive:true,maintainAspectRatio:false,cutout:"60%",
+        plugins:{legend:{position:"bottom",labels:{color:"#94a3b8",font:{size:10},boxWidth:10,padding:6}}}}
+    });
+  } else _vazio("graficoStatus","Sem dados");
+
+  // ── Grafico: Evolucao 90 dias ────────────────────────────────────────────────
+  const pd90   = cv.porDia90 || {};
+  const ld90   = Object.keys(pd90).map(d=>d.slice(8,10)+"/"+d.slice(5,7));
+  const vd90   = Object.values(pd90);
+  _destr("convDia90");
+  const ctxD90 = document.getElementById("graficoConvDia90");
+  if(ctxD90 && ld90.length) {
+    graficos.convDia90 = new Chart(ctxD90, {
+      type:"line",
+      data:{labels:ld90,datasets:[{
+        label:"Conversas",data:vd90,
+        borderColor:"#a855f7",backgroundColor:"rgba(168,85,247,0.1)",
+        tension:0.3,fill:true,pointRadius:0,pointHoverRadius:4
+      }]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:"#94a3b8",font:{size:10}}}},
+        scales:{
+          x:{ticks:{color:"#64748b",maxTicksLimit:12,font:{size:9}},grid:{color:"#1e2540"}},
+          y:{ticks:{color:"#64748b",font:{size:9}},grid:{color:"#1e2540"},beginAtZero:true}
+        }}
+    });
+  } else _vazio("graficoConvDia90","Sem dados — execute atualizar_respondio.py");
+
+  // ── Funil visual ─────────────────────────────────────────────────────────────
+  const funilEl = document.getElementById("respondioFunil");
+  if(funilEl) {
+    if(!funil.length) {
+      funilEl.innerHTML=`<p style="color:#475569;font-size:12px;text-align:center;padding:32px 0">Sem dados de ciclo de vida.<br>Execute atualizar_respondio.py</p>`;
+    } else {
+      const CORES_F = {
+        "New Lead": "#3b82f6","Hot Lead":"#f59e0b","Payment":"#10b981",
+        "Customer":"#a855f7","Cold Lead":"#ef4444"
+      };
+      const principais = funil.filter(e=>!e.outro);
+      const maxV = Math.max(...principais.filter(e=>!e.perdido).map(e=>e.total),1);
+      funilEl.innerHTML = principais.map((e,i) => {
+        const cor    = CORES_F[e.estagio] || (e.perdido?"#ef4444":"#64748b");
+        const pct    = e.perdido ? null : Math.round(e.total/maxV*100);
+        const bar    = pct!==null ? Math.max(pct,3) : 20;
+        const conv   = (!e.perdido && i>0 && principais[i-1]?.total)
+                        ? Math.round(e.total/principais[i-1].total*100)+"%" : "";
+        const icone  = e.perdido?"❌":["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣"][i]||"•";
+        return `
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
+              <span style="font-size:12px;font-weight:600;color:#e2e8f0">${icone} ${e.estagio}
+                ${conv?`<span style="font-size:10px;color:#64748b;margin-left:6px">→ ${conv} do anterior</span>`:''}
+              </span>
+              <span style="font-size:14px;font-weight:700;color:${cor}">${e.total.toLocaleString("pt-BR")}</span>
+            </div>
+            <div style="background:#0f1225;border-radius:4px;height:8px;overflow:hidden">
+              <div style="height:100%;width:${bar}%;background:${cor};border-radius:4px;transition:width .5s"></div>
+            </div>
+          </div>`;
+      }).join("");
+    }
+  }
+
+  // ── Agentes ──────────────────────────────────────────────────────────────────
+  const agentesEl = document.getElementById("respondioAgentes");
+  if(agentesEl) {
+    const agentes = D.agentes || [];
+    if(!agentes.length) {
+      agentesEl.innerHTML=`<p style="color:#475569;font-size:12px;padding:8px">Sem dados de agentes.</p>`;
+    } else {
+      const maxA = Math.max(...agentes.map(a=>a.total||0),1);
+      agentesEl.innerHTML = agentes.slice(0,12).map((a,i)=>`
+        <div style="background:#0f1225;border:1px solid #1e2540;border-radius:8px;padding:10px 12px">
+          <div style="font-size:11px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.nome||"Agente "+(i+1)}</div>
+          <div style="font-size:18px;font-weight:700;color:${CORES[i%CORES.length]};margin:4px 0">${(a.total||0).toLocaleString("pt-BR")}</div>
+          <div style="background:#1e2540;border-radius:3px;height:4px;overflow:hidden">
+            <div style="height:100%;width:${Math.round((a.total||0)/maxA*100)}%;background:${CORES[i%CORES.length]};border-radius:3px"></div>
+          </div>
+          <div style="font-size:10px;color:#475569;margin-top:4px">${a.abertos!=null?a.abertos+" abertas":""} ${a.fechados!=null?a.fechados+" fechadas":""}</div>
+        </div>`).join("");
+    }
+  }
+
+  // ── Tags ─────────────────────────────────────────────────────────────────────
+  const tagsEl = document.getElementById("respondioTags");
+  if(tagsEl) {
+    const tags = D.tags || [];
+    if(!tags.length) {
+      tagsEl.innerHTML=`<p style="color:#475569;font-size:12px">Sem dados de tags.</p>`;
+    } else {
+      const maxT = Math.max(...tags.map(t=>t.total||0),1);
+      tagsEl.innerHTML = tags.slice(0,20).map((t,i)=>{
+        const pct = Math.max(Math.round((t.total||0)/maxT*100),10);
+        return `<div style="background:#1e2540;border:1px solid #334155;border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;color:#94a3b8">${t.nome||t.tag||"Tag"+(i+1)}</span>
+          <span style="font-size:12px;font-weight:700;color:${CORES[i%CORES.length]}">${(t.total||0).toLocaleString("pt-BR")}</span>
+        </div>`;
+      }).join("");
+    }
+  }
+
+} catch(e){ console.error("renderizarRespondio:",e); }}
 
 // ────────────────────────────────────────────────────────────────────────────
 // FILTROS DE DATA — META / GOOGLE (visuais, dados estáticos de 30 dias)
