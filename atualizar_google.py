@@ -1,7 +1,7 @@
 """
 atualizar_google.py
 ===================
-Busca dados reais do Google Ads API e atualiza o dashboard_completo.html.
+Busca dados reais do Google Ads API e atualiza o index.html.
 Execute: python atualizar_google.py
 
 ─── REQUISITOS ──────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ REFRESH_TOKEN   = "SEU_REFRESH_TOKEN"      # Gerado por gerar_token_google.py
 CUSTOMER_ID     = "XXXXXXXXXX"             # ID da conta sem hifens
 LOGIN_CUSTOMER_ID = ""                     # ID da conta MCC (se houver); senao deixe ""
 
-ARQUIVO_DASH    = "dashboard_completo.html"
+ARQUIVO_DASH    = "index.html"
 DATE_RANGE      = "LAST_30_DAYS"
 # Opcoes: LAST_7_DAYS, LAST_14_DAYS, LAST_30_DAYS, THIS_MONTH, LAST_MONTH
 # ──────────────────────────────────────────────────────────────────────────────

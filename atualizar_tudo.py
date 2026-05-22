@@ -42,4 +42,4 @@ print(f"  Meta Ads:   {'OK' if ok_meta   else 'ERRO — verifique token/conta'}"
 print(f"  Google Ads: {'OK' if ok_google else 'ERRO — verifique credenciais'}")
 print(f"  Rezdy:      {'OK' if ok_rezdy  else 'ERRO — verifique chave API'}")
 print(f"  Duracao:    {duracao}s")
-print(f"\n  Abra: dashboard_completo.html\n")
+print(f"\n  Abra: index.html\n")

@@ -1,7 +1,7 @@
 """
 atualizar_dados.py
 ==================
-Busca dados do Rezdy com paginacao e gera o dashboard_completo.html.
+Busca dados do Rezdy com paginacao e gera o index.html.
 Armazena dataCriacao (booking date) e dataFulfillment (data do voo) separadamente.
 Execute: python atualizar_dados.py
 """
@@ -15,7 +15,7 @@ from collections import defaultdict
 # ─── CONFIGURACAO ─────────────────────────────────────────────────────────────
 CHAVE_API_REZDY   = "dc7f8d97256e484b8763a983ded2ba22"
 URL_BASE_REZDY    = "https://api.rezdy.com/v1"
-ARQUIVO_DASHBOARD = "dashboard_completo.html"
+ARQUIVO_DASHBOARD = "index.html"
 LIMITE_TOTAL      = 1000   # total de reservas a buscar (10 chamadas de 100)
 # ──────────────────────────────────────────────────────────────────────────────
 

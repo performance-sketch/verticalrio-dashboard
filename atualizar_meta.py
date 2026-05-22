@@ -1,7 +1,7 @@
 """
 atualizar_meta.py
 =================
-Busca dados reais da Meta Ads API e atualiza o dashboard_completo.html.
+Busca dados reais da Meta Ads API e atualiza o index.html.
   - 4 periodos predefinidos: 7d, 14d, 30d, 90d (com campanhas, idades, paises)
   - Totais diarios dos ultimos 365 dias (para ranges customizados no dashboard)
 Execute: python atualizar_meta.py
@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 # ─── CONFIGURACAO ─────────────────────────────────────────────────────────────
 ACCESS_TOKEN  = "EAASW2NZCdwiwBRjZBpgb4Unpo2rqHB8iSJfZAt3BkkHB3pxrkevSo0UYx5RnF5hN7dnZCUV5yqwuPtfVUqhE3gAyOcfbLvYVhmMb5Cq1OAZBtJQ9cCRQAIce6wU7QNiX1iy11KH8tELm38U8HKTZCIgriWrUZBUdP4l60xZB4zxDgJVyZAC2bllLHsyDHnos83noLfm9SX14s0ZCmAP0iLTZBAw5OShUTb84yf4AgQCz201"
 AD_ACCOUNT_ID = "act_2613909812239242"
-ARQUIVO_DASH  = "dashboard_completo.html"
+ARQUIVO_DASH  = "index.html"
 API_VERSION   = "v19.0"
 BASE_URL      = f"https://graph.facebook.com/{API_VERSION}"
 
