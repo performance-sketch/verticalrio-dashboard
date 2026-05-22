@@ -512,25 +512,6 @@
 
   <div id="avisoRezdy"></div>
 
-  <div class="filtro-datas" id="rezdyFiltros">
-    <span style="font-size:11px;color:#64748b;font-weight:600">Filtrar por:</span>
-    <button class="btn-periodo ativo" id="btnRezdyTipoBooking" onclick="setRezdyDateType('booking',this)">Booking</button>
-    <button class="btn-periodo" id="btnRezdyTipoFulfillment" onclick="setRezdyDateType('fulfillment',this)">Fulfillment</button>
-    <div class="div-sep-v"></div>
-    <button class="btn-periodo ativo" id="rezdyBtnAtivo" onclick="filtrarRezdy(this,'todos')">Todos</button>
-    <button class="btn-periodo" onclick="filtrarRezdy(this,'passado7d')">Ult. 7d</button>
-    <button class="btn-periodo" onclick="filtrarRezdy(this,'passado30d')">Ult. 30d</button>
-    <button class="btn-periodo" onclick="filtrarRezdy(this,'hoje')">Hoje</button>
-    <button class="btn-periodo" onclick="filtrarRezdy(this,'7d')">Prox. 7d</button>
-    <button class="btn-periodo" onclick="filtrarRezdy(this,'30d')">Prox. 30d</button>
-    <div class="div-sep-v"></div>
-    <input type="date" id="rezdyDataInicio" class="input-data">
-    <span style="color:#64748b;font-size:12px">&mdash;</span>
-    <input type="date" id="rezdyDataFim" class="input-data">
-    <button class="btn-aplicar" onclick="aplicarFiltroRezdyCustom()">Aplicar</button>
-    <span id="rezdyFiltroLabel" style="font-size:11px;color:#64748b;margin-left:6px"></span>
-  </div>
-
   <div class="grade-kpi" id="kpiRezdy">
     <div class="card-kpi kpi-azul"><div class="kpi-label">Carregando...</div><div class="kpi-valor">--</div></div>
   </div>
@@ -558,7 +539,14 @@
   </div>
 
   <div class="card">
-    <div class="card-titulo">Reservas Recentes <span class="indicador-vivo"><span class="dot-vivo"></span>Vivo</span></div>
+    <div class="card-titulo" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span>Reservas Recentes <span class="indicador-vivo"><span class="dot-vivo"></span>Vivo</span></span>
+      <span style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;color:#64748b">Filtrar por data de:</span>
+        <button class="btn-periodo ativo" id="btnRezdyTipoBooking" onclick="setRezdyDateType('booking',this)" style="padding:3px 10px;font-size:11px">Booking</button>
+        <button class="btn-periodo" id="btnRezdyTipoFulfillment" onclick="setRezdyDateType('fulfillment',this)" style="padding:3px 10px;font-size:11px">Fulfillment</button>
+      </span>
+    </div>
     <div class="tabela-scroll">
       <table>
         <thead>
@@ -23748,6 +23736,22 @@ function renderizarAnalytics() {
 // ABA: REZDY (dados embutidos pelo atualizar_dados.py)
 // ────────────────────────────────────────────────────────────────────────────
 
+function getRezdyFiltroGlobal() {
+  // Traduz o filtro global (FILTRO) para iniStr/fimStr para uso no Rezdy
+  if(FILTRO.ini && FILTRO.fim){
+    const iniS = FILTRO.iniStr || FILTRO.ini.toLocaleDateString('sv');
+    const fimS = FILTRO.fimStr || FILTRO.fim.toLocaleDateString('sv');
+    return { iniStr: iniS, fimStr: fimS };
+  }
+  if(FILTRO.dias === 'max') return { iniStr: null, fimStr: null };
+  if(FILTRO.dias){
+    const hoje = new Date().toISOString().slice(0,10);
+    const addD = (d,n) => { const dt=new Date(d+"T12:00:00"); dt.setDate(dt.getDate()+n); return dt.toISOString().slice(0,10); };
+    return { iniStr: addD(hoje, -(FILTRO.dias-1)), fimStr: hoje };
+  }
+  return { iniStr: null, fimStr: null };
+}
+
 function renderizarResumoRezdy() { try {
   const r = DADOS_REZDY_LIVE.resumo;
 
@@ -23760,7 +23764,7 @@ function renderizarResumoRezdy() { try {
   const elAviso = document.getElementById("avisoRezdy");
   if(elAviso) elAviso.innerHTML = avisoHTML;
 
-  // Grafico status na visao geral (nao filtrado — usa totais completos)
+  // Grafico status na visao geral (usa totais completos, nao filtrado)
   const contStatus = r.contagem_status || {};
   if(Object.keys(contStatus).length){
     criarGrafico("graficoStatusGeral",{
@@ -23770,8 +23774,9 @@ function renderizarResumoRezdy() { try {
     });
   }
 
-  // Renderiza tudo com filtro padrao (todos os dados)
-  aplicarFiltroTabelaRezdy(null, null);
+  // Renderiza com o filtro global ativo
+  const {iniStr, fimStr} = getRezdyFiltroGlobal();
+  aplicarFiltroTabelaRezdy(iniStr, fimStr);
 } catch(e){ console.error("renderizarResumoRezdy:",e); }}
 
 function renderizarTabelaRezdy() {
@@ -23871,74 +23876,19 @@ function aplicarFiltroCustom(origem) {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// FILTROS DE DATA — REZDY (filtra a tabela por horarioVoo)
+// FILTROS DE DATA — REZDY
 // ────────────────────────────────────────────────────────────────────────────
-
-let rezdyFiltroAtivo = "todos";
 
 let rezdyDateType = 'booking'; // 'booking' | 'fulfillment'
 
 function setRezdyDateType(tipo, btn) {
   rezdyDateType = tipo;
-  document.querySelectorAll('#rezdyFiltros .btn-periodo').forEach(b=>{
-    if(b.id==='btnRezdyTipoBooking'||b.id==='btnRezdyTipoFulfillment') b.classList.remove('ativo');
-  });
+  document.querySelectorAll('#btnRezdyTipoBooking, #btnRezdyTipoFulfillment').forEach(b => b.classList.remove('ativo'));
   btn.classList.add('ativo');
-  const label = document.getElementById("rezdyFiltroLabel");
-  if(label) label.textContent = "Filtrando por: " + (tipo==='booking'?'Data de Booking':'Data de Fulfillment');
-  // Reaplicar filtro atual
-  const atv = document.querySelector('#rezdyFiltros button.ativo:not(#btnRezdyTipoBooking):not(#btnRezdyTipoFulfillment)');
-  if(atv) atv.click(); else aplicarFiltroTabelaRezdy(null, null);
-}
-
-function filtrarRezdy(btn, modo) {
-  rezdyFiltroAtivo = modo;
-  // Limpa apenas os botoes de periodo (nao os de tipo)
-  document.querySelectorAll('#rezdyFiltros .btn-periodo').forEach(b=>{
-    if(b.id!=='btnRezdyTipoBooking'&&b.id!=='btnRezdyTipoFulfillment') b.classList.remove('ativo');
-  });
-  btn.classList.add('ativo');
-  const hoje = new Date().toISOString().slice(0,10);
-  const label = document.getElementById("rezdyFiltroLabel");
-  let iniStr = null, fimStr = null;
-
-  const addDays = (d, n) => {
-    const dt = new Date(d+"T12:00:00"); dt.setDate(dt.getDate()+n);
-    return dt.toISOString().slice(0,10);
-  };
-
-  if(modo==="hoje"){
-    iniStr = hoje; fimStr = hoje;
-    if(label) label.textContent = "Hoje ("+hoje+")";
-  } else if(modo==="passado7d"){
-    iniStr = addDays(hoje,-6); fimStr = hoje;
-    if(label) label.textContent = "Ultimos 7 dias";
-  } else if(modo==="passado30d"){
-    iniStr = addDays(hoje,-29); fimStr = hoje;
-    if(label) label.textContent = "Ultimos 30 dias";
-  } else if(modo==="7d"){
-    iniStr = hoje; fimStr = addDays(hoje,6);
-    if(label) label.textContent = "Proximos 7 dias";
-  } else if(modo==="30d"){
-    iniStr = hoje; fimStr = addDays(hoje,29);
-    if(label) label.textContent = "Proximos 30 dias";
-  } else {
-    if(label) label.textContent = "";
-  }
+  const {iniStr, fimStr} = getRezdyFiltroGlobal();
   aplicarFiltroTabelaRezdy(iniStr, fimStr);
 }
 
-function aplicarFiltroRezdyCustom() {
-  const ini = document.getElementById("rezdyDataInicio").value;
-  const fim = document.getElementById("rezdyDataFim").value;
-  if(!ini||!fim){ alert("Selecione data de inicio e fim."); return; }
-  document.querySelectorAll('#rezdyFiltros .btn-periodo').forEach(b=>{
-    if(b.id!=='btnRezdyTipoBooking'&&b.id!=='btnRezdyTipoFulfillment') b.classList.remove('ativo');
-  });
-  const label = document.getElementById("rezdyFiltroLabel");
-  if(label) label.textContent = ini+" a "+fim;
-  aplicarFiltroTabelaRezdy(ini, fim);
-}
 
 function aplicarFiltroTabelaRezdy(iniStr, fimStr) {
   const todas = DADOS_REZDY_LIVE.resumo.tabela || [];
