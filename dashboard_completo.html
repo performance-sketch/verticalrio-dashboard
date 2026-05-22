@@ -23909,7 +23909,6 @@ function aplicarFiltroTabelaRezdy(iniStr, fimStr) {
   // Bookings e Fulfillments de ontem (sempre sobre dataset completo)
   const addDaysStr = (d, n) => { const dt=new Date(d+"T12:00:00"); dt.setDate(dt.getDate()+n); return dt.toISOString().slice(0,10); };
   const ontem = addDaysStr(new Date().toISOString().slice(0,10), -1);
-  const todas  = DADOS_REZDY_LIVE.resumo.tabela || [];
   const bookingsOntem    = todas.filter(r => r.dataCriacao === ontem).length;
   const fulfillmentsOntem = todas.filter(r => r.dataFulfillment === ontem).length;
 
