@@ -539,9 +539,10 @@
         <span style="font-size:11px;color:#64748b">Filtrar por data de:</span>
         <button class="btn-periodo ativo" id="btnRezdyTipoBooking" onclick="setRezdyDateType('booking',this)" style="padding:3px 10px;font-size:11px">Booking</button>
         <button class="btn-periodo" id="btnRezdyTipoFulfillment" onclick="setRezdyDateType('fulfillment',this)" style="padding:3px 10px;font-size:11px">Fulfillment</button>
+        <button id="btnMinTabela" onclick="toggleRezdyTabela()" style="background:#1e2540;border:1px solid #2d3a5a;color:#94a3b8;font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer" title="Minimizar / Maximizar">&#x2212;</button>
       </span>
     </div>
-    <div class="tabela-scroll">
+    <div id="rezdyTabelaWrapper" class="tabela-scroll">
       <table>
         <thead>
           <tr>
@@ -23875,6 +23876,23 @@ function aplicarFiltroCustom(origem) {
 
 let rezdyDateType = 'booking'; // 'booking' | 'fulfillment'
 
+const fmtData = d => d ? d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4) : '—';
+
+function toggleRezdyTabela() {
+  const wrapper = document.getElementById("rezdyTabelaWrapper");
+  const btn = document.getElementById("btnMinTabela");
+  if (!wrapper || !btn) return;
+  if (wrapper.style.display === "none") {
+    wrapper.style.display = "";
+    btn.innerHTML = "&#x2212;";
+    btn.title = "Minimizar";
+  } else {
+    wrapper.style.display = "none";
+    btn.innerHTML = "&#x25BC;";
+    btn.title = "Maximizar";
+  }
+}
+
 function setRezdyDateType(tipo, btn) {
   rezdyDateType = tipo;
   document.querySelectorAll('#btnRezdyTipoBooking, #btnRezdyTipoFulfillment').forEach(b => b.classList.remove('ativo'));
@@ -24017,8 +24035,8 @@ function aplicarFiltroTabelaRezdy(iniStr, fimStr) {
     <td><span class="${classeBadgeStatus(r.status)}">${traduzirStatus(r.status)}</span></td>
     <td><div style="font-weight:500">${r.nomeCliente}</div><div style="font-size:10px;color:#64748b">${r.emailCliente}</div></td>
     <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${r.produto}</td>
-    <td style="color:#94a3b8;white-space:nowrap">${r.dataCriacao||'—'}</td>
-    <td style="color:#60a5fa;white-space:nowrap">${r.dataFulfillment||'—'}</td>
+    <td style="color:#94a3b8;white-space:nowrap">${fmtData(r.dataCriacao)}</td>
+    <td style="color:#60a5fa;white-space:nowrap">${fmtData(r.dataFulfillment)}</td>
     <td style="color:#94a3b8;white-space:nowrap">${r.horaFulfillment||'—'}</td>
     <td style="text-align:center">${r.quantidade}</td>
     <td style="font-weight:600">R$ ${formatarMoeda(r.valorTotal)}</td>
