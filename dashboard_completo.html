@@ -259,7 +259,7 @@
     <div class="card-kpi kpi-azul">
       <div class="kpi-label" id="kpiLabelMetaGasto">Total Gasto (30d)</div>
       <div class="kpi-valor" id="kpiMetaGasto">R$ 31.007</div>
-      <div class="kpi-sub">17 conjuntos de anuncios</div>
+      <div class="kpi-sub" id="kpiMetaCampanhasCount">— campanhas</div>
     </div>
     <div class="card-kpi kpi-roxo">
       <div class="kpi-label">Impressoes</div>
@@ -285,7 +285,7 @@
 
   <div class="grade-21">
     <div class="card">
-      <div class="card-titulo">Gasto por Conjunto de Anuncios — Top 10</div>
+      <div class="card-titulo">Gasto por Campanha — Top 10</div>
       <div class="grafico-alto"><canvas id="graficoMetaBarra"></canvas></div>
     </div>
     <div class="card">
@@ -295,12 +295,12 @@
   </div>
 
   <div class="card">
-    <div class="card-titulo">Todos os Conjuntos de Anuncios</div>
+    <div class="card-titulo">Todas as Campanhas</div>
     <div class="tabela-scroll">
       <table>
         <thead>
           <tr>
-            <th>Conjunto de Anuncios</th>
+            <th>Campanha</th>
             <th>Gasto (R$)</th>
             <th>Impressoes</th>
             <th>Cliques</th>
@@ -19955,6 +19955,8 @@ function renderizarMetaAds() { try {
     if(elMC) elMC.textContent=formatarNumero(Math.round(_meta.totalCliques));
     const lbl=document.getElementById("kpiLabelMetaGasto");
     if(lbl) lbl.textContent="Total Gasto ("+(FILTRO.ini&&FILTRO.fim?'custom':FILTRO.dias==='max'?'maximo':FILTRO.dias?FILTRO.dias+'d':'todos')+")";
+    const elCount=document.getElementById("kpiMetaCampanhasCount");
+    if(elCount){ const n=(_meta.campanhas||[]).filter(c=>c.gasto>0).length; elCount.textContent=n+" campanha"+(n!==1?"s":""); }
   }
 } catch(e){ console.error("renderizarMetaAds:",e); }}
 
