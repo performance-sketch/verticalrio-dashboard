@@ -316,6 +316,105 @@ def variacao_seguidores(hist, perfil):
     return resultado
 
 
+def buscar_ab_tests(n_testes=2):
+    """
+    Agrupa ads por adset, seleciona os N adsets com maior gasto que tenham
+    pelo menos 2 criativos diferentes e retorna pares A/B com métricas comparativas.
+    """
+    # ── Insights por ad (last 30d) ────────────────────────────────────────
+    ins_all = []
+    resp = api_get(f"{AD_ACCOUNT_ID}/insights", {
+        "level":       "ad",
+        "fields":      "ad_id,ad_name,adset_id,adset_name,campaign_id,campaign_name,"
+                       "spend,impressions,clicks,ctr,cpc,cpm,reach,actions",
+        "date_preset": "last_30d",
+        "limit":       500,
+    })
+    ins_all.extend(resp.get("data", []))
+    while resp.get("paging", {}).get("next"):
+        resp = requests.get(resp["paging"]["next"], timeout=30).json()
+        ins_all.extend(resp.get("data", []))
+
+    # ── Agrupar por adset ─────────────────────────────────────────────────
+    from collections import defaultdict
+    grupos = defaultdict(list)
+    for row in ins_all:
+        spend = float(row.get("spend") or 0)
+        if spend <= 0:
+            continue
+        grupos[row["adset_id"]].append({
+            "adId":      row["ad_id"],
+            "nome":      row["ad_name"],
+            "adsetId":   row["adset_id"],
+            "adsetNome": row.get("adset_name", ""),
+            "campNome":  row.get("campaign_name", ""),
+            "spend":     round(spend, 2),
+            "impressoes":int(row.get("impressions") or 0),
+            "cliques":   int(row.get("clicks")      or 0),
+            "ctr":       round(float(row.get("ctr") or 0), 3),
+            "cpc":       round(float(row.get("cpc") or 0), 3),
+            "cpm":       round(float(row.get("cpm") or 0), 3),
+            "alcance":   int(row.get("reach")        or 0),
+            "thumbnail": "",
+        })
+
+    # Ordenar adsets por gasto total, manter só os com >= 2 ads
+    candidatos = sorted(
+        [(k, v) for k, v in grupos.items() if len(v) >= 2],
+        key=lambda x: -sum(a["spend"] for a in x[1]),
+    )
+
+    # ── Buscar thumbnails para os ads dos top N adsets ────────────────────
+    top_ids = []
+    for _, ads in candidatos[:n_testes]:
+        ads.sort(key=lambda x: -x["spend"])
+        top_ids += [a["adId"] for a in ads[:2]]
+
+    if top_ids:
+        try:
+            thumb_resp = api_get("", {
+                "ids":    ",".join(top_ids),
+                "fields": "id,creative{thumbnail_url,image_url}",
+            })
+            for ad_id, ad_data in thumb_resp.items():
+                cr = ad_data.get("creative") or {}
+                thumb = cr.get("thumbnail_url") or cr.get("image_url") or ""
+                for _, ads in candidatos[:n_testes]:
+                    for ad in ads:
+                        if ad["adId"] == ad_id:
+                            ad["thumbnail"] = thumb
+        except Exception as e:
+            print(f"  [AVISO] Thumbnails: {e}")
+
+    # ── Montar pares A/B ──────────────────────────────────────────────────
+    def score(ad):
+        # Score normalizado: alta CTR + baixo CPC → melhor
+        return (ad["ctr"] or 0) / max(ad["cpc"], 0.01)
+
+    testes = []
+    for adset_id, ads in candidatos[:n_testes]:
+        ads.sort(key=lambda x: -x["spend"])
+        a, b = ads[0], ads[1]
+
+        venc_ctr  = "a" if a["ctr"]   >= b["ctr"]   else "b"
+        venc_cpc  = "a" if a["cpc"]   <= b["cpc"]   else "b"
+        venc_geral= "a" if score(a)   >= score(b)   else "b"
+
+        testes.append({
+            "adsetId":     adset_id,
+            "adsetNome":   ads[0]["adsetNome"],
+            "campNome":    ads[0]["campNome"],
+            "totalAds":    len(ads),
+            "a":           a,
+            "b":           b,
+            "vencedorCtr": venc_ctr,
+            "vencedorCpc": venc_cpc,
+            "vencedorGeral": venc_geral,
+        })
+
+    return testes
+
+
 def atualizar_html(dados):
     with open(ARQUIVO_DASH, encoding="utf-8") as f:
         html = f.read()
@@ -366,6 +465,15 @@ def main():
     diario = buscar_diario()
     resultado["diario"] = diario
     print(f"  {len(diario)} dias com gasto registrado")
+
+    print("\nMontando testes A/B (top 2 adsets)...")
+    ab_tests = buscar_ab_tests(n_testes=2)
+    resultado["abTests"] = ab_tests
+    for t in ab_tests:
+        nome_safe = t['adsetNome'].encode('ascii','replace').decode()[:50]
+        print(f"  Teste: {nome_safe} | "
+              f"A ctr={t['a']['ctr']} | B ctr={t['b']['ctr']} | "
+              f"Vencedor={t['vencedorGeral'].upper()}")
 
     print(f"\nAtualizando {ARQUIVO_DASH}...")
     atualizar_html(resultado)
