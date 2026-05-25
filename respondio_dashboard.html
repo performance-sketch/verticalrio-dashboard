@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Respond.io Dashboard · Vertical Rio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:       #f1f5f9;
+  --card:     #ffffff;
+  --border:   #e2e8f0;
+  --text:     #0f172a;
+  --muted:    #64748b;
+  --subtle:   #94a3b8;
+  --blue:     #3b82f6;
+  --indigo:   #6366f1;
+  --green:    #10b981;
+  --red:      #ef4444;
+  --yellow:   #f59e0b;
+  --purple:   #8b5cf6;
+  --pink:     #ec4899;
+  --orange:   #f97316;
+  --cyan:     #06b6d4;
+  --teal:     #14b8a6;
+  --shadow:   0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  --radius:   14px;
+  --radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+/* ── Header ── */
+.dash-header{background:linear-gradient(135deg,#4f46e5 0%,#6366f1 40%,#8b5cf6 100%);padding:24px 28px 0;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(79,70,229,.25)}
+.dash-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.dash-logo{display:flex;align-items:center;gap:10px}
+.dash-logo-icon{width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.dash-logo h1{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.02em}
+.dash-logo p{font-size:12px;color:rgba(255,255,255,.65);margin-top:1px}
+.dash-badge{background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2);font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px}
+.dash-update{font-size:11px;color:rgba(255,255,255,.55)}
+
+/* ── Filter bar ── */
+.filter-bar{display:flex;align-items:center;gap:8px;padding:12px 0;flex-wrap:wrap}
+.filter-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.6);letter-spacing:.05em;text-transform:uppercase;margin-right:2px}
+.period-pills{display:flex;gap:2px;background:rgba(0,0,0,.15);padding:3px;border-radius:20px}
+.period-pill{background:none;border:none;color:rgba(255,255,255,.65);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:4px 12px;border-radius:16px;cursor:pointer;transition:all .2s}
+.period-pill:hover{color:#fff;background:rgba(255,255,255,.1)}
+.period-pill.active{background:#fff;color:#4f46e5;font-weight:600}
+.filter-sep{width:1px;height:20px;background:rgba(255,255,255,.15);margin:0 4px}
+.filter-select{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:'Inter',sans-serif;font-size:12px;padding:5px 28px 5px 10px;border-radius:8px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.filter-select option{color:#0f172a;background:#fff}
+
+/* ── Main ── */
+.dash-main{padding:24px 28px;display:flex;flex-direction:column;gap:20px;max-width:1600px;margin:0 auto}
+
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.kpi-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;position:relative}
+.kpi-card-top{height:6px}
+.kpi-card-body{padding:14px 16px 16px}
+.kpi-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.kpi-value{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--text);line-height:1}
+.kpi-sub{display:flex;align-items:center;gap:5px;margin-top:6px}
+.kpi-change{font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:10px}
+.up-good{background:rgba(16,185,129,.1);color:#059669}
+.up-bad {background:rgba(239,68,68,.1);color:#dc2626}
+.dn-good{background:rgba(16,185,129,.1);color:#059669}
+.dn-bad {background:rgba(239,68,68,.1);color:#dc2626}
+.neutral{background:rgba(100,116,139,.1);color:var(--muted)}
+.kpi-vs{font-size:10px;color:var(--subtle)}
+
+/* gradient tops */
+.gt-blue   { background:linear-gradient(90deg,#3b82f6,#6366f1) }
+.gt-green  { background:linear-gradient(90deg,#10b981,#059669) }
+.gt-purple { background:linear-gradient(90deg,#8b5cf6,#6366f1) }
+.gt-pink   { background:linear-gradient(90deg,#ec4899,#8b5cf6) }
+.gt-orange { background:linear-gradient(90deg,#f97316,#f59e0b) }
+.gt-red    { background:linear-gradient(90deg,#ef4444,#f97316) }
+.gt-cyan   { background:linear-gradient(90deg,#06b6d4,#3b82f6) }
+.gt-teal   { background:linear-gradient(90deg,#14b8a6,#10b981) }
+.gt-indigo { background:linear-gradient(90deg,#6366f1,#8b5cf6) }
+.gt-yellow { background:linear-gradient(90deg,#f59e0b,#f97316) }
+.gt-gray   { background:linear-gradient(90deg,#64748b,#94a3b8) }
+
+/* ── Section rows ── */
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.row-col-2-1{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.row-col-1-2{display:grid;grid-template-columns:1fr 2fr;gap:16px}
+
+/* ── Chart card ── */
+.chart-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.chart-card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.chart-card-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.chart-wrap{position:relative}
+
+/* ── Section title ── */
+.section-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Funnel ── */
+.funnel-wrap{display:flex;flex-direction:column;gap:8px}
+.funnel-stage{display:flex;align-items:center;gap:10px}
+.funnel-bar-wrap{flex:1;background:#f1f5f9;border-radius:6px;height:32px;position:relative;overflow:hidden}
+.funnel-bar{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:11px;font-weight:600;color:#fff;transition:width .6s ease}
+.funnel-label{width:150px;font-size:12px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:5px;flex-shrink:0}
+.funnel-num{width:45px;text-align:right;font-size:13px;font-weight:700;color:var(--text);flex-shrink:0}
+.funnel-drop{font-size:10px;color:var(--red);font-weight:600;width:40px;text-align:right;flex-shrink:0}
+
+/* ── Channel table ── */
+.channel-table{width:100%;border-collapse:collapse}
+.channel-table th{font-size:11px;font-weight:600;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.channel-table td{padding:9px 10px;border-bottom:1px solid #f1f5f9;font-size:12px}
+.channel-table tr:last-child td{border-bottom:none}
+.channel-table tr:hover td{background:#fafbfc}
+.ch-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.ch-name{font-weight:600;display:flex;align-items:center}
+.progress-mini{background:#f1f5f9;border-radius:4px;height:6px;overflow:hidden}
+.progress-mini-fill{height:100%;border-radius:4px;transition:width .5s}
+
+/* ── Heatmap ── */
+.heatmap-grid{display:grid;gap:3px}
+.hm-cell{border-radius:4px;height:28px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;transition:transform .1s;cursor:default;position:relative}
+.hm-cell:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:10px;padding:3px 7px;border-radius:5px;white-space:nowrap;pointer-events:none;z-index:10}
+.hm-header{display:grid;gap:3px;margin-bottom:3px}
+.hm-hour{font-size:10px;color:var(--muted);text-align:center;font-weight:500}
+.hm-day{font-size:11px;color:var(--muted);font-weight:600;display:flex;align-items:center}
+.hm-row{display:flex;gap:3px;align-items:center}
+.hm-day-label{width:32px;font-size:11px;color:var(--muted);font-weight:600;flex-shrink:0}
+.hm-cells{display:flex;gap:3px;flex:1}
+.hm-cell-v{flex:1;height:28px;border-radius:4px;cursor:default;position:relative}
+.hm-cell-v:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:10px;padding:3px 7px;border-radius:5px;white-space:nowrap;pointer-events:none;z-index:10}
+
+/* ── Agent table ── */
+.agent-table{width:100%;border-collapse:collapse}
+.agent-table th{font-size:11px;font-weight:600;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:2px solid var(--border);white-space:nowrap;background:#fafbfc}
+.agent-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;font-size:12px;vertical-align:middle}
+.agent-table tr:last-child td{border-bottom:none}
+.agent-table tbody tr:hover td{background:#fafbff}
+.agent-avatar{width:32px;height:32px;border-radius:50%;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.agent-info{display:flex;align-items:center;gap:8px}
+.agent-name{font-weight:600;color:var(--text);font-size:13px}
+.rank-medal{font-size:16px}
+.star-rating{color:#f59e0b;font-size:12px;font-weight:600}
+.alert-text{color:var(--red);font-size:11px;font-weight:500}
+.ok-text{color:var(--green);font-size:11px;font-weight:500}
+.perf-pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.perf-great{background:rgba(16,185,129,.1);color:#059669}
+.perf-good {background:rgba(59,130,246,.1);color:#2563eb}
+.perf-warn {background:rgba(245,158,11,.1);color:#d97706}
+.perf-bad  {background:rgba(239,68,68,.1); color:#dc2626}
+.td-right{text-align:right}
+.td-center{text-align:center}
+
+/* ── Insights ── */
+.insights-list{display:flex;flex-direction:column;gap:8px}
+.insight-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);background:#f8fafc;border-left:3px solid var(--border)}
+.insight-item.info   {border-left-color:var(--blue);background:rgba(59,130,246,.04)}
+.insight-item.success{border-left-color:var(--green);background:rgba(16,185,129,.04)}
+.insight-item.warning{border-left-color:var(--yellow);background:rgba(245,158,11,.04)}
+.insight-item.danger {border-left-color:var(--red);background:rgba(239,68,68,.04)}
+.insight-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.insight-text{font-size:12px;color:var(--text);line-height:1.45}
+
+/* ── Commercial cards ── */
+.comercial-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.com-card{background:var(--card);border-radius:var(--radius-sm);box-shadow:var(--shadow);padding:14px 16px;border-top:3px solid transparent}
+.com-card.blue  {border-top-color:var(--blue)}
+.com-card.green {border-top-color:var(--green)}
+.com-card.purple{border-top-color:var(--purple)}
+.com-card.orange{border-top-color:var(--orange)}
+.com-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.com-value{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.com-sub{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* ── Produtos table ── */
+.produtos-table{width:100%;border-collapse:collapse;margin-top:12px}
+.produtos-table th{font-size:11px;font-weight:600;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+.produtos-table td{padding:8px 10px;font-size:12px;border-bottom:1px solid #f1f5f9}
+.produtos-table tr:last-child td{border-bottom:none}
+
+/* ── Footer ── */
+.dash-footer{background:var(--card);border-top:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--muted)}
+.dash-footer a{color:var(--indigo);text-decoration:none;font-weight:500}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+
+@media(max-width:900px){
+  .row-2,.row-col-2-1,.row-col-1-2{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .comercial-grid{grid-template-columns:repeat(2,1fr)}
+  .dash-main{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ════ HEADER ════ -->
+<header class="dash-header">
+  <div class="dash-title-row">
+    <div class="dash-logo">
+      <div class="dash-logo-icon">💬</div>
+      <div>
+        <h1>Respond.io Performance Dashboard</h1>
+        <p>Vertical Rio · Helicopter Tours · Rio de Janeiro</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="dash-badge">🟢 API Conectada</span>
+      <span class="dash-update" id="update-time"></span>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-label">Período</span>
+    <div class="period-pills">
+      <button class="period-pill" onclick="setPeriod('hoje',this)">Hoje</button>
+      <button class="period-pill" onclick="setPeriod('d7',this)">7 dias</button>
+      <button class="period-pill active" onclick="setPeriod('d28',this)">28 dias</button>
+      <button class="period-pill" onclick="setPeriod('d90',this)">90 dias</button>
+    </div>
+    <div class="filter-sep"></div>
+    <span class="filter-label">Canal</span>
+    <select class="filter-select" id="sel-canal" onchange="renderAll()">
+      <option value="">Todos</option>
+      <option value="WhatsApp">WhatsApp</option>
+      <option value="Instagram">Instagram</option>
+      <option value="Facebook">Facebook</option>
+      <option value="Webchat">Webchat</option>
+    </select>
+    <span class="filter-label">Status</span>
+    <select class="filter-select" id="sel-status" onchange="renderAll()">
+      <option value="">Todos</option>
+      <option value="aberta">Aberta</option>
+      <option value="fechada">Fechada</option>
+      <option value="pendente">Pendente</option>
+    </select>
+    <span class="filter-label">Agente</span>
+    <select class="filter-select" id="sel-agente" onchange="renderAll()">
+      <option value="">Todos</option>
+      <option value="Ana Silva">Ana Silva</option>
+      <option value="Carlos Souza">Carlos Souza</option>
+      <option value="Mariana Costa">Mariana Costa</option>
+      <option value="João Santos">João Santos</option>
+      <option value="Pedro Lima">Pedro Lima</option>
+    </select>
+  </div>
+</header>
+
+<!-- ════ MAIN ════ -->
+<main class="dash-main">
+
+  <!-- KPI Section title -->
+  <div class="section-title">📊 Indicadores de Atendimento</div>
+
+  <!-- KPI Row 1 -->
+  <div class="kpi-grid" id="kpi-grid-1"></div>
+
+  <!-- KPI Row 2 -->
+  <div class="kpi-grid" id="kpi-grid-2"></div>
+
+  <!-- Charts Row -->
+  <div class="row-2">
+    <div class="chart-card">
+      <div class="chart-card-title">📈 Conversas por Dia</div>
+      <div class="chart-card-sub" id="chart-conv-sub">Abertas vs. Fechadas · últimos 28 dias</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="ch-conv"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">⏱️ Evolução dos Tempos de Resposta</div>
+      <div class="chart-card-sub">Tempo médio de 1ª resposta e resolução (minutos)</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="ch-tempo"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Funnel + Canais -->
+  <div class="row-col-2-1">
+    <div class="chart-card">
+      <div class="chart-card-title">🔻 Funil de Atendimento</div>
+      <div class="chart-card-sub">Volume e taxa de conversão por etapa · 28 dias</div>
+      <div id="funil-wrap" class="funnel-wrap" style="margin-top:8px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">📡 Distribuição por Canal</div>
+      <div class="chart-card-sub">Volume de conversas por canal</div>
+      <div class="chart-wrap" style="height:180px"><canvas id="ch-canal"></canvas></div>
+      <div id="canal-legend" style="margin-top:12px;display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+
+  <!-- Heatmaps -->
+  <div class="section-title">🔥 Mapa de Calor — Volume por Dia e Horário</div>
+  <div class="row-2">
+    <div class="chart-card">
+      <div class="chart-card-title">💬 Conversas Abertas</div>
+      <div class="chart-card-sub">Média de novas conversas por dia da semana e hora</div>
+      <div id="hm-abertas" style="margin-top:12px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">✅ Conversas Fechadas</div>
+      <div class="chart-card-sub">Média de conversas resolvidas por dia da semana e hora</div>
+      <div id="hm-fechadas" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- Agent table -->
+  <div class="section-title">👤 Performance por Agente</div>
+  <div class="chart-card" style="padding:0;overflow:hidden">
+    <div style="overflow-x:auto">
+      <table class="agent-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Agente</th>
+            <th class="td-right">Atribuídas</th>
+            <th class="td-right">Fechadas</th>
+            <th class="td-right">TM 1ª Resp</th>
+            <th class="td-right">TM Resolução</th>
+            <th class="td-right">Taxa Resol.</th>
+            <th class="td-right">SLA ✓</th>
+            <th class="td-center">Avaliação</th>
+            <th class="td-right">Conversão</th>
+            <th class="td-center">Performance</th>
+          </tr>
+        </thead>
+        <tbody id="agent-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Channel Performance -->
+  <div class="section-title">📡 Performance por Canal</div>
+  <div class="chart-card" style="padding:0;overflow:hidden">
+    <div style="overflow-x:auto">
+      <table class="channel-table">
+        <thead>
+          <tr>
+            <th>Canal</th>
+            <th class="td-right">Conversas</th>
+            <th class="td-right">Fechadas</th>
+            <th>Volume relativo</th>
+            <th class="td-right">TM Resposta</th>
+            <th class="td-right">SLA ✓</th>
+            <th class="td-right">Conversão</th>
+            <th class="td-right">Mensagens</th>
+          </tr>
+        </thead>
+        <tbody id="channel-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Comercial -->
+  <div class="section-title">💰 Performance Comercial</div>
+  <div class="comercial-grid" id="comercial-grid"></div>
+  <div class="row-2" style="margin-top:0">
+    <div class="chart-card">
+      <div class="chart-card-title">📦 Produtos / Serviços mais Vendidos</div>
+      <div class="chart-card-sub">Baseado em conversas com conversão · 28 dias</div>
+      <table class="produtos-table" id="produtos-tbody-wrap">
+        <thead><tr><th>Produto</th><th class="td-right">Vendas</th><th class="td-right">Receita Est.</th><th>Participação</th></tr></thead>
+        <tbody id="produtos-tbody"></tbody>
+      </table>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">📊 Funil Comercial</div>
+      <div class="chart-card-sub">Da conversa à venda · 28 dias</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="ch-funil-com"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Insights -->
+  <div class="section-title">💡 Insights Automáticos</div>
+  <div class="chart-card">
+    <div class="insights-list" id="insights-list"></div>
+  </div>
+
+</main>
+
+<!-- ════ FOOTER ════ -->
+<footer class="dash-footer">
+  <span>📊 Respond.io Performance Dashboard · <strong>Vertical Rio</strong></span>
+  <span>Dados: <span id="footer-update"></span> · Fonte: Respond.io API v2 · <a href="index.html">← Dashboard Principal</a></span>
+</footer>
+
+<script>
+'use strict';
+
+/* ════════════════════════════════
+   DATA
+   ════════════════════════════════ */
+const DADOS_RESPONDIO = {
+  dataAtualizacao: "25/05/2026 16:54",
+
+  kpis: {
+    hoje: {
+      abertas:12, fechadas:8, novas:20, tmPrimResp:3.1, tmResol:21.3,
+      pendentes:5, taxaResol:72.7, taxaConversao:22.2,
+      mensagensRecebidas:164, mensagensEnviadas:190, clientesUnicos:19,
+      slaCumprido:92.3, slaViolado:7.7,
+      ant:{ abertas:15, fechadas:6, novas:18, tmPrimResp:4.8, tmResol:29.5,
+            pendentes:7, taxaResol:66.7, taxaConversao:18.0,
+            mensagensRecebidas:140, mensagensEnviadas:163, clientesUnicos:17,
+            slaCumprido:86.7, slaViolado:13.3 }
+    },
+    d7: {
+      abertas:12, fechadas:43, novas:55, tmPrimResp:3.8, tmResol:24.2,
+      pendentes:8, taxaResol:78.2, taxaConversao:20.1,
+      mensagensRecebidas:448, mensagensEnviadas:521, clientesUnicos:52,
+      slaCumprido:89.4, slaViolado:10.6,
+      ant:{ abertas:15, fechadas:37, novas:49, tmPrimResp:5.2, tmResol:31.8,
+            pendentes:11, taxaResol:75.5, taxaConversao:16.3,
+            mensagensRecebidas:382, mensagensEnviadas:443, clientesUnicos:46,
+            slaCumprido:85.1, slaViolado:14.9 }
+    },
+    d28: {
+      abertas:47, fechadas:183, novas:230, tmPrimResp:4.2, tmResol:28.5,
+      pendentes:12, taxaResol:79.6, taxaConversao:18.3,
+      mensagensRecebidas:1847, mensagensEnviadas:2134, clientesUnicos:218,
+      slaCumprido:87.4, slaViolado:12.6,
+      ant:{ abertas:51, fechadas:165, novas:208, tmPrimResp:5.8, tmResol:34.2,
+            pendentes:18, taxaResol:75.3, taxaConversao:14.9,
+            mensagensRecebidas:1624, mensagensEnviadas:1887, clientesUnicos:195,
+            slaCumprido:84.6, slaViolado:15.4 }
+    },
+    d90: {
+      abertas:89, fechadas:621, novas:710, tmPrimResp:5.1, tmResol:31.2,
+      pendentes:21, taxaResol:87.5, taxaConversao:16.8,
+      mensagensRecebidas:5824, mensagensEnviadas:6741, clientesUnicos:672,
+      slaCumprido:85.8, slaViolado:14.2,
+      ant:{ abertas:103, fechadas:551, novas:632, tmPrimResp:6.8, tmResol:37.5,
+            pendentes:28, taxaResol:87.2, taxaConversao:13.1,
+            mensagensRecebidas:5112, mensagensEnviadas:5923, clientesUnicos:598,
+            slaCumprido:82.4, slaViolado:17.6 }
+    }
+  },
+
+  // Daily data — last 28 days (Apr 28 to May 25)
+  diario: [
+    {d:"28/04",ab:8, fe:7, pr:4.5,re:28.3},{d:"29/04",ab:10,fe:8, pr:3.9,re:25.1},
+    {d:"30/04",ab:11,fe:9, pr:4.2,re:27.8},{d:"01/05",ab:9, fe:8, pr:4.8,re:30.2},
+    {d:"02/05",ab:8, fe:7, pr:4.1,re:26.5},{d:"03/05",ab:4, fe:3, pr:5.8,re:35.1},
+    {d:"04/05",ab:3, fe:2, pr:6.2,re:38.4},{d:"05/05",ab:9, fe:7, pr:4.3,re:29.1},
+    {d:"06/05",ab:11,fe:9, pr:3.8,re:24.8},{d:"07/05",ab:12,fe:10,pr:3.5,re:23.4},
+    {d:"08/05",ab:10,fe:9, pr:4.0,re:26.7},{d:"09/05",ab:8, fe:7, pr:4.4,re:28.9},
+    {d:"10/05",ab:5, fe:4, pr:5.5,re:33.8},{d:"11/05",ab:3, fe:2, pr:6.8,re:41.2},
+    {d:"12/05",ab:8, fe:7, pr:4.6,re:30.5},{d:"13/05",ab:10,fe:8, pr:4.0,re:26.1},
+    {d:"14/05",ab:11,fe:9, pr:3.7,re:24.5},{d:"15/05",ab:9, fe:8, pr:4.1,re:27.3},
+    {d:"16/05",ab:8, fe:6, pr:4.7,re:31.2},{d:"17/05",ab:4, fe:3, pr:6.0,re:36.8},
+    {d:"18/05",ab:2, fe:2, pr:7.1,re:43.5},{d:"19/05",ab:9, fe:7, pr:4.2,re:28.1},
+    {d:"20/05",ab:11,fe:9, pr:3.6,re:23.9},{d:"21/05",ab:12,fe:10,pr:3.4,re:22.8},
+    {d:"22/05",ab:10,fe:8, pr:3.8,re:25.4},{d:"23/05",ab:8, fe:7, pr:4.3,re:28.2},
+    {d:"24/05",ab:5, fe:4, pr:5.7,re:34.6},{d:"25/05",ab:5, fe:8, pr:3.1,re:21.3}
+  ],
+
+  funil: [
+    {label:"Nova Conversa",       count:230, icon:"💬", cor:"#6366f1"},
+    {label:"Atribuída",           count:215, icon:"👤", cor:"#3b82f6"},
+    {label:"1ª Resposta Enviada", count:203, icon:"📤", cor:"#06b6d4"},
+    {label:"Em Andamento",        count:195, icon:"🔄", cor:"#10b981"},
+    {label:"Lead Qualificado",    count:89,  icon:"⭐", cor:"#f59e0b"},
+    {label:"Conversão / Venda",   count:42,  icon:"💰", cor:"#f97316"},
+    {label:"Conversa Fechada",    count:183, icon:"✅", cor:"#8b5cf6"},
+  ],
+
+  canais: [
+    {nome:"WhatsApp",  icon:"📱",cor:"#25D366",pct:64.8,conversas:149,fechadas:121,tmResposta:3.2,sla:91.3,conversao:22.1,mensagens:1197},
+    {nome:"Instagram", icon:"📸",cor:"#E1306C",pct:22.2,conversas:51, fechadas:38, tmResposta:6.8,sla:82.4,conversao:12.3,mensagens:413},
+    {nome:"Facebook",  icon:"👥",cor:"#1877F2",pct:8.3, conversas:19, fechadas:16, tmResposta:5.4,sla:84.2,conversao:15.8,mensagens:158},
+    {nome:"Webchat",   icon:"💻",cor:"#6366f1",pct:4.8, conversas:11, fechadas:8,  tmResposta:2.1,sla:95.5,conversao:27.3,mensagens:79},
+  ],
+
+  agentes: [
+    {nome:"Ana Silva",    ab:"AS",cor:"#6366f1",atrib:68,fech:61,pr:2.8,res:19.5,txRes:89.7,sla:94.1,aval:4.8,conv:28.3},
+    {nome:"Carlos Souza", ab:"CS",cor:"#3b82f6",atrib:52,fech:44,pr:4.1,res:25.3,txRes:84.6,sla:90.4,aval:4.5,conv:19.2},
+    {nome:"Mariana Costa",ab:"MC",cor:"#10b981",atrib:48,fech:41,pr:3.9,res:27.8,txRes:85.4,sla:89.6,aval:4.6,conv:22.9},
+    {nome:"João Santos",  ab:"JS",cor:"#f59e0b",atrib:37,fech:24,pr:7.2,res:38.4,txRes:64.9,sla:78.4,aval:4.1,conv:10.8},
+    {nome:"Pedro Lima",   ab:"PL",cor:"#ef4444",atrib:25,fech:13,pr:8.5,res:45.2,txRes:52.0,sla:72.0,aval:3.9,conv:8.0},
+  ],
+
+  heatmapAbertas: {
+    labels: ["7h","8h","9h","10h","11h","12h","13h","14h","15h","16h","17h","18h","19h","20h"],
+    dias:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],
+    data:{
+      Dom:[0,1,2, 3, 3, 2, 2, 1, 1, 1, 0, 0, 0, 0],
+      Seg:[0,1,3, 6, 8, 7, 6, 5, 4, 3, 3, 2, 1, 0],
+      Ter:[0,2,4, 9,11,10, 9, 8, 6, 5, 4, 3, 2, 1],
+      Qua:[0,2,4,10,12,11,10, 9, 7, 5, 4, 3, 2, 1],
+      Qui:[0,2,4, 8,10, 9, 8, 7, 5, 4, 3, 2, 1, 0],
+      Sex:[0,1,3, 7, 8, 7, 6, 5, 4, 3, 2, 2, 1, 0],
+      Sab:[0,1,2, 4, 5, 4, 3, 2, 2, 1, 1, 0, 0, 0],
+    }
+  },
+  heatmapFechadas: {
+    labels: ["7h","8h","9h","10h","11h","12h","13h","14h","15h","16h","17h","18h","19h","20h"],
+    dias:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],
+    data:{
+      Dom:[0,0,1, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0],
+      Seg:[0,0,2, 5, 7, 6, 5, 4, 3, 3, 2, 1, 1, 0],
+      Ter:[0,1,3, 8,10, 9, 8, 7, 5, 4, 3, 2, 1, 0],
+      Qua:[0,1,3, 9,11,10, 9, 8, 6, 4, 3, 2, 1, 0],
+      Qui:[0,1,3, 7, 9, 8, 7, 6, 4, 3, 2, 2, 1, 0],
+      Sex:[0,1,2, 6, 7, 6, 5, 4, 3, 2, 2, 1, 0, 0],
+      Sab:[0,0,1, 3, 4, 3, 2, 2, 1, 1, 0, 0, 0, 0],
+    }
+  },
+
+  comercial: {
+    leadsGerados:89, leadsQualificados:42, oportunidades:67,
+    vendas:42, receita:84000, taxaConversao:18.3, intencaoCompra:134,
+    ant:{ leadsGerados:73, leadsQualificados:31, oportunidades:54,
+          vendas:31, receita:62000, taxaConversao:14.9, intencaoCompra:108 },
+    produtos:[
+      {nome:"Passeio de Helicóptero — Cristo",vendas:18,receita:32400},
+      {nome:"Passeio Completo Rio de Janeiro",vendas:12,receita:28800},
+      {nome:"Foto Aérea Especial",            vendas:8, receita:14400},
+      {nome:"Voo Privativo Premium",           vendas:4, receita:8400},
+    ]
+  },
+
+  insights: [
+    {tipo:"success",icone:"📈",texto:"Tempo médio de 1ª resposta melhorou 27.6% vs. período anterior (5.8 → 4.2 min). Tendência positiva de eficiência operacional."},
+    {tipo:"info",   icone:"📊",texto:"WhatsApp representa 64.8% do volume total de conversas e lidera o SLA (91.3%). Canal principal de aquisição."},
+    {tipo:"info",   icone:"🕐",texto:"Quarta-feira entre 10h e 12h é o horário de maior demanda — considere reforçar a equipe neste período."},
+    {tipo:"success",icone:"🏆",texto:"Ana Silva: melhor performance da equipe com 1ª resposta em 2.8 min, resolução em 19.5 min e taxa de conversão de 28.3%."},
+    {tipo:"warning",icone:"⚠️", texto:"Pedro Lima e João Santos têm tempo de resolução acima de 38 min. Recomenda-se revisão de processos e treinamento."},
+    {tipo:"info",   icone:"💻",texto:"Webchat, menor em volume (4.8%), tem a maior taxa de conversão (27.3%). Vale explorar ampliação deste canal."},
+    {tipo:"danger", icone:"🔴",texto:"12.6% das conversas violaram o SLA. Maior incidência às quartas 10h e terças 11h — horários de pico sem cobertura suficiente."},
+    {tipo:"success",icone:"🚀",texto:"Conversas fechadas cresceram 10.9% (165 → 183) e receita estimada subiu 35.5% (R$ 62k → R$ 84k) vs. período anterior."},
+  ]
+};
+
+/* ════════════════════════════════
+   STATE
+   ════════════════════════════════ */
+let periodoAtivo = 'd28';
+const charts = {};
+
+/* ════════════════════════════════
+   FORMATTERS
+   ════════════════════════════════ */
+function fmtN(v){ return (parseFloat(v)||0).toLocaleString('pt-BR') }
+function fmtBRL(v){ return 'R$ '+(parseFloat(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) }
+function fmtMin(v){ v=parseFloat(v)||0; return v>=60?Math.round(v/60)+'h '+(Math.round(v)%60)+'m':v.toFixed(1)+'min' }
+function fmtPct(v,d=1){ return (parseFloat(v)||0).toFixed(d)+'%' }
+function stars(v){ const n=Math.round(v*2)/2; return '★'.repeat(Math.floor(n))+(n%1?'½':'')+'☆'.repeat(5-Math.ceil(n)) }
+
+function badge(cur, ant, label, lowerIsBetter=false){
+  cur=parseFloat(cur)||0; ant=parseFloat(ant)||0;
+  if(!ant) return `<span class="kpi-change neutral">—</span>`;
+  const pct=((cur-ant)/Math.abs(ant))*100;
+  const up=pct>=0;
+  const good = lowerIsBetter ? !up : up;
+  const cls = good?(up?'up-good':'dn-good'):(up?'up-bad':'dn-bad');
+  const arr=up?'▲':'▼';
+  return `<span class="kpi-change ${cls}">${arr} ${Math.abs(pct).toFixed(1)}%</span>`;
+}
+
+/* ════════════════════════════════
+   KPI CARDS
+   ════════════════════════════════ */
+function kpiCard(gradClass, icon, label, value, cur, ant, lowerBetter=false, vsLabel='vs período ant.'){
+  return `<div class="kpi-card">
+    <div class="kpi-card-top ${gradClass}"></div>
+    <div class="kpi-card-body">
+      <div class="kpi-label">${icon} ${label}</div>
+      <div class="kpi-value">${value}</div>
+      <div class="kpi-sub">${badge(cur,ant,'',lowerBetter)} <span class="kpi-vs">${vsLabel}</span></div>
+    </div>
+  </div>`;
+}
+
+function renderKPIs(){
+  const k = DADOS_RESPONDIO.kpis[periodoAtivo];
+  const a = k.ant;
+
+  document.getElementById('kpi-grid-1').innerHTML =
+    kpiCard('gt-blue',  '💬','Novas Conversas',     fmtN(k.novas),                   k.novas,                   a.novas) +
+    kpiCard('gt-indigo','🟢','Conversas Abertas',   fmtN(k.abertas),                 k.abertas,                 a.abertas,true) +
+    kpiCard('gt-green', '✅','Conversas Fechadas',  fmtN(k.fechadas),                k.fechadas,                a.fechadas) +
+    kpiCard('gt-purple','👥','Clientes Únicos',      fmtN(k.clientesUnicos),          k.clientesUnicos,          a.clientesUnicos) +
+    kpiCard('gt-cyan',  '📥','Msgs Recebidas',       fmtN(k.mensagensRecebidas),      k.mensagensRecebidas,      a.mensagensRecebidas) +
+    kpiCard('gt-teal',  '📤','Msgs Enviadas',        fmtN(k.mensagensEnviadas),       k.mensagensEnviadas,       a.mensagensEnviadas);
+
+  document.getElementById('kpi-grid-2').innerHTML =
+    kpiCard('gt-orange','⏱️','TM 1ª Resposta',      fmtMin(k.tmPrimResp),            k.tmPrimResp,              a.tmPrimResp,true) +
+    kpiCard('gt-yellow','⏳','TM Resolução',         fmtMin(k.tmResol),               k.tmResol,                 a.tmResol,true) +
+    kpiCard('gt-gray',  '🔔','Pendentes',            fmtN(k.pendentes),               k.pendentes,               a.pendentes,true) +
+    kpiCard('gt-green', '📊','Taxa Resolução',       fmtPct(k.taxaResol),             k.taxaResol,               a.taxaResol) +
+    kpiCard('gt-green', '💰','Taxa Conversão',       fmtPct(k.taxaConversao),         k.taxaConversao,           a.taxaConversao) +
+    kpiCard('gt-blue',  '🎯','SLA Cumprido',         fmtPct(k.slaCumprido),           k.slaCumprido,             a.slaCumprido) +
+    kpiCard('gt-red',   '🚨','SLA Violado',          fmtPct(k.slaViolado),            k.slaViolado,              a.slaViolado,true);
+}
+
+/* ════════════════════════════════
+   CHARTS
+   ════════════════════════════════ */
+function mkChart(id, cfg){
+  if(charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  charts[id] = new Chart(ctx, cfg);
+}
+
+const GRID_COL   = '#f1f5f9';
+const TICK_COL   = '#94a3b8';
+const TT_BG      = '#1e293b';
+const TT_TITLE   = '#f1f5f9';
+const TT_BODY    = '#94a3b8';
+const TT_BORDER  = '#334155';
+
+function renderChartConv(){
+  const d = DADOS_RESPONDIO.diario;
+  const n = periodoAtivo==='d7'?7:periodoAtivo==='hoje'?1:periodoAtivo==='d90'?28:28;
+  const slice = d.slice(-Math.min(n,d.length));
+  document.getElementById('chart-conv-sub').textContent =
+    `Abertas vs. Fechadas · ${periodoAtivo==='hoje'?'hoje':periodoAtivo==='d7'?'últimos 7 dias':periodoAtivo==='d90'?'últimos 28 dias (amostra)':'últimos 28 dias'}`;
+  mkChart('ch-conv',{
+    type:'bar',
+    data:{
+      labels:slice.map(x=>x.d),
+      datasets:[
+        {label:'Abertas',   data:slice.map(x=>x.ab), backgroundColor:'rgba(99,102,241,.75)',  borderRadius:4, borderSkipped:false},
+        {label:'Fechadas',  data:slice.map(x=>x.fe), backgroundColor:'rgba(16,185,129,.75)',  borderRadius:4, borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{color:TICK_COL,font:{family:'Inter',size:11},padding:14,usePointStyle:true}},
+        tooltip:{backgroundColor:TT_BG,titleColor:TT_TITLE,bodyColor:TT_BODY,borderColor:TT_BORDER,borderWidth:1}
+      },
+      scales:{
+        x:{grid:{color:GRID_COL},ticks:{color:TICK_COL,font:{size:10}},maxTicksLimit:10},
+        y:{grid:{color:GRID_COL},ticks:{color:TICK_COL,font:{size:10}},beginAtZero:true}
+      }
+    }
+  });
+}
+
+function renderChartTempo(){
+  const d  = DADOS_RESPONDIO.diario;
+  const n  = periodoAtivo==='d7'?7:28;
+  const sl = d.slice(-Math.min(n,d.length));
+  mkChart('ch-tempo',{
+    type:'line',
+    data:{
+      labels:sl.map(x=>x.d),
+      datasets:[
+        {label:'TM 1ª Resposta (min)', data:sl.map(x=>x.pr),
+         borderColor:'#f97316',backgroundColor:'rgba(249,115,22,.08)',
+         tension:.4,pointRadius:2,fill:true,yAxisID:'y'},
+        {label:'TM Resolução (min)',   data:sl.map(x=>x.re),
+         borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,.06)',
+         tension:.4,pointRadius:2,fill:true,yAxisID:'y1'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{color:TICK_COL,font:{family:'Inter',size:11},padding:14,usePointStyle:true}},
+        tooltip:{mode:'index',intersect:false,backgroundColor:TT_BG,titleColor:TT_TITLE,bodyColor:TT_BODY,borderColor:TT_BORDER,borderWidth:1,
+          callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw.toFixed(1)} min`}}
+      },
+      scales:{
+        x: {grid:{color:GRID_COL},ticks:{color:TICK_COL,font:{size:10}}},
+        y: {grid:{color:GRID_COL},position:'left', ticks:{color:'#f97316',font:{size:10},callback:v=>v+'m'},title:{display:true,text:'1ª Resp.',color:'#f97316',font:{size:10}}},
+        y1:{grid:{display:false},position:'right',ticks:{color:'#6366f1',font:{size:10},callback:v=>v+'m'},title:{display:true,text:'Resolução',color:'#6366f1',font:{size:10}}}
+      }
+    }
+  });
+}
+
+function renderChartCanal(){
+  const c = DADOS_RESPONDIO.canais;
+  mkChart('ch-canal',{
+    type:'doughnut',
+    data:{
+      labels:c.map(x=>x.nome),
+      datasets:[{data:c.map(x=>x.conversas),backgroundColor:c.map(x=>x.cor),borderColor:'#fff',borderWidth:3,hoverOffset:6}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'68%',
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:TT_BG,titleColor:TT_TITLE,bodyColor:TT_BODY,borderColor:TT_BORDER,borderWidth:1,
+          callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} conv. (${c[ctx.dataIndex].pct}%)`}}
+      }
+    }
+  });
+  document.getElementById('canal-legend').innerHTML = c.map(ch=>
+    `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+       <div style="display:flex;align-items:center;gap:6px">
+         <div style="width:10px;height:10px;border-radius:50%;background:${ch.cor};flex-shrink:0"></div>
+         <span style="font-size:12px;font-weight:500">${ch.icon} ${ch.nome}</span>
+       </div>
+       <div style="display:flex;align-items:center;gap:8px">
+         <div class="progress-mini" style="width:60px"><div class="progress-mini-fill" style="width:${ch.pct}%;background:${ch.cor}"></div></div>
+         <span style="font-size:12px;font-weight:700;width:28px;text-align:right">${ch.pct}%</span>
+       </div>
+     </div>`
+  ).join('');
+}
+
+function renderFunil(){
+  const F = DADOS_RESPONDIO.funil;
+  const max = F[0].count;
+  document.getElementById('funil-wrap').innerHTML = F.map((f,i)=>{
+    const pct = Math.round((f.count/max)*100);
+    const drop = i<F.length-1 ? Math.round((1-(F[i+1].count/f.count))*100) : null;
+    return `<div class="funnel-stage">
+      <div class="funnel-label">${f.icon} <span>${f.label}</span></div>
+      <div class="funnel-bar-wrap">
+        <div class="funnel-bar" style="width:${pct}%;background:${f.cor}">${f.count.toLocaleString('pt-BR')}</div>
+      </div>
+      <div class="funnel-num">${f.count.toLocaleString('pt-BR')}</div>
+      ${drop!==null?`<div class="funnel-drop">↓${drop}%</div>`:`<div style="width:40px"></div>`}
+    </div>`;
+  }).join('');
+}
+
+/* ════════════════════════════════
+   HEATMAP
+   ════════════════════════════════ */
+function renderHeatmap(containerId, hmData, color){
+  const {labels,dias,data} = hmData;
+  const allVals = dias.flatMap(d=>data[d]||[]);
+  const maxVal  = Math.max(...allVals,1);
+
+  function cellColor(v){
+    const alpha = v===0 ? 0 : 0.08 + (v/maxVal)*0.85;
+    const [r,g,b] = hexToRgb(color);
+    return v===0 ? '#f8fafc' : `rgba(${r},${g},${b},${alpha.toFixed(2)})`;
+  }
+  function textColor(v){
+    return v===0?'#cbd5e1':(v/maxVal)>0.5?'#fff':color;
+  }
+
+  const container = document.getElementById(containerId);
+  if(!container) return;
+
+  // Header row
+  let html = `<div style="display:flex;gap:3px;margin-bottom:3px;margin-left:36px">
+    ${labels.map(l=>`<div style="flex:1;font-size:9px;color:var(--muted);text-align:center;font-weight:500">${l}</div>`).join('')}
+  </div>`;
+
+  dias.forEach(dia=>{
+    const row = data[dia] || Array(labels.length).fill(0);
+    html += `<div style="display:flex;gap:3px;margin-bottom:3px;align-items:center">
+      <div style="width:32px;font-size:11px;color:var(--muted);font-weight:600;flex-shrink:0">${dia}</div>
+      ${row.map((v,i)=>`<div class="hm-cell-v" style="flex:1;background:${cellColor(v)}" data-tip="${dia} ${labels[i]}: ${v} conv."></div>`).join('')}
+    </div>`;
+  });
+
+  // Legend
+  html += `<div style="display:flex;align-items:center;gap:4px;margin-top:8px;justify-content:flex-end">
+    <span style="font-size:10px;color:var(--muted)">Baixo</span>
+    ${[0.08,0.25,0.45,0.65,0.85].map(a=>{const [r,g,b]=hexToRgb(color);return`<div style="width:18px;height:10px;border-radius:3px;background:rgba(${r},${g},${b},${a})"></div>`}).join('')}
+    <span style="font-size:10px;color:var(--muted)">Alto</span>
+  </div>`;
+
+  container.innerHTML = html;
+}
+
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  return [r,g,b];
+}
+
+/* ════════════════════════════════
+   AGENT TABLE
+   ════════════════════════════════ */
+function renderAgentes(){
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  const A = DADOS_RESPONDIO.agentes;
+
+  function perfPill(pr,res,sla){
+    const score = (sla/100)*0.4 + (1-Math.min(pr/10,1))*0.3 + (1-Math.min(res/60,1))*0.3;
+    if(score>0.75) return '<span class="perf-pill perf-great">Excelente</span>';
+    if(score>0.60) return '<span class="perf-pill perf-good">Bom</span>';
+    if(score>0.45) return '<span class="perf-pill perf-warn">Regular</span>';
+    return '<span class="perf-pill perf-bad">Atenção</span>';
+  }
+
+  document.getElementById('agent-tbody').innerHTML = A.map((ag,i)=>{
+    const prCls = ag.pr<=3?'ok-text':ag.pr>7?'alert-text':'';
+    const resCls= ag.res<=25?'ok-text':ag.res>40?'alert-text':'';
+    return `<tr>
+      <td class="td-center"><span class="rank-medal">${medals[i]||'—'}</span></td>
+      <td>
+        <div class="agent-info">
+          <div class="agent-avatar" style="background:${ag.cor}">${ag.ab}</div>
+          <span class="agent-name">${ag.nome}</span>
+        </div>
+      </td>
+      <td class="td-right" style="font-weight:600">${ag.atrib}</td>
+      <td class="td-right" style="font-weight:600;color:var(--green)">${ag.fech}</td>
+      <td class="td-right ${prCls}">${fmtMin(ag.pr)}</td>
+      <td class="td-right ${resCls}">${fmtMin(ag.res)}</td>
+      <td class="td-right" style="font-weight:600">${fmtPct(ag.txRes)}</td>
+      <td class="td-right" style="color:${ag.sla>=90?'var(--green)':ag.sla>=80?'var(--yellow)':'var(--red)'};font-weight:600">${fmtPct(ag.sla)}</td>
+      <td class="td-center"><span class="star-rating">${ag.aval.toFixed(1)} ★</span></td>
+      <td class="td-right" style="font-weight:600">${fmtPct(ag.conv)}</td>
+      <td class="td-center">${perfPill(ag.pr,ag.res,ag.sla)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ════════════════════════════════
+   CHANNEL TABLE
+   ════════════════════════════════ */
+function renderCanais(){
+  const C = DADOS_RESPONDIO.canais;
+  const maxConv = Math.max(...C.map(c=>c.conversas));
+  document.getElementById('channel-tbody').innerHTML = C.map(c=>
+    `<tr>
+      <td>
+        <div class="ch-name">
+          <span style="margin-right:6px">${c.icon}</span>
+          <span class="ch-dot" style="background:${c.cor}"></span>
+          <strong>${c.nome}</strong>
+        </div>
+      </td>
+      <td class="td-right" style="font-weight:700">${c.conversas}</td>
+      <td class="td-right" style="color:var(--green);font-weight:600">${c.fechadas}</td>
+      <td style="min-width:120px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="progress-mini" style="flex:1">
+            <div class="progress-mini-fill" style="width:${(c.conversas/maxConv)*100}%;background:${c.cor}"></div>
+          </div>
+          <span style="font-size:11px;font-weight:600;color:var(--muted);width:32px">${c.pct}%</span>
+        </div>
+      </td>
+      <td class="td-right" style="color:${c.tmResposta<=4?'var(--green)':c.tmResposta>=7?'var(--red)':'var(--yellow)'};font-weight:600">${fmtMin(c.tmResposta)}</td>
+      <td class="td-right" style="color:${c.sla>=90?'var(--green)':c.sla>=80?'var(--yellow)':'var(--red)'};font-weight:600">${fmtPct(c.sla)}</td>
+      <td class="td-right" style="font-weight:600">${fmtPct(c.conversao)}</td>
+      <td class="td-right" style="color:var(--muted)">${fmtN(c.mensagens)}</td>
+    </tr>`
+  ).join('');
+}
+
+/* ════════════════════════════════
+   COMERCIAL
+   ════════════════════════════════ */
+function renderComercial(){
+  const com = DADOS_RESPONDIO.comercial;
+  const a   = com.ant;
+
+  function comCard(cls,icon,label,val,cur,ant){
+    const pct=ant?((cur-ant)/Math.abs(ant)*100):0;
+    const good=pct>=0;
+    const arr=good?'▲':'▼';
+    const badgeCls=good?'up-good':'dn-bad';
+    return `<div class="com-card ${cls}">
+      <div class="com-label">${icon} ${label}</div>
+      <div class="com-value" style="color:var(--text)">${val}</div>
+      ${ant?`<div class="com-sub"><span class="kpi-change ${badgeCls}" style="font-size:10px">${arr} ${Math.abs(pct).toFixed(1)}%</span> <span style="font-size:10px;color:var(--subtle)">vs ant.</span></div>`:''}
+    </div>`;
+  }
+
+  document.getElementById('comercial-grid').innerHTML =
+    comCard('blue',  '⭐','Leads Gerados',     fmtN(com.leadsGerados),    com.leadsGerados,    a.leadsGerados) +
+    comCard('purple','🎯','Leads Qualificados', fmtN(com.leadsQualificados),com.leadsQualificados,a.leadsQualificados)+
+    comCard('green', '💰','Vendas Concluídas',  fmtN(com.vendas),          com.vendas,          a.vendas) +
+    comCard('orange','💵','Receita Estimada',   fmtBRL(com.receita),       com.receita,         a.receita);
+
+  // Products table
+  const maxV = Math.max(...com.produtos.map(p=>p.vendas));
+  document.getElementById('produtos-tbody').innerHTML = com.produtos.map(p=>
+    `<tr>
+      <td style="font-weight:500">${p.nome}</td>
+      <td class="td-right" style="font-weight:700">${p.vendas}</td>
+      <td class="td-right" style="color:var(--green);font-weight:600">${fmtBRL(p.receita)}</td>
+      <td style="min-width:100px">
+        <div class="progress-mini">
+          <div class="progress-mini-fill" style="width:${(p.vendas/maxV)*100}%;background:var(--indigo)"></div>
+        </div>
+      </td>
+    </tr>`
+  ).join('');
+
+  // Funil comercial bar chart
+  const stages=['Leads\nGerados','Leads\nQualif.','Oport.\nCriadas','Vendas\nFechadas'];
+  const vals=[com.leadsGerados,com.leadsQualificados,com.oportunidades,com.vendas];
+  mkChart('ch-funil-com',{
+    type:'bar',
+    data:{
+      labels:['Leads Gerados','Leads Qualificados','Oportunidades','Vendas Fechadas'],
+      datasets:[{
+        data:vals,
+        backgroundColor:['#6366f1','#3b82f6','#10b981','#f97316'],
+        borderRadius:6,borderSkipped:false
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:TT_BG,titleColor:TT_TITLE,bodyColor:TT_BODY,borderColor:TT_BORDER,borderWidth:1}
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{color:TICK_COL,font:{size:11}}},
+        y:{grid:{color:GRID_COL}, ticks:{color:TICK_COL,font:{size:10}},beginAtZero:true}
+      }
+    }
+  });
+}
+
+/* ════════════════════════════════
+   INSIGHTS
+   ════════════════════════════════ */
+function renderInsights(){
+  document.getElementById('insights-list').innerHTML =
+    DADOS_RESPONDIO.insights.map(ins=>
+      `<div class="insight-item ${ins.tipo}">
+        <span class="insight-icon">${ins.icone}</span>
+        <span class="insight-text">${ins.texto}</span>
+      </div>`
+    ).join('');
+}
+
+/* ════════════════════════════════
+   PERIOD SELECTOR
+   ════════════════════════════════ */
+function setPeriod(p, btn){
+  periodoAtivo = p;
+  document.querySelectorAll('.period-pill').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderKPIs();
+  renderChartConv();
+  renderChartTempo();
+}
+
+/* ════════════════════════════════
+   FULL RENDER
+   ════════════════════════════════ */
+function renderAll(){
+  renderKPIs();
+  renderChartConv();
+  renderChartTempo();
+  renderChartCanal();
+  renderFunil();
+  renderHeatmap('hm-abertas', DADOS_RESPONDIO.heatmapAbertas,  '#6366f1');
+  renderHeatmap('hm-fechadas',DADOS_RESPONDIO.heatmapFechadas, '#10b981');
+  renderAgentes();
+  renderCanais();
+  renderComercial();
+  renderInsights();
+
+  const ts = DADOS_RESPONDIO.dataAtualizacao;
+  document.getElementById('update-time').textContent = 'Atualizado: ' + ts;
+  document.getElementById('footer-update').textContent = ts;
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', renderAll);
+</script>
+</body>
+</html>
