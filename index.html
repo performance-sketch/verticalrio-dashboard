@@ -507,6 +507,12 @@
 
   <div id="avisoRezdy"></div>
 
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <span style="font-size:12px;color:#64748b;font-weight:500">Status:</span>
+    <button class="btn-periodo ativo" id="btnRezdyStatusTodos" onclick="setRezdyStatusFiltro('todos',this)" style="padding:4px 14px;font-size:12px">Todos</button>
+    <button class="btn-periodo" id="btnRezdyStatusConfirmados" onclick="setRezdyStatusFiltro('confirmados',this)" style="padding:4px 14px;font-size:12px">&#x2713; Confirmados</button>
+  </div>
+
   <div class="grade-kpi" id="kpiRezdy">
     <div class="card-kpi kpi-azul"><div class="kpi-label">Carregando...</div><div class="kpi-valor">--</div></div>
   </div>
@@ -20738,7 +20744,16 @@ function aplicarFiltroCustom(origem) {
 // FILTROS DE DATA — REZDY
 // ────────────────────────────────────────────────────────────────────────────
 
-let rezdyDateType = 'booking'; // 'booking' | 'fulfillment'
+let rezdyDateType     = 'booking';  // 'booking' | 'fulfillment'
+let rezdyStatusFiltro = 'todos';    // 'todos' | 'confirmados'
+
+function setRezdyStatusFiltro(filtro, btn) {
+  rezdyStatusFiltro = filtro;
+  document.querySelectorAll('#btnRezdyStatusTodos, #btnRezdyStatusConfirmados').forEach(b => b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  const {iniStr, fimStr} = getRezdyFiltroGlobal();
+  aplicarFiltroTabelaRezdy(iniStr, fimStr);
+}
 
 const fmtData = d => d ? d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4) : '—';
 
@@ -20777,6 +20792,11 @@ function aplicarFiltroTabelaRezdy(iniStr, fimStr) {
       if(!dataR) return false;
       return (!iniStr || dataR >= iniStr) && (!fimStr || dataR <= fimStr);
     });
+  }
+
+  // Aplicar filtro de status se selecionado
+  if (rezdyStatusFiltro === 'confirmados') {
+    filtradas = filtradas.filter(r => r.status === 'CONFIRMED');
   }
 
   const tipoLabel = rezdyDateType === 'booking' ? 'Booking' : 'Fulfillment';
