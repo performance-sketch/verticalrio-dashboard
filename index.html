@@ -260,26 +260,31 @@
     <div class="card-kpi" style="background:linear-gradient(135deg,#833ab4 0%,#fd1d1d 50%,#fcb045 100%);border:none">
       <div class="kpi-label" style="color:#fff">Instagram</div>
       <div class="kpi-valor" id="kpiIgFollowers" style="color:#fff">—</div>
+      <div id="varIgFollowers" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
       <div class="kpi-sub" style="color:rgba(255,255,255,.75)">seguidores &bull; <span id="kpiIgMedia">—</span> posts</div>
     </div>
     <div class="card-kpi kpi-azul">
       <div class="kpi-label">Facebook</div>
       <div class="kpi-valor" id="kpiFbFollowers">—</div>
+      <div id="varFbFollowers" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
       <div class="kpi-sub">seguidores na pagina</div>
     </div>
     <div class="card-kpi kpi-verde">
       <div class="kpi-label">Conexoes Mensagem</div>
       <div class="kpi-valor" id="kpiMsgConexoes">—</div>
+      <div id="varMsgConexoes" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
       <div class="kpi-sub">via anuncios (pago)</div>
     </div>
     <div class="card-kpi kpi-ciano">
       <div class="kpi-label">Primeiras Respostas</div>
       <div class="kpi-valor" id="kpiMsgFirstReply">—</div>
+      <div id="varMsgFirstReply" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
       <div class="kpi-sub">via anuncios (pago)</div>
     </div>
     <div class="card-kpi kpi-amarelo">
       <div class="kpi-label">Conversas Iniciadas</div>
       <div class="kpi-valor" id="kpiMsgConversas">—</div>
+      <div id="varMsgConversas" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
       <div class="kpi-sub">janela 7d (pago)</div>
     </div>
   </div>
@@ -365,6 +370,35 @@
           <tr><th>Pais / Regiao</th><th>Gasto (R$)</th><th>Impressoes</th><th>Cliques</th><th>CPC (R$)</th><th>CTR (%)</th></tr>
         </thead>
         <tbody id="tabelaMetaGeo"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Linktree -->
+  <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin:20px 0 8px">Linktree <span id="dataLinktree" style="font-weight:400;text-transform:none;letter-spacing:0;color:#334155"></span></div>
+  <div class="grade-kpi" style="margin-bottom:12px">
+    <div class="card-kpi kpi-verde">
+      <div class="kpi-label">Total Cliques</div>
+      <div class="kpi-valor" id="ltTotalCliques">—</div>
+      <div class="kpi-sub">todos os links (30d)</div>
+    </div>
+    <div class="card-kpi kpi-azul">
+      <div class="kpi-label">Visualizacoes</div>
+      <div class="kpi-valor" id="ltVisualizacoes">—</div>
+      <div class="kpi-sub">visitas ao perfil (30d)</div>
+    </div>
+    <div class="card-kpi kpi-roxo">
+      <div class="kpi-label">CTR</div>
+      <div class="kpi-valor" id="ltCtr">—</div>
+      <div class="kpi-sub">cliques / visualizacoes</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-titulo">Cliques por Link — Linktree</div>
+    <div class="tabela-scroll">
+      <table>
+        <thead><tr><th>Link</th><th>URL</th><th>Cliques</th></tr></thead>
+        <tbody id="tabelaLinktree"></tbody>
       </table>
     </div>
   </div>
@@ -894,7 +928,25 @@ const DADOS_META = {
     "igFollowers": 138545,
     "igMedia": 909,
     "fbFollowers": 2082,
-    "fbNome": "Vertical.Rio"
+    "fbNome": "Vertical.Rio",
+    "variacoes": {
+      "d7": {
+        "ig": null,
+        "fb": null
+      },
+      "d14": {
+        "ig": null,
+        "fb": null
+      },
+      "d30": {
+        "ig": null,
+        "fb": null
+      },
+      "d90": {
+        "ig": null,
+        "fb": null
+      }
+    }
   },
   "d7": {
     "totalGasto": 3355.61,
@@ -1038,6 +1090,16 @@ const DADOS_META = {
       "firstReply": 52,
       "conversas": 53,
       "bloqueios": 6
+    },
+    "anterior": {
+      "gasto": 4249.85,
+      "impressoes": 520253,
+      "cliques": 22506,
+      "mensagens": {
+        "conexoes": 15,
+        "firstReply": 17,
+        "conversas": 17
+      }
     }
   },
   "d14": {
@@ -1194,6 +1256,16 @@ const DADOS_META = {
       "firstReply": 57,
       "conversas": 58,
       "bloqueios": 20
+    },
+    "anterior": {
+      "gasto": 20615.93,
+      "impressoes": 3066987,
+      "cliques": 109489,
+      "mensagens": {
+        "conexoes": 26,
+        "firstReply": 34,
+        "conversas": 37
+      }
     }
   },
   "d30": {
@@ -1350,6 +1422,16 @@ const DADOS_META = {
       "firstReply": 94,
       "conversas": 99,
       "bloqueios": 59
+    },
+    "anterior": {
+      "gasto": 12672.7,
+      "impressoes": 2184176,
+      "cliques": 66560,
+      "mensagens": {
+        "conexoes": 730,
+        "firstReply": 696,
+        "conversas": 741
+      }
     }
   },
   "d90": {
@@ -1530,36 +1612,46 @@ const DADOS_META = {
       "firstReply": 1656,
       "conversas": 1735,
       "bloqueios": 110
+    },
+    "anterior": {
+      "gasto": 50795.9,
+      "impressoes": 7518758,
+      "cliques": 207423,
+      "mensagens": {
+        "conexoes": 1513,
+        "firstReply": 1445,
+        "conversas": 1563
+      }
     }
   },
   "max": {
-    "totalGasto": 432742.38,
-    "totalImpressoes": 76406066,
-    "totalCliques": 1518759,
+    "totalGasto": 432745.93,
+    "totalImpressoes": 76406324,
+    "totalCliques": 1518774,
     "cpcMedio": 0.285,
     "campanhas": [
       {
         "id": "120214656968890437",
         "nome": "[LX][TRAFEGO-SEGUIDORES][ABO][PUBLICO_FRIO]",
-        "gasto": 93363.25,
-        "impressoes": 17564718,
-        "cliques": 397959,
+        "gasto": 93364.28,
+        "impressoes": 17564754,
+        "cliques": 397961,
         "cpc": 0.23,
         "ctr": 2.27,
         "cpm": 5.32,
-        "alcance": 6418036,
+        "alcance": 6418033,
         "conv": null
       },
       {
         "id": "120226714217400437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO]",
-        "gasto": 57114.15,
-        "impressoes": 9220185,
-        "cliques": 427936,
+        "gasto": 57115.09,
+        "impressoes": 9220296,
+        "cliques": 427941,
         "cpc": 0.13,
         "ctr": 4.64,
         "cpm": 6.19,
-        "alcance": 3550888,
+        "alcance": 3550877,
         "conv": 1.0
       },
       {
@@ -1721,25 +1813,25 @@ const DADOS_META = {
       {
         "id": "120243998081540437",
         "nome": "[MSG][GRINGO][RJ][NUVENS-ORG]",
-        "gasto": 3579.6,
-        "impressoes": 345047,
+        "gasto": 3580.22,
+        "impressoes": 345103,
         "cliques": 5438,
         "cpc": 0.66,
         "ctr": 1.58,
         "cpm": 10.37,
-        "alcance": 204103,
+        "alcance": 204121,
         "conv": 1.0
       },
       {
         "id": "120247060568150437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO] [TESTE]",
-        "gasto": 3524.3,
-        "impressoes": 254699,
-        "cliques": 17020,
+        "gasto": 3525.26,
+        "impressoes": 254754,
+        "cliques": 17028,
         "cpc": 0.21,
         "ctr": 6.68,
         "cpm": 13.84,
-        "alcance": 164549,
+        "alcance": 164547,
         "conv": null
       },
       {
@@ -2388,69 +2480,69 @@ const DADOS_META = {
       },
       {
         "faixa": "18-24",
-        "gasto": 89533.53,
-        "impressoes": 22852252,
+        "gasto": 89533.83,
+        "impressoes": 22852296,
         "cliques": 363467
       },
       {
         "faixa": "25-34",
-        "gasto": 198639.49,
-        "impressoes": 35596218,
-        "cliques": 645858
+        "gasto": 198640.73,
+        "impressoes": 35596352,
+        "cliques": 645869
       },
       {
         "faixa": "35-44",
-        "gasto": 83652.12,
-        "impressoes": 11351926,
-        "cliques": 238749
+        "gasto": 83653.04,
+        "impressoes": 11351980,
+        "cliques": 238750
       },
       {
         "faixa": "45-54",
-        "gasto": 31264.35,
-        "impressoes": 3198246,
-        "cliques": 119161
+        "gasto": 31265.43,
+        "impressoes": 3198276,
+        "cliques": 119164
       },
       {
         "faixa": "55-64",
-        "gasto": 17209.12,
-        "impressoes": 1889486,
-        "cliques": 84695
+        "gasto": 17209.27,
+        "impressoes": 1889499,
+        "cliques": 84696
       },
       {
         "faixa": "65+",
-        "gasto": 12441.31,
-        "impressoes": 1517613,
+        "gasto": 12441.88,
+        "impressoes": 1517629,
         "cliques": 66820
       }
     ],
     "geos": [
       {
         "local": "Brasil",
-        "gasto": 263389.32,
-        "impressoes": 43337375,
-        "cliques": 694857
+        "gasto": 263391.4,
+        "impressoes": 43337577,
+        "cliques": 694864
       },
       {
         "local": "Colombia",
-        "gasto": 13874.41,
-        "impressoes": 2529622,
+        "gasto": 13874.46,
+        "impressoes": 2529625,
         "cliques": 114996
       },
       {
         "local": "Chile",
-        "gasto": 10865.64,
-        "impressoes": 1931461,
-        "cliques": 52640
+        "gasto": 10865.68,
+        "impressoes": 1931463,
+        "cliques": 52641
       },
       {
         "local": "Argentina",
-        "gasto": 6907.75,
-        "impressoes": 1336710,
+        "gasto": 6907.77,
+        "impressoes": 1336711,
         "cliques": 37312
       },
       {
         "local": "Canada",
-        "gasto": 3282.67,
+        "gasto": 3282.68,
         "impressoes": 159693,
         "cliques": 2786
       },
@@ -4637,9 +4729,9 @@ const DADOS_META = {
     },
     {
       "data": "2026-05-25",
-      "gasto": 256.63,
-      "impressoes": 19710,
-      "cliques": 969
+      "gasto": 260.89,
+      "impressoes": 20001,
+      "cliques": 985
     }
   ]
 };
@@ -107586,6 +107678,18 @@ const DADOS_REZDY_LIVE = {
 };
 
 // ────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
+// DADOS LINKTREE (embutidos pelo script atualizar_linktree.py)
+// Para atualizar: execute "python atualizar_linktree.py" e reabra este arquivo
+// ────────────────────────────────────────────────────────────────────────────
+const DADOS_LINKTREE = {
+  "totalCliques": 0,
+  "visualizacoes": 0,
+  "ctr": 0.0,
+  "links": [],
+  "dataAtualizacao": ""
+};
+
 // DADOS RESPOND.IO (embutidos pelo script atualizar_respondio.py)
 // Para atualizar: execute "python atualizar_respondio.py" e reabra este arquivo
 // ────────────────────────────────────────────────────────────────────────────
@@ -107927,15 +108031,36 @@ function renderizarMetaAds() { try {
   const top10 = _meta.campanhas.slice(0,10);
 
   // ── Perfil: seguidores e mensagens ────────────────────────────────────
-  const _s = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  const _s  = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  const _sh = (id,v) => { const el=document.getElementById(id); if(el) el.innerHTML=v; };
+
+  function _varBadge(cur, ant, branco) {
+    if(cur==null||ant==null||ant===0) return '';
+    const pct = ((cur-ant)/ant*100).toFixed(1);
+    const up  = pct >= 0;
+    const cor = branco ? (up?'rgba(255,255,255,.9)':'rgba(255,200,200,.9)') : (up?'#4ade80':'#f87171');
+    const seta= up ? '▲' : '▼';
+    return `<span style="color:${cor}">${seta} ${up?'+':''}${pct}% vs período ant.</span>`;
+  }
+
   const perfil = DADOS_META.perfil || {};
+  const periodoKey = FILTRO.dias==='max'?'d90': FILTRO.dias?`d${FILTRO.dias}`:'d30';
+  const varPerfil  = (perfil.variacoes || {})[periodoKey] || {};
+
   _s("kpiIgFollowers", perfil.igFollowers ? formatarNumero(perfil.igFollowers) : "—");
   _s("kpiIgMedia",     perfil.igMedia     ? formatarNumero(perfil.igMedia)     : "—");
   _s("kpiFbFollowers", perfil.fbFollowers ? formatarNumero(perfil.fbFollowers) : "—");
+  _sh("varIgFollowers", _varBadge(perfil.igFollowers, perfil.igFollowers && varPerfil.ig!=null ? perfil.igFollowers/(1+varPerfil.ig/100) : null, true));
+  _sh("varFbFollowers", _varBadge(perfil.fbFollowers, perfil.fbFollowers && varPerfil.fb!=null ? perfil.fbFollowers/(1+varPerfil.fb/100) : null, false));
+
   const msg = _meta.mensagens || {};
+  const ant = (_meta.anterior || {}).mensagens || {};
   _s("kpiMsgConexoes",   msg.conexoes   != null ? formatarNumero(msg.conexoes)   : "—");
   _s("kpiMsgFirstReply", msg.firstReply != null ? formatarNumero(msg.firstReply) : "—");
   _s("kpiMsgConversas",  msg.conversas  != null ? formatarNumero(msg.conversas)  : "—");
+  _sh("varMsgConexoes",   _varBadge(msg.conexoes,   ant.conexoes,   false));
+  _sh("varMsgFirstReply", _varBadge(msg.firstReply, ant.firstReply, false));
+  _sh("varMsgConversas",  _varBadge(msg.conversas,  ant.conversas,  false));
   const cores = ["#3b82f6","#8b5cf6","#22c55e","#f97316","#06b6d4","#eab308","#ec4899","#f87171","#94a3b8","#10b981"];
 
   criarGrafico("graficoMetaBarra",{
@@ -108025,6 +108150,24 @@ function renderizarMetaAds() { try {
     if(lbl) lbl.textContent="Total Gasto ("+(FILTRO.ini&&FILTRO.fim?'custom':FILTRO.dias==='max'?'maximo':FILTRO.dias?FILTRO.dias+'d':'todos')+")";
     const elCount=document.getElementById("kpiMetaCampanhasCount");
     if(elCount){ const n=(_meta.campanhas||[]).filter(c=>c.gasto>0).length; elCount.textContent=n+" campanha"+(n!==1?"s":""); }
+  }
+
+  // ── Linktree ────────────────────────────────────────────────────────
+  const lt = DADOS_LINKTREE || {};
+  _s("ltTotalCliques",  lt.totalCliques  ? formatarNumero(lt.totalCliques)  : "—");
+  _s("ltVisualizacoes", lt.visualizacoes ? formatarNumero(lt.visualizacoes) : "—");
+  _s("ltCtr",           lt.ctr           ? lt.ctr.toFixed(1)+"%" : "—");
+  const tbLt = document.getElementById("tabelaLinktree");
+  if(tbLt){
+    if(!lt.links || !lt.links.length){
+      tbLt.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;color:#475569">Configure o script atualizar_linktree.py para exibir dados reais</td></tr>';
+    } else {
+      tbLt.innerHTML = lt.links.map(lk=>`<tr>
+        <td style="font-weight:500">${lk.titulo}</td>
+        <td style="font-size:11px;color:#475569;max-width:220px;overflow:hidden;text-overflow:ellipsis">${lk.url}</td>
+        <td style="font-weight:700;color:#4ade80;text-align:center">${formatarNumero(lk.cliques)}</td>
+      </tr>`).join("");
+    }
   }
 } catch(e){ console.error("renderizarMetaAds:",e); }}
 

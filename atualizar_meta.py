@@ -242,6 +242,80 @@ def processar(conjuntos_raw, idades_raw, paises_raw):
     }
 
 
+HISTORICO_ARQUIVO = "perfil_historico.json"
+DIAS_POR_PERIODO = {"d7": 7, "d14": 14, "d30": 30, "d90": 90}
+
+
+def buscar_anterior_ads(dias):
+    """Busca métricas de anúncios do período anterior (mesmo N dias, logo antes)."""
+    hoje = datetime.now()
+    fim = (hoje - timedelta(days=dias)).strftime("%Y-%m-%d")
+    ini = (hoje - timedelta(days=dias * 2)).strftime("%Y-%m-%d")
+    params = {
+        "level": "account",
+        "fields": "spend,impressions,clicks,actions",
+        "time_range": json.dumps({"since": ini, "until": fim}),
+        "limit": 1,
+    }
+    resp = api_get(f"{AD_ACCOUNT_ID}/insights", params)
+    row = (resp.get("data") or [{}])[0]
+    msg = {"conexoes": 0, "firstReply": 0, "conversas": 0}
+    for a in (row.get("actions") or []):
+        at = a.get("action_type", "")
+        v  = float(a.get("value", 0) or 0)
+        if at == "onsite_conversion.total_messaging_connection":
+            msg["conexoes"] = int(v)
+        elif at == "onsite_conversion.messaging_first_reply":
+            msg["firstReply"] = int(v)
+        elif at == "onsite_conversion.messaging_conversation_started_7d":
+            msg["conversas"] = int(v)
+    return {
+        "gasto":      round(float(row.get("spend") or 0), 2),
+        "impressoes": int(row.get("impressions") or 0),
+        "cliques":    int(row.get("clicks") or 0),
+        "mensagens":  msg,
+    }
+
+
+def salvar_historico(perfil):
+    hoje = datetime.now().strftime("%Y-%m-%d")
+    try:
+        with open(HISTORICO_ARQUIVO, "r", encoding="utf-8") as f:
+            hist = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        hist = {}
+    hist[hoje] = {"igFollowers": perfil["igFollowers"], "fbFollowers": perfil["fbFollowers"]}
+    # Manter apenas ultimos 365 dias
+    datas = sorted(hist.keys())[-365:]
+    hist = {d: hist[d] for d in datas}
+    with open(HISTORICO_ARQUIVO, "w", encoding="utf-8") as f:
+        json.dump(hist, f, indent=2)
+    return hist
+
+
+def variacao_seguidores(hist, perfil):
+    """Retorna dict com % variação de seguidores para cada período."""
+    hoje = datetime.now()
+    resultado = {}
+    for chave, dias in DIAS_POR_PERIODO.items():
+        alvo = (hoje - timedelta(days=dias)).strftime("%Y-%m-%d")
+        snap = None
+        for d in sorted(hist.keys(), reverse=True):
+            if d <= alvo:
+                snap = hist[d]
+                break
+        if snap:
+            def pct(cur, prev):
+                return round((cur - prev) / prev * 100, 1) if prev > 0 else None
+            resultado[chave] = {
+                "ig": pct(perfil["igFollowers"], snap["igFollowers"]),
+                "fb": pct(perfil["fbFollowers"], snap["fbFollowers"]),
+            }
+        else:
+            resultado[chave] = {"ig": None, "fb": None}
+    return resultado
+
+
 def atualizar_html(dados):
     with open(ARQUIVO_DASH, encoding="utf-8") as f:
         html = f.read()
@@ -268,6 +342,8 @@ def main():
 
     print("Buscando perfil (Instagram + Facebook)...")
     perfil = buscar_perfil()
+    hist = salvar_historico(perfil)
+    perfil["variacoes"] = variacao_seguidores(hist, perfil)
     resultado["perfil"] = perfil
     print(f"  Instagram: {perfil['igFollowers']:,} seguidores | Facebook: {perfil['fbFollowers']:,}")
 
@@ -275,6 +351,11 @@ def main():
         print(f"Buscando periodo {preset}...")
         dp = {"date_preset": preset}
         dados_periodo = processar(buscar_conjuntos(dp), buscar_idades(dp), buscar_paises(dp))
+        # Buscar periodo anterior para variacao %
+        dias = DIAS_POR_PERIODO.get(chave)
+        if dias:
+            print(f"  Buscando periodo anterior ({dias}d antes)...")
+            dados_periodo["anterior"] = buscar_anterior_ads(dias)
         resultado[chave] = dados_periodo
         print(f"  Gasto: R$ {dados_periodo['totalGasto']:,.2f} | "
               f"Impressoes: {dados_periodo['totalImpressoes']:,} | "
