@@ -92,13 +92,28 @@ def buscar_paises(date_params):
     return api_get(f"{AD_ACCOUNT_ID}/insights", params).get("data", [])
 
 
+_MSG_ACTIONS = {
+    "onsite_conversion.total_messaging_connection":        "conexoes",
+    "onsite_conversion.messaging_first_reply":             "firstReply",
+    "onsite_conversion.messaging_conversation_started_7d": "conversas",
+}
+
+def _extrair_msg_dia(actions):
+    """Extrai contagens de mensagens de uma lista de actions diária."""
+    out = {"conexoes": 0, "firstReply": 0, "conversas": 0}
+    for a in (actions or []):
+        chave = _MSG_ACTIONS.get(a.get("action_type"))
+        if chave:
+            out[chave] += int(float(a.get("value", 0)))
+    return out
+
 def buscar_diario():
     """Totais diarios dos ultimos 365 dias para suportar ranges customizados."""
     hoje = datetime.now()
     inicio = hoje - timedelta(days=365)
     params = {
         "level": "account",
-        "fields": "spend,impressions,clicks",
+        "fields": "spend,impressions,clicks,actions",
         "time_range": json.dumps({
             "since": inicio.strftime("%Y-%m-%d"),
             "until":  hoje.strftime("%Y-%m-%d"),
@@ -113,16 +128,19 @@ def buscar_diario():
         resp = requests.get(resp["paging"]["next"], timeout=30).json()
         dados.extend(resp.get("data", []))
 
-    return [
-        {
+    result = []
+    for d in dados:
+        if float(d.get("spend") or 0) <= 0:
+            continue
+        msg = _extrair_msg_dia(d.get("actions", []))
+        result.append({
             "data":       d["date_start"],
             "gasto":      round(float(d.get("spend") or 0), 2),
             "impressoes": int(d.get("impressions") or 0),
             "cliques":    int(d.get("clicks") or 0),
-        }
-        for d in dados
-        if float(d.get("spend") or 0) > 0
-    ]
+            "mensagens":  msg,
+        })
+    return result
 
 
 def extrair_conv(actions):
