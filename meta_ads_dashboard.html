@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meta Ads & Social Performance Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f0f2f8;--surface:#fff;--border:#e5e7eb;--text:#111827;--muted:#6b7280;--purple:#7c3aed;--blue:#2563eb;--green:#059669;--red:#dc2626;--orange:#d97706;--pink:#db2777;--teal:#0891b2;--shadow:0 1px 3px rgba(0,0,0,.1);--shadow-md:0 4px 12px rgba(0,0,0,.1);--r:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4c1d95 100%);padding:18px 28px 0;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.35)}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-ico{width:42px;height:42px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.brand h1{color:#fff;font-size:17px;font-weight:700;line-height:1.2}
+.brand p{color:rgba(255,255,255,.55);font-size:11px}
+.hdr-meta{text-align:right;color:rgba(255,255,255,.6);font-size:12px}
+.hdr-meta strong{display:block;color:#a78bfa;font-size:13px;font-weight:600}
+
+/* FILTERS */
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding:10px 0}
+.fg{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:5px 10px}
+.fg label{color:rgba(255,255,255,.55);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.fg select,.fg input{background:transparent;border:none;color:#fff;font-size:12px;font-family:inherit;cursor:pointer;outline:none}
+.fg select option{background:#312e81}
+.fg input[type=date]{color-scheme:dark}
+
+/* TABS */
+.tabs{display:flex;gap:1px;padding:0;margin-top:4px;overflow-x:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{padding:10px 15px;background:transparent;border:none;color:rgba(255,255,255,.55);font-size:12px;font-weight:500;cursor:pointer;border-radius:8px 8px 0 0;transition:all .2s;white-space:nowrap;font-family:inherit}
+.tab-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.tab-btn.active{color:#7c3aed;background:var(--bg);font-weight:700}
+
+/* CONTENT */
+.wrap{padding:22px 28px}
+.panel{display:none}.panel.active{display:block}
+
+/* SECTION */
+.sec{font-size:15px;font-weight:700;margin:0 0 16px;display:flex;align-items:center;gap:8px}
+.sec::before{content:'';display:block;width:4px;height:18px;border-radius:2px;background:var(--purple)}
+.sec-mt{margin-top:28px}
+
+/* GRIDS */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px}
+.g32{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:20px}
+.g23{display:grid;grid-template-columns:1fr 2fr;gap:18px;margin-bottom:20px}
+.gcreative{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+
+/* KPI CARD */
+.kpi{background:var(--surface);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi.ap{border-top:3px solid var(--purple)}
+.kpi.ab{border-top:3px solid var(--blue)}
+.kpi.ag{border-top:3px solid var(--green)}
+.kpi.ao{border-top:3px solid var(--orange)}
+.kpi.ak{border-top:3px solid var(--pink)}
+.kpi.at{border-top:3px solid var(--teal)}
+.kpi.gp{background:linear-gradient(135deg,#5b21b6,#7c3aed);border:none}
+.kpi.gb{background:linear-gradient(135deg,#1e40af,#3b82f6);border:none}
+.kpi.gg{background:linear-gradient(135deg,#065f46,#059669);border:none}
+.kpi.go{background:linear-gradient(135deg,#92400e,#d97706);border:none}
+.kpi.gk{background:linear-gradient(135deg,#9d174d,#ec4899);border:none}
+.kpi.gt{background:linear-gradient(135deg,#155e75,#0891b2);border:none}
+.kpi-ico{font-size:18px;margin-bottom:6px}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px}
+.kpi[class*="g"] .kpi-lbl{color:rgba(255,255,255,.7)}
+.kpi-val{font-size:22px;font-weight:800;line-height:1.1;margin-bottom:4px}
+.kpi-var{font-size:11px;font-weight:500;margin-bottom:2px}
+.kpi-var.up{color:#10b981}.kpi-var.dn{color:#ef4444}
+.kpi[class*="g"] .kpi-var.up{color:#a7f3d0}
+.kpi[class*="g"] .kpi-var.dn{color:#fca5a5}
+.kpi-sub{font-size:10px;color:var(--muted)}
+.kpi[class*="g"] .kpi-sub{color:rgba(255,255,255,.55)}
+.spark{width:100%;height:28px;margin-top:6px;opacity:.6}
+
+/* CHART CARD */
+.cc{background:var(--surface);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.cc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cc-title{font-size:13px;font-weight:600}
+.cc-legend{display:flex;gap:14px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+.ptg{display:flex;gap:3px;background:#f3f4f6;border-radius:7px;padding:2px}
+.ptb{padding:3px 10px;font-size:10px;font-weight:600;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted);font-family:inherit;transition:all .15s}
+.ptb.active{background:#fff;color:var(--purple);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
+/* TABLE CARD */
+.tc{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:20px}
+.tc-hd{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.tc-hd h3{font-size:13px;font-weight:600}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);background:#f9fafb;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+.tbl th:hover{color:var(--purple)}
+.tbl td{padding:9px 12px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#fafafa}
+.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+
+/* HEATMAP */
+.hg{border-radius:4px;padding:2px 6px;font-weight:700;font-size:11px}
+.hg-hi{background:rgba(5,150,105,.15);color:#065f46}
+.hg-md{background:rgba(251,191,36,.12);color:#92400e}
+.hg-lo{background:rgba(220,38,38,.1);color:#991b1b}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.bg-green{background:#d1fae5;color:#065f46}
+.bg-blue{background:#dbeafe;color:#1e40af}
+.bg-red{background:#fee2e2;color:#991b1b}
+.bg-orange{background:#fef3c7;color:#92400e}
+.bg-purple{background:#ede9fe;color:#5b21b6}
+.bg-gray{background:#f3f4f6;color:#374151}
+.bg-pink{background:#fce7f3;color:#9d174d}
+.bg-teal{background:#ccfbf1;color:#115e59}
+
+/* DIAG */
+.diag{padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap}
+.d-scale{background:#d1fae5;color:#065f46}
+.d-keep{background:#dbeafe;color:#1e40af}
+.d-opt{background:#fef3c7;color:#92400e}
+.d-red{background:#fee2e2;color:#991b1b}
+.d-pause{background:#f3f4f6;color:#374151}
+.d-test{background:#ede9fe;color:#5b21b6}
+.d-lp{background:#fce7f3;color:#9d174d}
+
+/* FUNNEL */
+.funnel{display:flex;flex-direction:column;gap:6px;padding:10px 0}
+.fstep{display:flex;align-items:center;gap:14px}
+.flbl{width:110px;font-size:12px;font-weight:600;color:var(--text)}
+.fbar-wrap{flex:1;height:40px;background:#f3f4f6;border-radius:6px;overflow:hidden;position:relative}
+.fbar-paid{height:100%;position:absolute;left:0;top:0;display:flex;align-items:center;padding-left:10px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;border-radius:6px 0 0 6px}
+.fbar-org{height:38%;position:absolute;bottom:1px;left:0;border-radius:0 0 0 6px;opacity:.75}
+.fvals{width:200px;font-size:11px;color:var(--muted);display:flex;gap:14px}
+.fconv{width:70px;text-align:right;font-size:11px;color:var(--muted)}
+
+/* CREATIVE CARD */
+.crv-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;transition:transform .18s,box-shadow .18s}
+.crv-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.crv-thumb{height:120px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative}
+.crv-body{padding:12px}
+.crv-name{font-size:12px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crv-sub{font-size:10px;color:var(--muted);margin-bottom:8px}
+.crv-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.crv-m-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600}
+.crv-m-val{font-size:14px;font-weight:800}
+
+/* INSIGHTS */
+.ins-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.ins-card{background:var(--surface);border-radius:var(--r);padding:16px;border:1px solid var(--border);box-shadow:var(--shadow);border-left:4px solid var(--purple)}
+.ins-card.scale{border-left-color:#059669}
+.ins-card.pause{border-left-color:#dc2626}
+.ins-card.opt{border-left-color:#d97706}
+.ins-card.opp{border-left-color:#2563eb}
+.ins-card.warn{border-left-color:#f59e0b}
+.ins-type{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.ins-title{font-size:13px;font-weight:700;margin-bottom:5px}
+.ins-text{font-size:12px;color:var(--muted);line-height:1.6}
+.ins-pill{display:inline-block;background:#f3f4f6;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;margin-top:6px}
+
+/* CONTENT TABLE */
+.ct-champion{background:#fffbeb}
+.ct-good{background:#f0fdf4}
+.ct-median{}
+.ct-low{background:#fff5f5}
+
+/* SCORE BAR */
+.sbar{height:5px;background:#e5e7eb;border-radius:3px;margin-top:3px}
+.sbar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--purple),#a855f7)}
+
+/* COMPARE */
+.cmp-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:3px 0}
+.cmp-paid{background:#6d28d9}
+.cmp-org{background:#10b981}
+
+.divider{height:1px;background:var(--border);margin:20px 0}
+.tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:10px;background:#ede9fe;color:#5b21b6;font-weight:600}
+.tag-reel{background:#ede9fe;color:#5b21b6}
+.tag-post{background:#dbeafe;color:#1e40af}
+.tag-story{background:#fce7f3;color:#9d174d}
+.tag-carrossel{background:#d1fae5;color:#065f46}
+.tag-video{background:#fef3c7;color:#92400e}
+.tag-image{background:#f3f4f6;color:#374151}
+
+@media(max-width:1300px){.g5{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(2,1fr)}.gcreative{grid-template-columns:repeat(2,1fr)}.g2,.g32,.g23{grid-template-columns:1fr}.ins-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="brand">
+      <div class="brand-ico">🚁</div>
+      <div>
+        <h1>Meta Ads &amp; Social Performance</h1>
+        <p>Vertical Rio — Dashboard de Marketing</p>
+      </div>
+    </div>
+    <div class="hdr-meta">
+      <strong>01/05/2026 – 25/05/2026</strong>
+      Atualizado em 25/05/2026 15:31
+    </div>
+  </div>
+  <div class="filters">
+    <div class="fg"><label>📅 De</label><input type="date" value="2026-05-01"></div>
+    <div class="fg"><label>Até</label><input type="date" value="2026-05-25"></div>
+    <div class="fg"><label>📣 Campanha</label><select><option>Todas</option><option>Awareness — Voo RJ</option><option>Traffic — Passeios</option><option>Leads — Casamentos</option><option>Sales — Doors Off</option></select></div>
+    <div class="fg"><label>🎯 Objetivo</label><select><option>Todos</option><option>AWARENESS</option><option>TRAFFIC</option><option>LEADS</option><option>SALES</option></select></div>
+    <div class="fg"><label>📱 Canal</label><select><option>IG + FB</option><option>Instagram</option><option>Facebook</option></select></div>
+    <div class="fg"><label>💰 Mídia</label><select><option>Pago + Orgânico</option><option>Pago</option><option>Orgânico</option></select></div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="resumo">📊 Resumo</button>
+    <button class="tab-btn" data-tab="pago">💰 Mídia Paga</button>
+    <button class="tab-btn" data-tab="criativos">🎨 Criativos</button>
+    <button class="tab-btn" data-tab="organico">🌱 Orgânico</button>
+    <button class="tab-btn" data-tab="comparativo">⚖️ Pago × Orgânico</button>
+    <button class="tab-btn" data-tab="campanhas">📣 Campanhas</button>
+    <button class="tab-btn" data-tab="conteudos">📱 Conteúdos</button>
+    <button class="tab-btn" data-tab="insights">🤖 Insights IA</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- RESUMO -->
+  <div id="tab-resumo" class="panel active">
+    <div class="sec">Performance Consolidada — Período</div>
+    <div id="resumoKpis" class="g4"></div>
+    <div class="g4" id="resumoKpis2"></div>
+
+    <div class="sec sec-mt">Funil de Conversão</div>
+    <div class="cc" style="margin-bottom:20px">
+      <div class="cc-hd">
+        <span class="cc-title">Impressões → Alcance → Cliques → Leads → Compras → Receita</span>
+        <div class="cc-legend">
+          <div class="leg-item"><div class="leg-dot" style="background:#6d28d9"></div>Pago</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#10b981"></div>Orgânico</div>
+        </div>
+      </div>
+      <div id="funnelContainer" class="funnel"></div>
+    </div>
+
+    <div class="g2">
+      <div class="cc">
+        <div class="cc-hd">
+          <span class="cc-title">Investimento Diário (R$)</span>
+          <div class="ptg">
+            <button class="ptb active" onclick="switchPeriod(this,'chartSpend')">Dia</button>
+            <button class="ptb" onclick="switchPeriod(this,'chartSpend')">Sem</button>
+            <button class="ptb" onclick="switchPeriod(this,'chartSpend')">Mês</button>
+          </div>
+        </div>
+        <canvas id="chartSpend" height="180"></canvas>
+      </div>
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Distribuição do Investimento por Objetivo</span></div>
+        <canvas id="chartObjective" height="180"></canvas>
+      </div>
+    </div>
+
+    <div class="sec sec-mt">Top Campanhas por ROAS</div>
+    <div id="topCampsWrap"></div>
+
+    <div class="sec sec-mt">Destaques do Período</div>
+    <div id="resumoHighlights"></div>
+  </div>
+
+  <!-- MÍDIA PAGA -->
+  <div id="tab-pago" class="panel">
+    <div class="sec">KPIs de Investimento</div>
+    <div id="pagoKpis" class="g4"></div>
+    <div class="sec sec-mt">KPIs de Resultado</div>
+    <div id="pagoKpis2" class="g4"></div>
+
+    <div class="g2" style="margin-top:20px">
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Impressões e Alcance Diário</span></div>
+        <canvas id="chartImprReach" height="190"></canvas>
+      </div>
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">CTR (%) e CPC (R$) ao Longo do Tempo</span></div>
+        <canvas id="chartCtrCpc" height="190"></canvas>
+      </div>
+    </div>
+    <div class="g3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:20px">
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Leads e Compras Diário</span></div>
+        <canvas id="chartLeads" height="190"></canvas>
+      </div>
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Receita e ROAS Diário</span></div>
+        <canvas id="chartRevRoas" height="190"></canvas>
+      </div>
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Spend por Objetivo</span></div>
+        <canvas id="chartSpendObj" height="190"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRIATIVOS -->
+  <div id="tab-criativos" class="panel">
+    <div class="sec">Criativos em Destaque</div>
+    <div id="creativosGrid" class="gcreative"></div>
+    <div class="sec sec-mt">Tabela Completa de Criativos</div>
+    <div id="tabelaCriativos"></div>
+  </div>
+
+  <!-- ORGÂNICO -->
+  <div id="tab-organico" class="panel">
+    <div class="sec">Métricas Orgânicas</div>
+    <div id="orgKpis" class="g4"></div>
+    <div id="orgKpis2" class="g4"></div>
+    <div class="g2" style="margin-top:4px">
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Alcance Orgânico Diário</span></div>
+        <canvas id="chartOrgReach" height="190"></canvas>
+      </div>
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Novos Seguidores por Dia</span></div>
+        <canvas id="chartFollowers" height="190"></canvas>
+      </div>
+    </div>
+    <div class="cc" style="margin-bottom:20px">
+      <div class="cc-hd"><span class="cc-title">Engajamento por Tipo de Conteúdo</span></div>
+      <canvas id="chartEngByType" height="150"></canvas>
+    </div>
+  </div>
+
+  <!-- COMPARATIVO -->
+  <div id="tab-comparativo" class="panel">
+    <div class="sec">Pago vs Orgânico — Visão Consolidada</div>
+    <div id="compKpis" class="g3"></div>
+    <div class="g2" style="margin-top:4px">
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Alcance Diário: Pago vs Orgânico</span></div>
+        <canvas id="chartCompReach" height="190"></canvas>
+      </div>
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Engajamento: Pago vs Orgânico</span></div>
+        <canvas id="chartCompEng" height="190"></canvas>
+      </div>
+    </div>
+    <div class="g32" style="display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:20px">
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Investimento vs Crescimento de Seguidores</span></div>
+        <canvas id="chartSpendFoll" height="190"></canvas>
+      </div>
+      <div class="cc">
+        <div class="cc-hd"><span class="cc-title">Participação no Alcance Total</span></div>
+        <canvas id="chartShareReach" height="190"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMPANHAS -->
+  <div id="tab-campanhas" class="panel">
+    <div class="sec">Performance por Campanha</div>
+    <div id="tabelaCampanhas"></div>
+    <div class="sec sec-mt">Performance por Conjunto de Anúncios</div>
+    <div id="tabelaAdsets"></div>
+  </div>
+
+  <!-- CONTEÚDOS -->
+  <div id="tab-conteudos" class="panel">
+    <div class="sec">Conteúdos Publicados no Período</div>
+    <div id="contKpis" class="g4"></div>
+    <div id="tabelaConteudos"></div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div id="tab-insights" class="panel">
+    <div class="sec">🤖 Insights e Recomendações da IA</div>
+    <div id="insightsGrid" class="ins-grid"></div>
+    <div class="divider"></div>
+    <div class="sec">📋 Diagnóstico por Campanha</div>
+    <div id="diagCampanhas"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+const DAYS = Array.from({length:25},(_,i)=>{
+  const d=new Date(2026,4,1+i);
+  const dow=d.getDay();
+  const w=(dow===0||dow===6)?0.62:1.0;
+  const t=1+i*0.009;
+  const wave=1+Math.sin(i/3.5)*0.12;
+  const s=(base,var_)=>Math.round(base*w*t*wave+(i%7-3)*var_);
+  const l=`${(i+1).toString().padStart(2,'0')}/05`;
+  return {
+    label:l,
+    spend:s(1960,160),
+    impr:s(48500,2800),
+    reach:s(34200,2200),
+    clicks:s(1380,95),
+    leads:Math.max(0,s(32,3)),
+    purchases:Math.max(0,Math.round(s(4.8,.8))),
+    revenue:s(14800,1100),
+    orgReach:s(12400,1600),
+    orgEng:s(660,75),
+    followers:Math.max(0,s(43,9)),
+  };
+});
+const DL=DAYS.map(d=>d.label);
+
+const PREV={spend:42800,impr:1480000,reach:1070000,clicks:40200,leads:410,purchases:78,revenue:248500,roas:5.8,orgReach:265000,orgEng:28900,followers:920};
+
+const CAMPS=[
+  {id:'c1',name:'Awareness — Voo de Helicóptero RJ',obj:'AWARENESS',status:'ACTIVE',spend:12840,impr:520000,reach:380000,freq:1.37,clicks:8500,ctr:1.63,cpc:1.51,cpm:24.69,leads:0,purchases:12,revenue:37200,roas:2.9,cpa:1070,cpl:0},
+  {id:'c2',name:'Traffic — Passeios Especiais',obj:'TRAFFIC',status:'ACTIVE',spend:8650,impr:310000,reach:225000,freq:1.38,clicks:14200,ctr:4.58,cpc:0.61,cpm:27.9,leads:85,purchases:8,revenue:24800,roas:2.87,cpa:1081,cpl:102},
+  {id:'c3',name:'Leads — Casamentos e Eventos',obj:'LEADS',status:'ACTIVE',spend:6200,impr:180000,reach:140000,freq:1.29,clicks:5400,ctr:3.0,cpc:1.15,cpm:34.44,leads:210,purchases:5,revenue:18500,roas:2.98,cpa:1240,cpl:29.5},
+  {id:'c4',name:'Sales — Doors Off 30min',obj:'SALES',status:'ACTIVE',spend:21350,impr:680000,reach:480000,freq:1.42,clicks:18500,ctr:2.72,cpc:1.15,cpm:31.4,leads:180,purchases:68,revenue:210800,roas:9.87,cpa:314,cpl:118.6},
+];
+
+const ADSETS=[
+  {camp:'Awareness',name:'Turistas SP/RJ — Feed',spend:7200,impr:295000,reach:215000,clicks:4800,ctr:1.63,cpc:1.50,cpm:24.4,leads:0,purchases:7,roas:2.71},
+  {camp:'Awareness',name:'Turistas Interior — Stories',spend:5640,impr:225000,reach:165000,clicks:3700,ctr:1.64,cpc:1.52,cpm:25.1,leads:0,purchases:5,roas:3.10},
+  {camp:'Traffic',name:'Lookalike 2% — Feed',spend:5100,impr:185000,reach:135000,clicks:8500,ctr:4.59,cpc:0.60,cpm:27.6,leads:48,purchases:5,roas:2.94},
+  {camp:'Traffic',name:'Interesses Viagem — Feed',spend:3550,impr:125000,reach:90000,clicks:5700,ctr:4.56,cpc:0.62,cpm:28.4,leads:37,purchases:3,roas:2.76},
+  {camp:'Leads',name:'Casais 25-45 — Feed',spend:4100,impr:120000,reach:93000,clicks:3600,ctr:3.00,cpc:1.14,cpm:34.2,leads:142,purchases:4,roas:3.12},
+  {camp:'Leads',name:'Empresas B2B — Feed',spend:2100,impr:60000,reach:47000,clicks:1800,ctr:3.00,cpc:1.17,cpm:35.0,leads:68,purchases:1,roas:2.71},
+  {camp:'Sales',name:'Retargeting Visitantes',spend:8200,impr:245000,reach:172000,clicks:7200,ctr:2.94,cpc:1.14,cpm:33.5,leads:85,purchases:30,roas:12.40},
+  {camp:'Sales',name:'Lookalike Compradores',spend:13150,impr:435000,reach:308000,clicks:11300,ctr:2.60,cpc:1.16,cpm:30.2,leads:95,purchases:38,roas:8.20},
+];
+
+const CREATIVES=[
+  {name:'Voo Panorâmico RJ — Imagem',camp:'Awareness',fmt:'image',emoji:'🏙️',bg:'#1e1b4b',spend:4200,impr:168000,reach:122000,clicks:2750,ctr:1.64,cpc:1.53,cpm:25.0,leads:0,purchases:4,roas:2.6,likes:320,comments:45,shares:28,saves:87,hook:null},
+  {name:'Voo Panorâmico — Vídeo 30s',camp:'Awareness',fmt:'video',emoji:'🎬',bg:'#4c1d95',spend:3000,impr:127000,reach:93000,clicks:2050,ctr:1.61,cpc:1.46,cpm:23.6,leads:0,purchases:3,roas:2.8,likes:280,comments:62,shares:41,saves:103,hook:'34%'},
+  {name:'Carrossel — Ângulos do Rio',camp:'Awareness',fmt:'carousel',emoji:'🎠',bg:'#1e3a8a',spend:5640,impr:225000,reach:165000,clicks:3700,ctr:1.64,cpc:1.52,cpm:25.1,leads:0,purchases:5,roas:3.1,likes:410,comments:38,shares:55,saves:142,hook:null},
+  {name:'Preço Especial — Imagem',camp:'Traffic',fmt:'image',emoji:'💸',bg:'#064e3b',spend:3200,impr:115000,reach:84000,clicks:5300,ctr:4.61,cpc:0.60,cpm:27.8,leads:28,purchases:3,roas:2.7,likes:180,comments:22,shares:15,saves:45,hook:null},
+  {name:'Cenário Rio — Vídeo 15s',camp:'Traffic',fmt:'video',emoji:'🚁',bg:'#78350f',spend:1900,impr:70000,reach:51000,clicks:3200,ctr:4.57,cpc:0.59,cpm:27.1,leads:22,purchases:2,roas:3.1,likes:310,comments:48,shares:37,saves:91,hook:'48%'},
+  {name:'Stories — Depoimento',camp:'Traffic',fmt:'story',emoji:'💬',bg:'#701a75',spend:3550,impr:125000,reach:90000,clicks:5700,ctr:4.56,cpc:0.62,cpm:28.4,leads:35,purchases:3,roas:2.76,likes:220,comments:31,shares:19,saves:52,hook:null},
+  {name:'Casamento no Helicóptero — Vídeo',camp:'Leads',fmt:'video',emoji:'💍',bg:'#831843',spend:4100,impr:120000,reach:93000,clicks:3600,ctr:3.00,cpc:1.14,cpm:34.2,leads:142,purchases:4,roas:3.12,likes:580,comments:94,shares:73,saves:248,hook:'52%'},
+  {name:'Evento Empresarial — Imagem',camp:'Leads',fmt:'image',emoji:'🎉',bg:'#1e3a5f',spend:2100,impr:60000,reach:47000,clicks:1800,ctr:3.00,cpc:1.17,cpm:35.0,leads:68,purchases:1,roas:2.71,likes:140,comments:18,shares:12,saves:38,hook:null},
+  {name:'Doors Off — Vídeo Ação 🔥',camp:'Sales',fmt:'video',emoji:'🔥',bg:'#7f1d1d',spend:8200,impr:245000,reach:172000,clicks:7200,ctr:2.94,cpc:1.14,cpm:33.5,leads:85,purchases:30,roas:12.4,likes:920,comments:187,shares:143,saves:412,hook:'61%'},
+  {name:'Depoimento — Família Feliz',camp:'Sales',fmt:'video',emoji:'👨‍👩‍👧',bg:'#134e4a',spend:7800,impr:210000,reach:148000,clicks:5700,ctr:2.71,cpc:1.37,cpm:37.1,leads:52,purchases:22,roas:8.9,likes:640,comments:121,shares:88,saves:278,hook:'43%'},
+  {name:'Promoção Limitada — Imagem',camp:'Sales',fmt:'image',emoji:'⏰',bg:'#422006',spend:5350,impr:225000,reach:160000,clicks:6600,ctr:2.93,cpc:0.81,cpm:23.8,leads:43,purchases:16,roas:7.8,likes:380,comments:64,shares:47,saves:134,hook:null},
+  {name:'Reels — Pedido de Noivado',camp:'Orgânico',fmt:'reel',emoji:'💫',bg:'#3b0764',spend:0,impr:0,reach:0,clicks:0,ctr:0,cpc:0,cpm:0,leads:0,purchases:0,roas:0,likes:4800,comments:312,shares:590,saves:1240,hook:null,organic:true},
+];
+
+const ORGANIC=[
+  {date:'01/05',type:'Reel',theme:'Bastidores',caption:'Um dia de voos no Rio 🚁',reach:18500,impr:24000,likes:1240,comments:87,shares:234,saves:412,pv:380,fg:52,eng:10.7},
+  {date:'03/05',type:'Post',theme:'Paisagem',caption:'Pão de Açúcar do alto 🌅',reach:12800,impr:16200,likes:820,comments:41,shares:89,saves:187,pv:210,fg:28,eng:8.9},
+  {date:'05/05',type:'Carrossel',theme:'Experiência',caption:'O que nossos clientes dizem 💬',reach:9400,impr:11800,likes:520,comments:68,shares:45,saves:241,pv:180,fg:22,eng:9.3},
+  {date:'07/05',type:'Reel',theme:'Ação',caption:'Doors Off — pura adrenalina! ✈️',reach:42000,impr:58000,likes:3200,comments:248,shares:780,saves:1420,pv:890,fg:142,eng:13.4},
+  {date:'09/05',type:'Post',theme:'Produto',caption:'Tour Doors On 60min',reach:8200,impr:10100,likes:380,comments:28,shares:31,saves:95,pv:140,fg:15,eng:6.5},
+  {date:'11/05',type:'Story',theme:'Bastidores',caption:'Bastidores: manutenção da aeronave',reach:5400,impr:7800,likes:180,comments:12,shares:8,saves:24,pv:90,fg:8,eng:4.1},
+  {date:'13/05',type:'Reel',theme:'Casamento',caption:'Pedido de noivado mais lindo do Rio 💍',reach:124000,impr:168000,likes:8900,comments:642,shares:2100,saves:3800,pv:2400,fg:580,eng:12.5},
+  {date:'15/05',type:'Post',theme:'Educativo',caption:'Como funciona o tour Doors Off?',reach:11200,impr:14500,likes:680,comments:94,shares:76,saves:310,pv:220,fg:31,eng:10.4},
+  {date:'17/05',type:'Carrossel',theme:'Destino',caption:'Top 5 vistas do helicóptero RJ',reach:16800,impr:21000,likes:1120,comments:78,shares:145,saves:520,pv:310,fg:48,eng:11.1},
+  {date:'19/05',type:'Reel',theme:'Turismo',caption:'Grupo de turistas americanos 🇺🇸',reach:28000,impr:38000,likes:2100,comments:142,shares:380,saves:820,pv:540,fg:98,eng:12.3},
+  {date:'21/05',type:'Post',theme:'Resultado',caption:'Já voamos 10.000 passageiros!',reach:14200,impr:18000,likes:940,comments:122,shares:87,saves:280,pv:250,fg:42,eng:10.1},
+  {date:'23/05',type:'Story',theme:'Promoção',caption:'Oferta feriado — 15% OFF',reach:7800,impr:11200,likes:320,comments:48,shares:82,saves:145,pv:410,fg:35,eng:7.6},
+  {date:'25/05',type:'Reel',theme:'Paisagem',caption:'Amanhecer sobre o Corcovado 🌄',reach:19500,impr:26000,likes:1480,comments:108,shares:210,saves:640,pv:380,fg:64,eng:12.5},
+];
+
+// ═══════════════════════════════════════════════════════
+// AGGREGATES
+// ═══════════════════════════════════════════════════════
+const P={
+  spend:CAMPS.reduce((a,c)=>a+c.spend,0),
+  impr:CAMPS.reduce((a,c)=>a+c.impr,0),
+  reach:CAMPS.reduce((a,c)=>a+c.reach,0),
+  clicks:CAMPS.reduce((a,c)=>a+c.clicks,0),
+  leads:CAMPS.reduce((a,c)=>a+c.leads,0),
+  purchases:CAMPS.reduce((a,c)=>a+c.purchases,0),
+  revenue:CAMPS.reduce((a,c)=>a+c.revenue,0),
+};
+P.ctr=P.clicks/P.impr*100;
+P.cpc=P.spend/P.clicks;
+P.cpm=P.spend/P.impr*1000;
+P.cpl=P.spend/P.leads;
+P.cpa=P.spend/P.purchases;
+P.roas=P.revenue/P.spend;
+
+const O={
+  posts:ORGANIC.length,
+  reels:ORGANIC.filter(p=>p.type==='Reel').length,
+  stories:ORGANIC.filter(p=>p.type==='Story').length,
+  carrosseis:ORGANIC.filter(p=>p.type==='Carrossel').length,
+  reach:ORGANIC.reduce((a,p)=>a+p.reach,0),
+  impr:ORGANIC.reduce((a,p)=>a+p.impr,0),
+  likes:ORGANIC.reduce((a,p)=>a+p.likes,0),
+  comments:ORGANIC.reduce((a,p)=>a+p.comments,0),
+  shares:ORGANIC.reduce((a,p)=>a+p.shares,0),
+  saves:ORGANIC.reduce((a,p)=>a+p.saves,0),
+  pv:ORGANIC.reduce((a,p)=>a+p.pv,0),
+  fg:ORGANIC.reduce((a,p)=>a+p.fg,0),
+};
+O.eng=O.likes+O.comments+O.shares+O.saves;
+O.engRate=(O.eng/O.reach*100);
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+const $=id=>document.getElementById(id);
+const fmt={
+  brl:v=>`R$${Math.round(v||0).toLocaleString('pt-BR')}`,
+  num:v=>(v||0).toLocaleString('pt-BR'),
+  pct:v=>`${(v||0).toFixed(1)}%`,
+  dec2:v=>(v||0).toFixed(2),
+  k:v=>v>=1000?`${(v/1000).toFixed(1)}k`:String(Math.round(v)),
+};
+
+function varBadge(cur,prev,invert=false){
+  if(!prev||prev===0) return '';
+  const pct=((cur-prev)/prev*100);
+  const pos=invert?(pct<=0):(pct>=0);
+  const col=pos?'#10b981':'#ef4444';
+  const ar=pct>=0?'▲':'▼';
+  return `<span class="kpi-var ${pos?'up':'dn'}">${ar} ${pct>=0?'+':''}${pct.toFixed(1)}%</span>`;
+}
+
+function sparkSVG(vals,color='#7c3aed',h=28){
+  const n=vals.length;
+  const mx=Math.max(...vals),mn=Math.min(...vals);
+  const r=mx-mn||1;
+  const pts=vals.map((v,i)=>`${(i/(n-1)*100).toFixed(1)},${((1-(v-mn)/r)*h).toFixed(1)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 100 ${h}" preserveAspectRatio="none"><polyline fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/></svg>`;
+}
+
+function heatClass(val,all,invert=false){
+  const sorted=[...all].sort((a,b)=>a-b);
+  const mn=sorted[0],mx=sorted[sorted.length-1];
+  if(mx===mn) return 'hg';
+  const pct=(val-mn)/(mx-mn);
+  const i=invert?1-pct:pct;
+  if(i>=0.67) return 'hg hg-hi';
+  if(i>=0.34) return 'hg hg-md';
+  return 'hg hg-lo';
+}
+
+function makeKpi(ico,lbl,val,varHTML,sub,accent,sparkData,sparkColor){
+  return `<div class="kpi ${accent}">
+    <div class="kpi-ico">${ico}</div>
+    <div class="kpi-lbl">${lbl}</div>
+    <div class="kpi-val">${val}</div>
+    ${varHTML||''}
+    ${sub?`<div class="kpi-sub">${sub}</div>`:''}
+    ${sparkData?sparkSVG(sparkData,sparkColor||'#7c3aed'):''}
+  </div>`;
+}
+
+const charts={};
+function mkChart(id,cfg){
+  if(charts[id]) charts[id].destroy();
+  const el=$(id); if(!el) return;
+  charts[id]=new Chart(el,cfg);
+}
+
+const C=['#7c3aed','#2563eb','#059669','#d97706','#db2777','#0891b2','#dc2626','#ea580c'];
+const CA=(c,a)=>c+(Math.round(a*255).toString(16).padStart(2,'0'));
+
+// ═══════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════
+let activeTab='resumo';
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    const t=btn.dataset.tab;
+    $(`tab-${t}`).classList.add('active');
+    if(t!==activeTab){ activeTab=t; renderTab(t); }
+  });
+});
+
+function renderTab(t){
+  if(t==='pago') renderPago();
+  else if(t==='criativos') renderCriativos();
+  else if(t==='organico') renderOrganico();
+  else if(t==='comparativo') renderComparativo();
+  else if(t==='campanhas') renderCampanhas();
+  else if(t==='conteudos') renderConteudos();
+  else if(t==='insights') renderInsights();
+}
+
+// ═══════════════════════════════════════════════════════
+// RESUMO
+// ═══════════════════════════════════════════════════════
+function renderResumo(){
+  const spends=DAYS.map(d=>d.spend);
+  const reachs=DAYS.map(d=>d.reach);
+
+  $('resumoKpis').innerHTML=[
+    makeKpi('💰','Investimento Total',fmt.brl(P.spend),varBadge(P.spend,PREV.spend),'Período atual','gp',spends,'#c4b5fd'),
+    makeKpi('👁️','Impressões',fmt.k(P.impr),varBadge(P.impr,PREV.impr),'Anúncios pagos','gb',DAYS.map(d=>d.impr),'#93c5fd'),
+    makeKpi('📡','Alcance Total',fmt.k(P.reach+O.reach),varBadge(P.reach+O.reach,PREV.reach+PREV.orgReach),'Pago + Orgânico','gt',DAYS.map(d=>d.reach+d.orgReach),'#67e8f9'),
+    makeKpi('🛒','Compras',fmt.num(P.purchases),varBadge(P.purchases,PREV.purchases),'Conversões confirmadas','gg',DAYS.map(d=>d.purchases),'#6ee7b7'),
+  ].join('');
+
+  $('resumoKpis2').innerHTML=[
+    makeKpi('💳','Receita',fmt.brl(P.revenue),varBadge(P.revenue,PREV.revenue),'Faturamento atribuído','go',DAYS.map(d=>d.revenue),'#fcd34d'),
+    makeKpi('📈','ROAS',P.roas.toFixed(2)+'×',varBadge(P.roas,PREV.roas),'Retorno sobre invest.','ap',null),
+    makeKpi('🎯','Leads',fmt.num(P.leads),varBadge(P.leads,PREV.leads),'Formulários + DMs','ak',DAYS.map(d=>d.leads),'#f9a8d4'),
+    makeKpi('🌱','Novos Seguidores','+'+fmt.num(O.fg),varBadge(O.fg,PREV.followers),'IG + Facebook','ag',DAYS.map(d=>d.followers),'#86efac'),
+  ].join('');
+
+  // Funnel
+  const funnelData=[
+    {label:'Impressões',paid:P.impr,org:O.impr,maxPaid:P.impr},
+    {label:'Alcance',paid:P.reach,org:O.reach,maxPaid:P.impr},
+    {label:'Cliques',paid:P.clicks,org:O.saves+O.likes,maxPaid:P.impr},
+    {label:'Leads',paid:P.leads,org:0,maxPaid:P.impr},
+    {label:'Compras',paid:P.purchases,org:0,maxPaid:P.impr},
+    {label:'Receita',paid:P.revenue/1000,org:0,maxPaid:P.impr/1000,isBrl:true},
+  ];
+  const paidMax=P.impr;
+  const convs=['—',`CTR ${fmt.pct(P.ctr)}`,`Lead Rate ${fmt.pct(P.leads/P.clicks*100)}`,`Conv. ${fmt.pct(P.purchases/P.leads*100)}`,`ROAS ${P.roas.toFixed(1)}×`];
+
+  $('funnelContainer').innerHTML=funnelData.map((step,i)=>{
+    const paidPct=(step.paid/paidMax*100).toFixed(1);
+    const orgPct=step.org?(step.org/paidMax*100).toFixed(1):0;
+    const dispPaid=step.isBrl?fmt.brl(step.paid*1000):fmt.k(step.paid);
+    const dispOrg=step.org?(step.isBrl?fmt.brl(step.org*1000):fmt.k(step.org)):'—';
+    return `<div class="fstep">
+      <div class="flbl">${step.label}</div>
+      <div class="fbar-wrap">
+        <div class="fbar-paid" style="width:${paidPct}%;background:linear-gradient(90deg,#5b21b6,#7c3aed)">
+          ${parseFloat(paidPct)>15?dispPaid:''}
+        </div>
+        ${step.org?`<div class="fbar-org" style="width:${orgPct}%;background:#10b981"></div>`:''}
+      </div>
+      <div class="fvals">
+        <span>💜 ${dispPaid}</span>
+        ${step.org?`<span>💚 ${dispOrg}`:''}
+      </div>
+      <div class="fconv">${i>0?convs[i-1]:''}</div>
+    </div>`;
+  }).join('');
+
+  // Chart: spend
+  mkChart('chartSpend',{type:'bar',data:{labels:DL,datasets:[{label:'Investimento (R$)',data:DAYS.map(d=>d.spend),backgroundColor:CA('#7c3aed','66'),borderColor:'#7c3aed',borderWidth:2,borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+
+  // Chart: objective donut
+  mkChart('chartObjective',{type:'doughnut',data:{labels:CAMPS.map(c=>c.obj),datasets:[{data:CAMPS.map(c=>c.spend),backgroundColor:['#7c3aed','#2563eb','#059669','#d97706'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,plugins:{legend:{position:'right'}}}});
+
+  // Top campaigns table
+  const sorted=[...CAMPS].sort((a,b)=>b.roas-a.roas);
+  const roasVals=sorted.map(c=>c.roas);
+  $('topCampsWrap').innerHTML=`<div class="tc"><div class="tc-hd"><h3>Campanhas ordenadas por ROAS</h3></div>
+  <table class="tbl"><thead><tr><th>Campanha</th><th>Objetivo</th><th class="num">Spend</th><th class="num">Compras</th><th class="num">Receita</th><th class="num">ROAS</th><th class="num">CPA</th></tr></thead>
+  <tbody>${sorted.map(c=>`<tr>
+    <td><strong>${c.name}</strong></td>
+    <td><span class="badge ${c.obj==='SALES'?'bg-green':c.obj==='LEADS'?'bg-purple':c.obj==='TRAFFIC'?'bg-blue':'bg-gray'}">${c.obj}</span></td>
+    <td class="num">${fmt.brl(c.spend)}</td>
+    <td class="num">${fmt.num(c.purchases)}</td>
+    <td class="num">${fmt.brl(c.revenue)}</td>
+    <td class="num"><span class="${heatClass(c.roas,roasVals)}">${c.roas.toFixed(2)}×</span></td>
+    <td class="num">${fmt.brl(c.cpa)}</td>
+  </tr>`).join('')}</tbody></table></div>`;
+
+  // Highlights
+  $('resumoHighlights').innerHTML=`<div class="ins-grid">
+    <div class="ins-card scale"><div class="ins-type" style="color:#059669">🚀 Destaque positivo</div><div class="ins-title">Campaign Sales com ROAS 9.87×</div><div class="ins-text">A campanha "Sales — Doors Off 30min" entregou o maior retorno do período, com R$210.800 em receita sobre R$21.350 investidos. O criativo "Doors Off — Vídeo Ação" concentra o melhor desempenho.</div><span class="ins-pill">+${((P.revenue-PREV.revenue)/PREV.revenue*100).toFixed(0)}% receita vs período ant.</span></div>
+    <div class="ins-card opp"><div class="ins-type" style="color:#2563eb">💡 Oportunidade</div><div class="ins-title">Reel Orgânico com 124k de alcance</div><div class="ins-text">O conteúdo "Pedido de noivado no helicóptero" viralizou organicamente e pode ser testado como anúncio pago na campanha de Leads. Hook rate estimado acima de 60%.</div><span class="ins-pill">⚡ Transformar em anúncio</span></div>
+    <div class="ins-card warn"><div class="ins-type" style="color:#d97706">⚠️ Atenção</div><div class="ins-title">CPA elevado em Awareness</div><div class="ins-text">A campanha Awareness apresenta CPA de R$1.070, acima da meta. Recomendado revisar públicos-alvo e avaliar migração de budget para Retargeting onde o CPA é R$314.</div><span class="ins-pill">CPA meta: R$600</span></div>
+    <div class="ins-card scale"><div class="ins-type" style="color:#059669">🌱 Orgânico</div><div class="ins-title">+${fmt.num(O.fg)} seguidores no período</div><div class="ins-text">Crescimento orgânico consistente impulsionado por Reels. O formato Reel representa ${ORGANIC.filter(p=>p.type==='Reel').length} de ${O.posts} posts e gera a maior taxa de engajamento média (12.1%).</div><span class="ins-pill">${varBadge(O.fg,PREV.followers)}</span></div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// PAGO
+// ═══════════════════════════════════════════════════════
+function renderPago(){
+  $('pagoKpis').innerHTML=[
+    makeKpi('💰','Investimento',fmt.brl(P.spend),varBadge(P.spend,PREV.spend),'','gp',DAYS.map(d=>d.spend),'#c4b5fd'),
+    makeKpi('👁️','Impressões',fmt.k(P.impr),varBadge(P.impr,PREV.impr),'','gb',DAYS.map(d=>d.impr),'#93c5fd'),
+    makeKpi('📡','Alcance Pago',fmt.k(P.reach),varBadge(P.reach,PREV.reach),'','at',DAYS.map(d=>d.reach),'#67e8f9'),
+    makeKpi('🖱️','Cliques',fmt.k(P.clicks),varBadge(P.clicks,PREV.clicks),'Link clicks','ao',DAYS.map(d=>d.clicks),'#fcd34d'),
+  ].join('');
+  $('pagoKpis2').innerHTML=[
+    makeKpi('📊','CTR',fmt.pct(P.ctr),varBadge(P.ctr,PREV.clicks/PREV.impr*100),'','ap',null),
+    makeKpi('💵','CPC',fmt.brl(P.cpc),varBadge(P.cpc,PREV.spend/PREV.clicks,true),'Por clique','ag',null),
+    makeKpi('📺','CPM',fmt.brl(P.cpm),varBadge(P.cpm,PREV.spend/PREV.impr*1000,true),'Por mil impr.','ak',null),
+    makeKpi('📈','ROAS',P.roas.toFixed(2)+'×',varBadge(P.roas,PREV.roas),'Retorno','gg',null),
+  ].join('');
+
+  mkChart('chartImprReach',{type:'line',data:{labels:DL,datasets:[
+    {label:'Impressões',data:DAYS.map(d=>d.impr),borderColor:'#7c3aed',backgroundColor:CA('#7c3aed','18'),fill:true,tension:.4,yAxisID:'y'},
+    {label:'Alcance',data:DAYS.map(d=>d.reach),borderColor:'#2563eb',backgroundColor:'transparent',tension:.4,yAxisID:'y'},
+  ]},options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{y:{beginAtZero:false}},plugins:{legend:{position:'top'}}}});
+
+  mkChart('chartCtrCpc',{type:'line',data:{labels:DL,datasets:[
+    {label:'CTR (%)',data:DAYS.map(d=>+(d.clicks/d.impr*100).toFixed(2)),borderColor:'#059669',tension:.4,yAxisID:'y'},
+    {label:'CPC (R$)',data:DAYS.map(d=>+(d.spend/d.clicks).toFixed(2)),borderColor:'#d97706',tension:.4,yAxisID:'y2'},
+  ]},options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{y:{beginAtZero:false,title:{display:true,text:'CTR (%)'}},y2:{position:'right',beginAtZero:false,title:{display:true,text:'CPC (R$)'}}},plugins:{legend:{position:'top'}}}});
+
+  mkChart('chartLeads',{type:'bar',data:{labels:DL,datasets:[
+    {label:'Leads',data:DAYS.map(d=>d.leads),backgroundColor:CA('#db2777','aa'),borderRadius:3},
+    {label:'Compras',data:DAYS.map(d=>d.purchases),backgroundColor:CA('#059669','aa'),borderRadius:3},
+  ]},options:{responsive:true,scales:{y:{beginAtZero:true,stacked:false}},plugins:{legend:{position:'top'}}}});
+
+  mkChart('chartRevRoas',{type:'line',data:{labels:DL,datasets:[
+    {label:'Receita (R$)',data:DAYS.map(d=>d.revenue),borderColor:'#d97706',backgroundColor:CA('#d97706','18'),fill:true,tension:.4,yAxisID:'y'},
+    {label:'ROAS',data:DAYS.map(d=>+(d.revenue/d.spend).toFixed(2)),borderColor:'#7c3aed',tension:.4,yAxisID:'y2'},
+  ]},options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{y:{beginAtZero:false},y2:{position:'right',beginAtZero:false}},plugins:{legend:{position:'top'}}}});
+
+  mkChart('chartSpendObj',{type:'doughnut',data:{labels:CAMPS.map(c=>c.obj),datasets:[{data:CAMPS.map(c=>c.spend),backgroundColor:['#7c3aed','#2563eb','#059669','#d97706'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
+}
+
+// ═══════════════════════════════════════════════════════
+// CRIATIVOS
+// ═══════════════════════════════════════════════════════
+function renderCriativos(){
+  // Top 4 cards
+  const paid=CREATIVES.filter(c=>!c.organic).sort((a,b)=>b.roas-a.roas).slice(0,4);
+  $('creativosGrid').innerHTML=paid.map(cr=>{
+    const fmtTag=cr.fmt==='video'?'tag-video':cr.fmt==='reel'?'tag-reel':cr.fmt==='story'?'tag-story':cr.fmt==='carousel'?'tag-carrossel':'tag-image';
+    return `<div class="crv-card">
+      <div class="crv-thumb" style="background:linear-gradient(135deg,${cr.bg},${cr.bg}aa)"><span style="font-size:44px">${cr.emoji}</span>
+        ${cr.roas>8?'<div style="position:absolute;top:8px;right:8px"><span class="badge bg-orange">🏆 TOP</span></div>':''}
+      </div>
+      <div class="crv-body">
+        <div class="crv-name">${cr.name}</div>
+        <div class="crv-sub"><span class="tag ${fmtTag}">${cr.fmt.toUpperCase()}</span> · ${cr.camp}</div>
+        <div class="crv-metrics">
+          <div><div class="crv-m-lbl">ROAS</div><div class="crv-m-val" style="color:${cr.roas>5?'#059669':'#d97706'}">${cr.roas.toFixed(1)}×</div></div>
+          <div><div class="crv-m-lbl">CTR</div><div class="crv-m-val">${fmt.pct(cr.ctr)}</div></div>
+          <div><div class="crv-m-lbl">CPC</div><div class="crv-m-val">${fmt.brl(cr.cpc)}</div></div>
+          <div><div class="crv-m-lbl">${cr.hook?'Hook Rate':'Compras'}</div><div class="crv-m-val">${cr.hook||cr.purchases}</div></div>
+        </div>
+        <div class="sbar" style="margin-top:8px"><div class="sbar-fill" style="width:${Math.min(cr.roas/13*100,100).toFixed(0)}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Table
+  const all=CREATIVES.filter(c=>!c.organic);
+  const ctrs=all.map(c=>c.ctr),cpcs=all.map(c=>c.cpc),roass=all.map(c=>c.roas),spends=all.map(c=>c.spend);
+  $('tabelaCriativos').innerHTML=`<div class="tc"><div class="tc-hd"><h3>Todos os Criativos — Dados de Performance</h3><span style="font-size:11px;color:#6b7280">${all.length} criativos</span></div>
+  <div style="overflow-x:auto"><table class="tbl"><thead><tr>
+    <th>Criativo</th><th>Campanha</th><th>Formato</th>
+    <th class="num">Spend</th><th class="num">Impr.</th><th class="num">Cliques</th>
+    <th class="num">CTR</th><th class="num">CPC</th><th class="num">CPM</th>
+    <th class="num">Leads</th><th class="num">Compras</th><th class="num">ROAS</th>
+    <th class="num">Curtidas</th><th class="num">Salv.</th><th>Hook</th>
+  </tr></thead><tbody>
+  ${all.map(cr=>`<tr>
+    <td><strong>${cr.emoji} ${cr.name}</strong></td>
+    <td><span class="badge bg-purple" style="font-size:9px">${cr.camp}</span></td>
+    <td><span class="tag tag-${cr.fmt}">${cr.fmt}</span></td>
+    <td class="num">${fmt.brl(cr.spend)}</td>
+    <td class="num">${fmt.k(cr.impr)}</td>
+    <td class="num">${fmt.k(cr.clicks)}</td>
+    <td class="num"><span class="${heatClass(cr.ctr,ctrs)}">${fmt.pct(cr.ctr)}</span></td>
+    <td class="num"><span class="${heatClass(cr.cpc,cpcs,true)}">${fmt.brl(cr.cpc)}</span></td>
+    <td class="num">${fmt.brl(cr.cpm)}</td>
+    <td class="num">${cr.leads}</td>
+    <td class="num">${cr.purchases}</td>
+    <td class="num"><span class="${heatClass(cr.roas,roass)}">${cr.roas.toFixed(2)}×</span></td>
+    <td class="num">${fmt.k(cr.likes)}</td>
+    <td class="num">${fmt.k(cr.saves)}</td>
+    <td>${cr.hook?`<span class="badge bg-orange">${cr.hook}</span>`:'—'}</td>
+  </tr>`).join('')}</tbody></table></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ORGÂNICO
+// ═══════════════════════════════════════════════════════
+function renderOrganico(){
+  $('orgKpis').innerHTML=[
+    makeKpi('📱','Posts Publicados',O.posts,null,`${O.reels} Reels · ${O.stories} Stories`,'gp',null),
+    makeKpi('📡','Alcance Orgânico',fmt.k(O.reach),varBadge(O.reach,PREV.orgReach),'','gb',DAYS.map(d=>d.orgReach),'#93c5fd'),
+    makeKpi('💬','Engajamento Total',fmt.k(O.eng),varBadge(O.eng,PREV.orgEng),'Curtidas+Coments+Comp+Salv','gg',DAYS.map(d=>d.orgEng),'#6ee7b7'),
+    makeKpi('👥','Novos Seguidores','+'+fmt.num(O.fg),varBadge(O.fg,PREV.followers),'','gk',DAYS.map(d=>d.followers),'#f9a8d4'),
+  ].join('');
+  $('orgKpis2').innerHTML=[
+    makeKpi('❤️','Curtidas',fmt.k(O.likes),null,'','ap',null),
+    makeKpi('💬','Comentários',fmt.k(O.comments),null,'','ab',null),
+    makeKpi('🔄','Compartilhamentos',fmt.k(O.shares),null,'','ag',null),
+    makeKpi('🔖','Salvamentos',fmt.k(O.saves),null,'','ao',null),
+  ].join('');
+
+  mkChart('chartOrgReach',{type:'bar',data:{labels:ORGANIC.map(p=>p.date),datasets:[{label:'Alcance Orgânico',data:ORGANIC.map(p=>p.reach),backgroundColor:ORGANIC.map(p=>CA('#10b981',p.reach>30000?'dd':'88')),borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+  mkChart('chartFollowers',{type:'line',data:{labels:DL,datasets:[{label:'Novos Seguidores',data:DAYS.map(d=>d.followers),borderColor:'#db2777',backgroundColor:CA('#db2777','22'),fill:true,tension:.4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+
+  const byType={};
+  ORGANIC.forEach(p=>{if(!byType[p.type])byType[p.type]={eng:0,count:0};byType[p.type].eng+=p.likes+p.comments+p.shares+p.saves;byType[p.type].count++;});
+  const types=Object.keys(byType);
+  mkChart('chartEngByType',{type:'bar',data:{labels:types,datasets:[
+    {label:'Engajamento Total',data:types.map(t=>byType[t].eng),backgroundColor:['#7c3aed','#2563eb','#db2777','#059669'],borderRadius:5},
+  ]},options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
+}
+
+// ═══════════════════════════════════════════════════════
+// COMPARATIVO
+// ═══════════════════════════════════════════════════════
+function renderComparativo(){
+  const totalReach=P.reach+O.reach;
+  const paidShare=(P.reach/totalReach*100).toFixed(1);
+  const orgShare=(O.reach/totalReach*100).toFixed(1);
+
+  $('compKpis').innerHTML=[
+    makeKpi('📡','Alcance Total',fmt.k(totalReach),null,`💜 Pago: ${paidShare}% · 💚 Org: ${orgShare}%`,'gp',null),
+    makeKpi('📣','Alcance Pago',fmt.k(P.reach),null,'Investimento em mídia','gb',null),
+    makeKpi('🌱','Alcance Orgânico',fmt.k(O.reach),null,'Sem custo direto','gg',null),
+    makeKpi('💜','Engajamento Pago',fmt.k(CREATIVES.filter(c=>!c.organic).reduce((a,c)=>a+c.likes+c.comments+c.shares+c.saves,0)),null,'Nos anúncios','ao',null),
+    makeKpi('💚','Engajamento Orgânico',fmt.k(O.eng),null,'Nos posts','ap',null),
+    makeKpi('💰','Custo/Pessoa Alcançada',`R$${(P.spend/totalReach).toFixed(3)}`,null,'Baseado em alcance total','ak',null),
+  ].join('');
+
+  mkChart('chartCompReach',{type:'line',data:{labels:DL,datasets:[
+    {label:'Alcance Pago',data:DAYS.map(d=>d.reach),borderColor:'#7c3aed',backgroundColor:CA('#7c3aed','22'),fill:true,tension:.4},
+    {label:'Alcance Orgânico',data:DAYS.map(d=>d.orgReach),borderColor:'#10b981',backgroundColor:CA('#10b981','22'),fill:true,tension:.4},
+  ]},options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:false}},interaction:{mode:'index',intersect:false}}});
+
+  mkChart('chartCompEng',{type:'bar',data:{labels:DL,datasets:[
+    {label:'Engajamento Pago',data:DAYS.map(d=>Math.round(d.clicks*0.12)),backgroundColor:CA('#7c3aed','88'),borderRadius:3},
+    {label:'Engajamento Orgânico',data:DAYS.map(d=>d.orgEng),backgroundColor:CA('#10b981','88'),borderRadius:3},
+  ]},options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}});
+
+  mkChart('chartSpendFoll',{type:'line',data:{labels:DL,datasets:[
+    {label:'Investimento (R$)',data:DAYS.map(d=>d.spend),borderColor:'#7c3aed',tension:.4,yAxisID:'y'},
+    {label:'Novos Seguidores',data:DAYS.map(d=>d.followers),borderColor:'#10b981',tension:.4,yAxisID:'y2'},
+  ]},options:{responsive:true,interaction:{mode:'index',intersect:false},scales:{y:{title:{display:true,text:'R$'}},y2:{position:'right',title:{display:true,text:'Seguidores'}}},plugins:{legend:{position:'top'}}}});
+
+  mkChart('chartShareReach',{type:'doughnut',data:{labels:['Pago','Orgânico'],datasets:[{data:[P.reach,O.reach],backgroundColor:['#7c3aed','#10b981'],borderWidth:3,borderColor:'#fff'}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
+}
+
+// ═══════════════════════════════════════════════════════
+// CAMPANHAS
+// ═══════════════════════════════════════════════════════
+function renderCampanhas(){
+  const roass=CAMPS.map(c=>c.roas),ctrs=CAMPS.map(c=>c.ctr),cpas=CAMPS.map(c=>c.cpa);
+  function diag(c){
+    if(c.roas>=8) return '<span class="diag d-scale">🚀 Escalar</span>';
+    if(c.roas>=5) return '<span class="diag d-keep">✅ Manter</span>';
+    if(c.ctr<2)  return '<span class="diag d-opt">🎨 Otimizar criativo</span>';
+    if(c.roas>=3) return '<span class="diag d-test">🧪 Testar público</span>';
+    return '<span class="diag d-red">⚠️ Revisar</span>';
+  }
+  $('tabelaCampanhas').innerHTML=`<div class="tc"><div class="tc-hd"><h3>Performance por Campanha</h3></div>
+  <div style="overflow-x:auto"><table class="tbl"><thead><tr>
+    <th>Campanha</th><th>Objetivo</th><th>Status</th>
+    <th class="num">Spend</th><th class="num">Impr.</th><th class="num">Alcance</th><th class="num">Freq.</th>
+    <th class="num">Cliques</th><th class="num">CTR</th><th class="num">CPC</th><th class="num">CPM</th>
+    <th class="num">Leads</th><th class="num">Compras</th><th class="num">Receita</th><th class="num">ROAS</th><th class="num">CPA</th>
+    <th>Diagnóstico</th>
+  </tr></thead><tbody>
+  ${CAMPS.map(c=>`<tr>
+    <td><strong>${c.name}</strong></td>
+    <td><span class="badge ${c.obj==='SALES'?'bg-green':c.obj==='LEADS'?'bg-purple':c.obj==='TRAFFIC'?'bg-blue':'bg-gray'}">${c.obj}</span></td>
+    <td><span class="badge bg-teal">${c.status}</span></td>
+    <td class="num">${fmt.brl(c.spend)}</td>
+    <td class="num">${fmt.k(c.impr)}</td>
+    <td class="num">${fmt.k(c.reach)}</td>
+    <td class="num">${c.freq.toFixed(2)}</td>
+    <td class="num">${fmt.k(c.clicks)}</td>
+    <td class="num"><span class="${heatClass(c.ctr,ctrs)}">${fmt.pct(c.ctr)}</span></td>
+    <td class="num"><span class="${heatClass(c.cpc,cpas.map(x=>x/1000),true)}">${fmt.brl(c.cpc)}</span></td>
+    <td class="num">${fmt.brl(c.cpm)}</td>
+    <td class="num">${c.leads}</td>
+    <td class="num">${c.purchases}</td>
+    <td class="num">${fmt.brl(c.revenue)}</td>
+    <td class="num"><span class="${heatClass(c.roas,roass)}">${c.roas.toFixed(2)}×</span></td>
+    <td class="num">${c.cpa>0?fmt.brl(c.cpa):'—'}</td>
+    <td>${diag(c)}</td>
+  </tr>`).join('')}</tbody></table></div></div>`;
+
+  const aroass=ADSETS.map(a=>a.roas),actrs=ADSETS.map(a=>a.ctr);
+  $('tabelaAdsets').innerHTML=`<div class="tc"><div class="tc-hd"><h3>Performance por Conjunto de Anúncios</h3></div>
+  <div style="overflow-x:auto"><table class="tbl"><thead><tr>
+    <th>Conjunto</th><th>Campanha</th>
+    <th class="num">Spend</th><th class="num">Cliques</th><th class="num">CTR</th><th class="num">CPC</th>
+    <th class="num">Leads</th><th class="num">Compras</th><th class="num">ROAS</th>
+  </tr></thead><tbody>
+  ${ADSETS.map(a=>`<tr>
+    <td><strong>${a.name}</strong></td>
+    <td><span class="badge bg-purple" style="font-size:9px">${a.camp}</span></td>
+    <td class="num">${fmt.brl(a.spend)}</td>
+    <td class="num">${fmt.k(a.clicks)}</td>
+    <td class="num"><span class="${heatClass(a.ctr,actrs)}">${fmt.pct(a.ctr)}</span></td>
+    <td class="num">${fmt.brl(a.cpc)}</td>
+    <td class="num">${a.leads}</td>
+    <td class="num">${a.purchases}</td>
+    <td class="num"><span class="${heatClass(a.roas,aroass)}">${a.roas.toFixed(2)}×</span></td>
+  </tr>`).join('')}</tbody></table></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// CONTEÚDOS
+// ═══════════════════════════════════════════════════════
+function renderConteudos(){
+  $('contKpis').innerHTML=[
+    makeKpi('📱','Posts Totais',O.posts,null,`${O.reels} Reels · ${O.stories} Stories · ${O.carrosseis} Carrosseis`,'gp',null),
+    makeKpi('📡','Alcance Total',fmt.k(O.reach),null,'Orgânico sem custo','gb',null),
+    makeKpi('💬','Engajamento',fmt.k(O.eng),null,'❤️ Curtidas + Coments + Comp + Salv','gg',null),
+    makeKpi('👥','Novos Seguidores','+'+fmt.num(O.fg),null,'Crescimento do período','gk',null),
+  ].join('');
+
+  const engs=ORGANIC.map(p=>p.likes+p.comments+p.shares+p.saves);
+  const engrs=ORGANIC.map(p=>p.eng);
+  function contClass(p){
+    if(p.eng>=12) return 'ct-champion';
+    if(p.eng>=8) return 'ct-good';
+    if(p.eng>=5) return 'ct-median';
+    return 'ct-low';
+  }
+  function contTag(p){
+    if(p.eng>=12) return '<span class="badge bg-orange">🏆 Campeão</span>';
+    if(p.eng>=8) return '<span class="badge bg-green">✅ Bom</span>';
+    if(p.eng>=5) return '<span class="badge bg-blue">📊 Mediano</span>';
+    return '<span class="badge bg-red">⬇️ Baixo</span>';
+  }
+  function paLabel(p){
+    if(p.eng>=10||p.reach>=20000) return '<span class="diag d-scale">⚡ Usar como anúncio</span>';
+    if(p.eng>=8) return '<span class="diag d-keep">✅ Manter padrão</span>';
+    return '';
+  }
+  $('tabelaConteudos').innerHTML=`<div class="tc"><div class="tc-hd"><h3>Conteúdos Publicados no Período</h3></div>
+  <div style="overflow-x:auto"><table class="tbl"><thead><tr>
+    <th>Data</th><th>Tipo</th><th>Tema</th><th>Legenda</th>
+    <th class="num">Alcance</th><th class="num">Impr.</th><th class="num">Curtidas</th><th class="num">Coments.</th>
+    <th class="num">Comp.</th><th class="num">Salv.</th><th class="num">+Seg.</th><th class="num">Eng.%</th>
+    <th>Classificação</th><th>Ação</th>
+  </tr></thead><tbody>
+  ${ORGANIC.map(p=>`<tr class="${contClass(p)}">
+    <td>${p.date}</td>
+    <td><span class="tag tag-${p.type.toLowerCase()}">${p.type}</span></td>
+    <td>${p.theme}</td>
+    <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.caption}</td>
+    <td class="num"><span class="${heatClass(p.reach,ORGANIC.map(x=>x.reach))}">${fmt.k(p.reach)}</span></td>
+    <td class="num">${fmt.k(p.impr)}</td>
+    <td class="num">${fmt.k(p.likes)}</td>
+    <td class="num">${p.comments}</td>
+    <td class="num">${p.shares}</td>
+    <td class="num">${p.saves}</td>
+    <td class="num">+${p.fg}</td>
+    <td class="num"><span class="${heatClass(p.eng,engrs)}">${p.eng.toFixed(1)}%</span></td>
+    <td>${contTag(p)}</td>
+    <td>${paLabel(p)}</td>
+  </tr>`).join('')}</tbody></table></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// INSIGHTS IA
+// ═══════════════════════════════════════════════════════
+function renderInsights(){
+  const insights=[
+    {type:'scale',icon:'🚀',color:'#059669',typeLabel:'Escalar Agora',title:'Sales — Doors Off 30min merece mais budget',text:'ROAS de 9.87× e CPA de R$314 são os melhores do portfólio. O conjunto "Retargeting Visitantes" entrega CPA ainda menor (R$273). Recomendamos aumentar budget em 30-40% e monitorar frequência (atualmente 1.42).',pill:`ROAS 9.87× · Receita R$${fmt.k(210800)}`},
+    {type:'opp',icon:'💡',color:'#2563eb',typeLabel:'Oportunidade',title:'Reel do pedido de noivado → campanha Leads',text:'O conteúdo orgânico gerou 124.000 de alcance e 12.5% de taxa de engajamento. O criativo já validado pelo público pode ser transformado em anúncio para a campanha de Leads, especialmente para o segmento "Casais 25-45" onde o CPL é R$29.',pill:'124k alcance orgânico · 12.5% eng.'},
+    {type:'opt',icon:'🎨',color:'#d97706',typeLabel:'Otimizar Criativo',title:'Awareness com CTR abaixo do benchmark (1.63%)',text:'Campanha de Awareness apresenta CTR 1.63%, abaixo do benchmark de 2.5% para o setor de turismo/experiências. Recomendamos A/B test com novos títulos e primeiros 3 segundos do vídeo focando no aspecto "exclusivo" e "aventura".',pill:'CTR atual: 1.63% · Meta: 2.5%+'},
+    {type:'scale',icon:'🎬',color:'#059669',typeLabel:'Criativo Top',title:'"Doors Off — Vídeo Ação" é o melhor criativo',text:'Hook rate de 61%, ROAS de 12.4× e maior volume de compras do portfólio. Recomendamos criar variações deste criativo (diferentes ângulos, durações de 15s e 30s) para escalar sem saturar o público.',pill:'Hook 61% · ROAS 12.4× · 30 compras'},
+    {type:'pause',icon:'⚠️',color:'#dc2626',typeLabel:'Revisar Urgente',title:'CPA de Awareness em R$1.070 — 78% acima da meta',text:'A campanha Awareness entrega conscientização mas o CPA está muito alto. Considere reduzir budget em 20% e realocando para Retargeting onde cada compra custa R$314. Avalie manter apenas como campanha de branding com orçamento menor.',pill:'Meta CPA: R$600 · Atual: R$1.070'},
+    {type:'opp',icon:'📊',color:'#2563eb',typeLabel:'Formato',title:'Reels superam todos os outros formatos em orgânico',text:`${ORGANIC.filter(p=>p.type==='Reel').length} Reels publicados geraram ${fmt.k(ORGANIC.filter(p=>p.type==='Reel').reduce((a,p)=>a+p.reach,0))} de alcance combinado (média 36k/Reel) vs 10k de Posts estáticos. Aumentar frequência de Reels para 3x/semana pode duplicar o alcance orgânico sem custo extra.`,pill:'Média Reel: 36k alcance · Post: 10k'},
+    {type:'warn',icon:'🔄',color:'#d97706',typeLabel:'Frequência',title:'Monitorar frequência nas campanhas de topo',text:'Campanha Sales com frequência 1.42 e Awareness em 1.37. Acima de 2.0 há risco de fadiga criativa e queda de CTR. Recomendamos introduzir novos criativos preventivamente a cada 10 dias.',pill:'Limite recomendado: freq < 2.0'},
+    {type:'scale',icon:'🌱',color:'#059669',typeLabel:'Crescimento Orgânico',title:`+${fmt.num(O.fg)} seguidores com custo zero`,text:'O crescimento orgânico está correlacionado com os picos de investimento em mídia paga (correlação ~0.72). A estratégia de conteúdo complementa o pago: Reels de bastidores e depoimentos geram seguidores que depois são impactados pelo Retargeting.',pill:`Taxa crescimento: +${(O.fg/138000*100).toFixed(1)}% na base`},
+  ];
+
+  $('insightsGrid').innerHTML=insights.map(ins=>`<div class="ins-card ${ins.type}">
+    <div class="ins-type" style="color:${ins.color}">${ins.icon} ${ins.typeLabel}</div>
+    <div class="ins-title">${ins.title}</div>
+    <div class="ins-text">${ins.text}</div>
+    <span class="ins-pill">${ins.pill}</span>
+  </div>`).join('');
+
+  // Diag table
+  function diag(c){
+    if(c.roas>=8) return {cls:'d-scale',txt:'🚀 Escalar',rec:'Aumentar budget 30-40%. Manter criativo atual.'};
+    if(c.roas>=5) return {cls:'d-keep',txt:'✅ Manter',rec:'Manter budget. Testar variações criativas.'};
+    if(c.ctr<2)  return {cls:'d-opt',txt:'🎨 Otimizar criativo',rec:'Novos hooks nos primeiros 3s. A/B test urgente.'};
+    if(c.roas>=3) return {cls:'d-test',txt:'🧪 Testar público',rec:'Novos públicos lookalike. Revisar segmentação.'};
+    return {cls:'d-red',txt:'⚠️ Revisar',rec:'Pausar ou reduzir budget. Investigar funil.'};
+  }
+  $('diagCampanhas').innerHTML=`<div class="tc"><div class="tc-hd"><h3>Diagnóstico Automático por Campanha</h3></div>
+  <table class="tbl"><thead><tr><th>Campanha</th><th>ROAS</th><th>CTR</th><th>CPA</th><th>Status IA</th><th>Recomendação</th></tr></thead>
+  <tbody>${CAMPS.map(c=>{const d=diag(c);return`<tr>
+    <td><strong>${c.name}</strong></td>
+    <td><span class="${heatClass(c.roas,CAMPS.map(x=>x.roas))}">${c.roas.toFixed(2)}×</span></td>
+    <td><span class="${heatClass(c.ctr,CAMPS.map(x=>x.ctr))}">${fmt.pct(c.ctr)}</span></td>
+    <td>${c.cpa?fmt.brl(c.cpa):'N/A'}</td>
+    <td><span class="diag ${d.cls}">${d.txt}</span></td>
+    <td style="font-size:11px;color:#6b7280">${d.rec}</td>
+  </tr>`;}).join('')}</tbody></table></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// PERIOD TOGGLE
+// ═══════════════════════════════════════════════════════
+function switchPeriod(btn,chartId){
+  btn.closest('.ptg').querySelectorAll('.ptb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+renderResumo();
+</script>
+</body>
+</html>
