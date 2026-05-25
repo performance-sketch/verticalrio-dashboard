@@ -131,6 +131,11 @@
     .card-kpi.drag-sobre,.card.drag-sobre{border-color:#5a7fff!important;box-shadow:0 0 0 2px rgba(90,127,255,.35)!important}
     .drag-hint{position:absolute;top:6px;right:8px;font-size:11px;color:#1e2540;opacity:0;transition:opacity .2s;pointer-events:none;letter-spacing:1px}
     .card-kpi:hover .drag-hint,.card:hover .drag-hint{opacity:1;color:#475569}
+    .subabas{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid #1e2540;padding-bottom:0}
+    .subaba{padding:7px 14px;background:transparent;border:none;color:#64748b;font-size:12px;font-weight:600;cursor:pointer;border-radius:6px 6px 0 0;transition:all .18s;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-2px}
+    .subaba:hover{color:#93c5fd;background:#0f1225}
+    .subaba.ativa{color:#60a5fa;border-bottom-color:#3b82f6;background:#0d1424}
+    .subpainel{display:none}.subpainel.ativo{display:block}
   </style>
 </head>
 <body>
@@ -161,7 +166,6 @@
   <div class="aba" onclick="mostrarAba('googleAdsPage',this)">&#x1F50D; Google Ads</div>
   <div class="aba" onclick="mostrarAba('analyticsPage',this)">&#x1F310; Analytics</div>
   <div class="aba" onclick="mostrarAba('rezdyPage',this)">&#x1F4C5; Reservas Rezdy</div>
-  <div class="aba" onclick="mostrarAba('passageirosPage',this)">&#x1F9F3; Passageiros</div>
   <div class="aba" onclick="mostrarAba('respondioPage',this)">&#x1F4AC; Respond.io</div>
 </div>
 
@@ -254,157 +258,201 @@
 <!-- ═══════════════ ABA: META ADS ═══════════════ -->
 <div id="midiaPage" class="conteudo">
 
-  <!-- Perfil: seguidores e mensagens -->
-  <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Perfil &amp; Mensagens</div>
-  <div class="grade-kpi" style="margin-bottom:20px">
-    <div class="card-kpi" style="background:linear-gradient(135deg,#833ab4 0%,#fd1d1d 50%,#fcb045 100%);border:none">
-      <div class="kpi-label" style="color:#fff">Instagram</div>
-      <div class="kpi-valor" id="kpiIgFollowers" style="color:#fff">—</div>
-      <div id="varIgFollowers" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
-      <div class="kpi-sub" style="color:rgba(255,255,255,.75)">seguidores &bull; <span id="kpiIgMedia">—</span> posts</div>
+  <!-- Sub-navegação Meta Ads -->
+  <div class="subabas">
+    <button class="subaba ativa" onclick="mostrarSubAba('metaResumo',this)">📊 Resumo</button>
+    <button class="subaba" onclick="mostrarSubAba('metaCampanhas',this)">📣 Campanhas</button>
+    <button class="subaba" onclick="mostrarSubAba('metaCriativos',this)">🎨 Criativos</button>
+    <button class="subaba" onclick="mostrarSubAba('metaOrganico',this)">🌱 Orgânico</button>
+    <button class="subaba" onclick="mostrarSubAba('metaInsightsIA',this)">🤖 Insights IA</button>
+  </div>
+
+  <!-- ── RESUMO ── -->
+  <div id="metaResumo" class="subpainel ativo">
+    <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Perfil &amp; Mensagens</div>
+    <div class="grade-kpi" style="margin-bottom:20px">
+      <div class="card-kpi" style="background:linear-gradient(135deg,#833ab4 0%,#fd1d1d 50%,#fcb045 100%);border:none">
+        <div class="kpi-label" style="color:#fff">Instagram</div>
+        <div class="kpi-valor" id="kpiIgFollowers" style="color:#fff">—</div>
+        <div id="varIgFollowers" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
+        <div class="kpi-sub" style="color:rgba(255,255,255,.75)">seguidores &bull; <span id="kpiIgMedia">—</span> posts</div>
+      </div>
+      <div class="card-kpi kpi-azul">
+        <div class="kpi-label">Facebook</div>
+        <div class="kpi-valor" id="kpiFbFollowers">—</div>
+        <div id="varFbFollowers" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
+        <div class="kpi-sub">seguidores na pagina</div>
+      </div>
+      <div class="card-kpi kpi-verde">
+        <div class="kpi-label">Conexoes Mensagem</div>
+        <div class="kpi-valor" id="kpiMsgConexoes">—</div>
+        <div id="varMsgConexoes" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
+        <div class="kpi-sub">via anuncios (pago)</div>
+      </div>
+      <div class="card-kpi kpi-ciano">
+        <div class="kpi-label">Primeiras Respostas</div>
+        <div class="kpi-valor" id="kpiMsgFirstReply">—</div>
+        <div id="varMsgFirstReply" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
+        <div class="kpi-sub">via anuncios (pago)</div>
+      </div>
+      <div class="card-kpi kpi-amarelo">
+        <div class="kpi-label">Conversas Iniciadas</div>
+        <div class="kpi-valor" id="kpiMsgConversas">—</div>
+        <div id="varMsgConversas" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
+        <div class="kpi-sub">janela 7d (pago)</div>
+      </div>
     </div>
-    <div class="card-kpi kpi-azul">
-      <div class="kpi-label">Facebook</div>
-      <div class="kpi-valor" id="kpiFbFollowers">—</div>
-      <div id="varFbFollowers" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
-      <div class="kpi-sub">seguidores na pagina</div>
+
+    <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Anuncios</div>
+    <div class="grade-kpi">
+      <div class="card-kpi kpi-azul">
+        <div class="kpi-label" id="kpiLabelMetaGasto">Total Gasto (30d)</div>
+        <div class="kpi-valor" id="kpiMetaGasto">—</div>
+        <div class="kpi-sub" id="kpiMetaCampanhasCount">— campanhas</div>
+      </div>
+      <div class="card-kpi kpi-roxo">
+        <div class="kpi-label">Impressoes</div>
+        <div class="kpi-valor" id="kpiMetaImpressoes">—</div>
+        <div class="kpi-sub" id="kpiMetaAlcance">Alcance unico</div>
+      </div>
+      <div class="card-kpi kpi-verde">
+        <div class="kpi-label">Cliques Totais</div>
+        <div class="kpi-valor" id="kpiMetaCliques">—</div>
+        <div class="kpi-sub">Todos os cliques</div>
+      </div>
+      <div class="card-kpi kpi-amarelo">
+        <div class="kpi-label">CPC Medio</div>
+        <div class="kpi-valor" id="kpiMetaCpc">—</div>
+        <div class="kpi-sub">Custo por clique</div>
+      </div>
+      <div class="card-kpi kpi-laranja">
+        <div class="kpi-label">CPM Medio</div>
+        <div class="kpi-valor" id="kpiMetaCpm">—</div>
+        <div class="kpi-sub">Por mil impressoes</div>
+      </div>
+      <div class="card-kpi kpi-ciano">
+        <div class="kpi-label">CTR Medio</div>
+        <div class="kpi-valor" id="kpiMetaCtr">—</div>
+        <div class="kpi-sub">Click-through rate</div>
+      </div>
     </div>
-    <div class="card-kpi kpi-verde">
-      <div class="kpi-label">Conexoes Mensagem</div>
-      <div class="kpi-valor" id="kpiMsgConexoes">—</div>
-      <div id="varMsgConexoes" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
-      <div class="kpi-sub">via anuncios (pago)</div>
+
+    <!-- Gasto diario (dado real da API) -->
+    <div class="card" style="margin-top:12px">
+      <div class="card-titulo">📈 Gasto Diario — Ultimos 30 dias</div>
+      <div style="height:200px"><canvas id="graficoMetaDiario"></canvas></div>
     </div>
-    <div class="card-kpi kpi-ciano">
-      <div class="kpi-label">Primeiras Respostas</div>
-      <div class="kpi-valor" id="kpiMsgFirstReply">—</div>
-      <div id="varMsgFirstReply" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
-      <div class="kpi-sub">via anuncios (pago)</div>
-    </div>
-    <div class="card-kpi kpi-amarelo">
-      <div class="kpi-label">Conversas Iniciadas</div>
-      <div class="kpi-valor" id="kpiMsgConversas">—</div>
-      <div id="varMsgConversas" style="font-size:12px;font-weight:700;min-height:16px;margin:1px 0"></div>
-      <div class="kpi-sub">janela 7d (pago)</div>
+
+    <div class="grade-21" style="margin-top:12px">
+      <div class="card">
+        <div class="card-titulo">Gasto por Campanha — Top 10</div>
+        <div class="grafico-alto"><canvas id="graficoMetaBarra"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-titulo">Distribuicao de Gasto</div>
+        <div class="grafico-alto"><canvas id="graficoMetaRosca"></canvas></div>
+      </div>
     </div>
   </div>
 
-  <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Anuncios</div>
-  <div class="grade-kpi">
-    <div class="card-kpi kpi-azul">
-      <div class="kpi-label" id="kpiLabelMetaGasto">Total Gasto (30d)</div>
-      <div class="kpi-valor" id="kpiMetaGasto">R$ 31.007</div>
-      <div class="kpi-sub" id="kpiMetaCampanhasCount">— campanhas</div>
+  <!-- ── CAMPANHAS ── -->
+  <div id="metaCampanhas" class="subpainel">
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-titulo">Todas as Campanhas</div>
+      <div class="tabela-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Campanha</th>
+              <th>Gasto (R$)</th>
+              <th>Impressoes</th>
+              <th>Cliques</th>
+              <th>CPC (R$)</th>
+              <th>CTR (%)</th>
+              <th>CPM (R$)</th>
+              <th>Alcance</th>
+              <th>Conv. Web</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaMeta"></tbody>
+        </table>
+      </div>
     </div>
-    <div class="card-kpi kpi-roxo">
-      <div class="kpi-label">Impressoes</div>
-      <div class="kpi-valor" id="kpiMetaImpressoes">4,67M</div>
-      <div class="kpi-sub">Alcance unico</div>
-    </div>
-    <div class="card-kpi kpi-verde">
-      <div class="kpi-label">Cliques Totais</div>
-      <div class="kpi-valor" id="kpiMetaCliques">166.425</div>
-      <div class="kpi-sub">Todos os cliques</div>
-    </div>
-    <div class="card-kpi kpi-amarelo">
-      <div class="kpi-label">CPC Medio</div>
-      <div class="kpi-valor">R$ 0,19</div>
-      <div class="kpi-sub">Custo por clique</div>
-    </div>
-    <div class="card-kpi kpi-laranja">
-      <div class="kpi-label">CPM Medio</div>
-      <div class="kpi-valor">R$ 6,63</div>
-      <div class="kpi-sub">Por mil impressoes</div>
-    </div>
-  </div>
 
-  <div class="grade-21">
+    <div class="grade-2">
+      <div class="card">
+        <div class="card-titulo">&#x1F465; Gasto e Cliques por Faixa Etaria</div>
+        <div class="grafico-alto"><canvas id="graficoMetaIdade"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-titulo">&#x1F4CD; Gasto e Cliques por Estado</div>
+        <div class="grafico-alto"><canvas id="graficoMetaGeo"></canvas></div>
+      </div>
+    </div>
+
     <div class="card">
-      <div class="card-titulo">Gasto por Campanha — Top 10</div>
-      <div class="grafico-alto"><canvas id="graficoMetaBarra"></canvas></div>
+      <div class="card-titulo">&#x1F4CD; Detalhamento por Localizacao</div>
+      <div class="tabela-scroll">
+        <table>
+          <thead>
+            <tr><th>Local</th><th>Gasto (R$)</th><th>Impressoes</th><th>Cliques</th><th>CPC (R$)</th><th>CTR (%)</th></tr>
+          </thead>
+          <tbody id="tabelaMetaGeo"></tbody>
+        </table>
+      </div>
     </div>
+  </div>
+
+  <!-- ── CRIATIVOS ── -->
+  <div id="metaCriativos" class="subpainel">
+    <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px">Testes A/B &mdash; Criativos (last 30d)</div>
+    <div id="abTestsContainer"></div>
+  </div>
+
+  <!-- ── ORGÂNICO ── -->
+  <div id="metaOrganico" class="subpainel">
+    <div class="grade-kpi" style="margin-bottom:16px">
+      <div class="card-kpi" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);border:none">
+        <div class="kpi-label" style="color:#fff">Instagram</div>
+        <div class="kpi-valor" id="kpiIgFollowersOrg" style="color:#fff">—</div>
+        <div class="kpi-sub" style="color:rgba(255,255,255,.75)">seguidores totais</div>
+      </div>
+      <div class="card-kpi kpi-azul">
+        <div class="kpi-label">Facebook</div>
+        <div class="kpi-valor" id="kpiFbFollowersOrg">—</div>
+        <div class="kpi-sub">fas na pagina</div>
+      </div>
+      <div class="card-kpi kpi-verde">
+        <div class="kpi-label">Total Cliques Linktree</div>
+        <div class="kpi-valor" id="ltTotalCliques">—</div>
+        <div id="ltData" style="font-size:10px;color:#475569;margin-top:2px"></div>
+      </div>
+      <div class="card-kpi kpi-roxo">
+        <div class="kpi-label">Visualizacoes Linktree</div>
+        <div class="kpi-valor" id="ltVisualizacoes">—</div>
+        <div class="kpi-sub">perfil visto</div>
+      </div>
+      <div class="card-kpi kpi-ciano">
+        <div class="kpi-label">CTR Linktree</div>
+        <div class="kpi-valor" id="ltCtr">—</div>
+        <div class="kpi-sub">clique / visualizacao</div>
+      </div>
+    </div>
+
     <div class="card">
-      <div class="card-titulo">Distribuicao de Gasto</div>
-      <div class="grafico-alto"><canvas id="graficoMetaRosca"></canvas></div>
+      <div class="card-titulo">Cliques por Link — Linktree</div>
+      <div class="tabela-scroll">
+        <table>
+          <thead><tr><th>Link</th><th>URL</th><th style="text-align:center">Cliques</th></tr></thead>
+          <tbody id="tabelaLinktree"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-titulo">Todas as Campanhas</div>
-    <div class="tabela-scroll">
-      <table>
-        <thead>
-          <tr>
-            <th>Campanha</th>
-            <th>Gasto (R$)</th>
-            <th>Impressoes</th>
-            <th>Cliques</th>
-            <th>CPC (R$)</th>
-            <th>CTR (%)</th>
-            <th>CPM (R$)</th>
-            <th>Alcance</th>
-            <th>Conv. Web</th>
-          </tr>
-        </thead>
-        <tbody id="tabelaMeta"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="grade-2">
-    <div class="card">
-      <div class="card-titulo">Publico por Faixa Etaria <span class="fonte-tag">Meta</span></div>
-      <div class="grafico-alto"><canvas id="graficoMetaIdade"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-titulo">Distribuicao Geografica — Top Paises <span class="fonte-tag">Meta</span></div>
-      <div class="grafico-alto"><canvas id="graficoMetaGeo"></canvas></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-titulo">Detalhamento Geografico <span class="fonte-tag">Meta</span></div>
-    <div class="tabela-scroll">
-      <table>
-        <thead>
-          <tr><th>Pais / Regiao</th><th>Gasto (R$)</th><th>Impressoes</th><th>Cliques</th><th>CPC (R$)</th><th>CTR (%)</th></tr>
-        </thead>
-        <tbody id="tabelaMetaGeo"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- A/B Tests -->
-  <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin:20px 0 8px">Testes A/B &mdash; Criativos (last 30d)</div>
-  <div id="abTestsContainer"></div>
-
-  <!-- Linktree -->
-  <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin:20px 0 8px">Linktree <span id="dataLinktree" style="font-weight:400;text-transform:none;letter-spacing:0;color:#334155"></span></div>
-  <div class="grade-kpi" style="margin-bottom:12px">
-    <div class="card-kpi kpi-verde">
-      <div class="kpi-label">Total Cliques</div>
-      <div class="kpi-valor" id="ltTotalCliques">—</div>
-      <div class="kpi-sub">todos os links (30d)</div>
-    </div>
-    <div class="card-kpi kpi-azul">
-      <div class="kpi-label">Visualizacoes</div>
-      <div class="kpi-valor" id="ltVisualizacoes">—</div>
-      <div class="kpi-sub">visitas ao perfil (30d)</div>
-    </div>
-    <div class="card-kpi kpi-roxo">
-      <div class="kpi-label">CTR</div>
-      <div class="kpi-valor" id="ltCtr">—</div>
-      <div class="kpi-sub">cliques / visualizacoes</div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-titulo">Cliques por Link — Linktree</div>
-    <div class="tabela-scroll">
-      <table>
-        <thead><tr><th>Link</th><th>URL</th><th>Cliques</th></tr></thead>
-        <tbody id="tabelaLinktree"></tbody>
-      </table>
-    </div>
+  <!-- ── INSIGHTS IA ── -->
+  <div id="metaInsightsIA" class="subpainel">
+    <div id="metaInsightsContainer" style="padding:4px 0"></div>
   </div>
 
 </div>
@@ -725,79 +773,6 @@
 
 </div>
 
-<!-- ═══════════════ ABA: PASSAGEIROS ═══════════════ -->
-<div id="passageirosPage" class="conteudo">
-
-  <!-- Header -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-    <div>
-      <h2 style="font-size:16px;font-weight:700;color:#e2e8f0;margin:0">&#x2708; Passageiros &mdash; Voos Executados</h2>
-      <span id="dataPassageiros" style="font-size:11px;color:#475569">Aguardando atualizacao</span>
-    </div>
-  </div>
-
-  <!-- KPIs dinâmicos -->
-  <div class="grade-kpi" id="kpiPassageiros">
-    <div class="card-kpi kpi-verde"><div class="kpi-label">Total PAX</div><div class="kpi-valor" id="paxTotalPax">—</div><div class="kpi-sub">Passageiros transportados</div></div>
-    <div class="card-kpi kpi-azul"><div class="kpi-label">Total Voos</div><div class="kpi-valor" id="paxTotalVoos">—</div><div class="kpi-sub">Voos executados</div></div>
-    <div class="card-kpi kpi-roxo"><div class="kpi-label">Media PAX/Voo</div><div class="kpi-valor" id="paxOcupMedia">—</div><div class="kpi-sub">Ocupacao media</div></div>
-    <div class="card-kpi kpi-amarelo"><div class="kpi-label">Top Pais</div><div class="kpi-valor" id="paxTopPais" style="font-size:18px">—</div><div class="kpi-sub">Maior volume de pax</div></div>
-    <div class="card-kpi kpi-ciano"><div class="kpi-label">Receita Total</div><div class="kpi-valor" id="paxReceita" style="font-size:16px">—</div><div class="kpi-sub">Soma dos voos</div></div>
-  </div>
-
-  <!-- Voos e PAX por mês -->
-  <div class="grade-21">
-    <div class="card">
-      <div class="card-titulo">Voos Executados por Mes</div>
-      <div class="grafico-alto"><canvas id="graficoVoosMes"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-titulo">Passageiros por Mes</div>
-      <div class="grafico-alto"><canvas id="graficoPaxMes"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Países, pilotos, tours -->
-  <div class="grade-3">
-    <div class="card">
-      <div class="card-titulo">Nacionalidade dos Passageiros</div>
-      <div class="grafico-box"><canvas id="graficoPaises"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-titulo">Pilotos</div>
-      <div class="grafico-box"><canvas id="graficoPilotos"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-titulo">Tipo de Tour</div>
-      <div class="grafico-box"><canvas id="graficoTours"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Aeronaves e ocupação -->
-  <div class="grade-2">
-    <div class="card">
-      <div class="card-titulo">Aeronaves</div>
-      <div class="grafico-box"><canvas id="graficoAeronaves"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-titulo">Ocupacao Media por Mes</div>
-      <div class="grafico-box"><canvas id="graficoOcupacao"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Tabela mensal -->
-  <div class="card">
-    <div class="card-titulo">Historico Mensal</div>
-    <div class="tabela-scroll">
-      <table>
-        <thead><tr><th>Mes</th><th>Voos</th><th>Passageiros</th><th>Media PAX/Voo</th><th>Receita</th></tr></thead>
-        <tbody id="tabelaVoos"></tbody>
-      </table>
-    </div>
-  </div>
-
-</div>
-
 <!-- ═══════════════ RESPOND.IO PAGE ═══════════════ -->
 <div id="respondioPage" class="conteudo">
 
@@ -929,7 +904,7 @@
 
 const DADOS_META = {
   "perfil": {
-    "igFollowers": 138555,
+    "igFollowers": 138556,
     "igMedia": 909,
     "fbFollowers": 2082,
     "fbNome": "Vertical.Rio",
@@ -1629,17 +1604,17 @@ const DADOS_META = {
     }
   },
   "max": {
-    "totalGasto": 432797.76,
-    "totalImpressoes": 76410091,
-    "totalCliques": 1518993,
+    "totalGasto": 432805.95,
+    "totalImpressoes": 76410695,
+    "totalCliques": 1519027,
     "cpcMedio": 0.285,
     "campanhas": [
       {
         "id": "120214656968890437",
         "nome": "[LX][TRAFEGO-SEGUIDORES][ABO][PUBLICO_FRIO]",
-        "gasto": 93381.49,
-        "impressoes": 17565400,
-        "cliques": 397991,
+        "gasto": 93383.12,
+        "impressoes": 17565501,
+        "cliques": 397997,
         "cpc": 0.23,
         "ctr": 2.27,
         "cpm": 5.32,
@@ -1649,13 +1624,13 @@ const DADOS_META = {
       {
         "id": "120226714217400437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO]",
-        "gasto": 57129.02,
-        "impressoes": 9221958,
-        "cliques": 428055,
+        "gasto": 57132.39,
+        "impressoes": 9222232,
+        "cliques": 428078,
         "cpc": 0.13,
         "ctr": 4.64,
-        "cpm": 6.19,
-        "alcance": 3550888,
+        "cpm": 6.2,
+        "alcance": 3550868,
         "conv": 1.0
       },
       {
@@ -1817,25 +1792,25 @@ const DADOS_META = {
       {
         "id": "120243998081540437",
         "nome": "[MSG][GRINGO][RJ][NUVENS-ORG]",
-        "gasto": 3588.8,
-        "impressoes": 345766,
-        "cliques": 5448,
+        "gasto": 3590.78,
+        "impressoes": 345935,
+        "cliques": 5449,
         "cpc": 0.66,
         "ctr": 1.58,
         "cpm": 10.38,
-        "alcance": 204154,
+        "alcance": 204377,
         "conv": 1.0
       },
       {
         "id": "120247060568150437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO] [TESTE]",
-        "gasto": 3537.37,
-        "impressoes": 255550,
-        "cliques": 17093,
+        "gasto": 3538.58,
+        "impressoes": 255610,
+        "cliques": 17097,
         "cpc": 0.21,
         "ctr": 6.69,
         "cpm": 13.84,
-        "alcance": 164637,
+        "alcance": 164633,
         "conv": null
       },
       {
@@ -2484,69 +2459,69 @@ const DADOS_META = {
       },
       {
         "faixa": "18-24",
-        "gasto": 89537.25,
-        "impressoes": 22852778,
-        "cliques": 363487
+        "gasto": 89537.64,
+        "impressoes": 22852849,
+        "cliques": 363489
       },
       {
         "faixa": "25-34",
-        "gasto": 198659.73,
-        "impressoes": 35598147,
-        "cliques": 645964
+        "gasto": 198662.69,
+        "impressoes": 35598421,
+        "cliques": 645973
       },
       {
         "faixa": "35-44",
-        "gasto": 83664.56,
-        "impressoes": 11352570,
-        "cliques": 238787
+        "gasto": 83666.05,
+        "impressoes": 11352662,
+        "cliques": 238791
       },
       {
         "faixa": "45-54",
-        "gasto": 31273.49,
-        "impressoes": 3198670,
-        "cliques": 119187
+        "gasto": 31274.79,
+        "impressoes": 3198747,
+        "cliques": 119195
       },
       {
         "faixa": "55-64",
-        "gasto": 17214.19,
-        "impressoes": 1889771,
-        "cliques": 84718
+        "gasto": 17215.48,
+        "impressoes": 1889825,
+        "cliques": 84725
       },
       {
         "faixa": "65+",
-        "gasto": 12446.08,
-        "impressoes": 1517830,
-        "cliques": 66841
+        "gasto": 12446.84,
+        "impressoes": 1517866,
+        "cliques": 66845
       }
     ],
     "geos": [
       {
         "local": "Brasil",
-        "gasto": 263417.77,
-        "impressoes": 43340156,
-        "cliques": 694991
+        "gasto": 263424.18,
+        "impressoes": 43340585,
+        "cliques": 695012
       },
       {
         "local": "Colombia",
-        "gasto": 13875.04,
-        "impressoes": 2529665,
-        "cliques": 114998
+        "gasto": 13875.65,
+        "impressoes": 2529687,
+        "cliques": 115001
       },
       {
         "local": "Chile",
-        "gasto": 10865.87,
-        "impressoes": 1931488,
-        "cliques": 52641
+        "gasto": 10866.05,
+        "impressoes": 1931499,
+        "cliques": 52642
       },
       {
         "local": "Argentina",
-        "gasto": 6908.71,
-        "impressoes": 1336790,
-        "cliques": 37319
+        "gasto": 6909.5,
+        "impressoes": 1336837,
+        "cliques": 37321
       },
       {
         "local": "Canada",
-        "gasto": 3282.67,
+        "gasto": 3282.68,
         "impressoes": 159693,
         "cliques": 2786
       },
@@ -2564,9 +2539,9 @@ const DADOS_META = {
       }
     ],
     "mensagens": {
-      "conexoes": 11991,
-      "firstReply": 11437,
-      "conversas": 14240,
+      "conexoes": 11992,
+      "firstReply": 11438,
+      "conversas": 14241,
       "bloqueios": 128
     }
   },
@@ -4733,9 +4708,9 @@ const DADOS_META = {
     },
     {
       "data": "2026-05-25",
-      "gasto": 312.01,
-      "impressoes": 23735,
-      "cliques": 1203
+      "gasto": 320.2,
+      "impressoes": 24339,
+      "cliques": 1237
     }
   ],
   "abTests": [
@@ -4757,7 +4732,7 @@ const DADOS_META = {
         "cpc": 0.252,
         "cpm": 3.606,
         "alcance": 243593,
-        "thumbnail": "https://scontent.fsdu36-1.fna.fbcdn.net/v/t15.5256-10/597385240_1368185495089184_2796060675907438818_n.jpg?_nc_cat=104&ccb=1-7&_nc_ohc=Q5B31kZdn3IQ7kNvwHR1abu&_nc_oc=AdqBcE-yf-_MlJf3lX7_5TLpnJvfKut3ZoeRUT7wWK7suRSat_751-NDTdhZ9grL53Wm3irbWcf9mKwsQD8vNCgG&_nc_zt=23&_nc_ht=scontent.fsdu36-1.fna&edm=AAwGEdEEAAAA&_nc_gid=c4C2Z2sjmQa7g6Q38Ag1Jw&_nc_tpa=Q5bMBQFwQx5TcfbV3Aj2v60LuoYWSqolVccMLsI5_cePttFXugweQLlB1BFbXoZDCDqGWtiI_gy85ZGDiw&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&ur=5fad0e&_nc_sid=58080a&oh=00_Af6DFRYeJoXw-lFnMoZflFi6Vc2EyZw3WzpYiMO_dRDJ7Q&oe=6A1A650E"
+        "thumbnail": "https://scontent.fsdu36-1.fna.fbcdn.net/v/t15.5256-10/597385240_1368185495089184_2796060675907438818_n.jpg?_nc_cat=104&ccb=1-7&_nc_ohc=Q5B31kZdn3IQ7kNvwHR1abu&_nc_oc=AdqBcE-yf-_MlJf3lX7_5TLpnJvfKut3ZoeRUT7wWK7suRSat_751-NDTdhZ9grL53Wm3irbWcf9mKwsQD8vNCgG&_nc_zt=23&_nc_ht=scontent.fsdu36-1.fna&edm=AAwGEdEEAAAA&_nc_gid=YNVXyGh29GaSfHE7DubPaw&_nc_tpa=Q5bMBQGWIG-67pbWTunN3UztMQ2MuVCVBKkDBJwlViO3dAhEIKYmn0-KJE2UomtTTWxHnI1h5oRZy_C94A&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&ur=5fad0e&_nc_sid=58080a&oh=00_Af67fkt49mCKFQhJyq_NWxR6jDl0QUiaZai75Q5gpfNsjA&oe=6A1A650E"
       },
       "b": {
         "adId": "120246945045380437",
@@ -4772,7 +4747,7 @@ const DADOS_META = {
         "cpc": 0.268,
         "cpm": 9.772,
         "alcance": 133463,
-        "thumbnail": "https://scontent.fsdu36-1.fna.fbcdn.net/v/t15.5256-10/689789943_1543137207598270_2379855030338845825_n.jpg?_nc_cat=101&ccb=1-7&_nc_ohc=M8EMvTpecvMQ7kNvwERay0T&_nc_oc=Adpfk0BenWv2xHIQL51BBjxH76tAEBCirFop0hj-eOoHja-DNK1Ib3f1yyOewPnYBuya0k53ZyjhbGEyklppWF8n&_nc_zt=23&_nc_ht=scontent.fsdu36-1.fna&edm=AAwGEdEEAAAA&_nc_gid=c4C2Z2sjmQa7g6Q38Ag1Jw&_nc_tpa=Q5bMBQGGOXMTEiKjQs2gxdoP1nkpzNcHL1e1QumJEFJQ67onPFv-h8gKWsntbhzSdR6S78WRvZ_FVhXSdg&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&ur=5fad0e&_nc_sid=58080a&oh=00_Af7ZXXAzZ_ZWdRyFRa-RKHW63KCYuT8hTwT54IsGWKWjQw&oe=6A1A5E7D"
+        "thumbnail": "https://scontent.fsdu36-1.fna.fbcdn.net/v/t15.5256-10/689789943_1543137207598270_2379855030338845825_n.jpg?_nc_cat=101&ccb=1-7&_nc_ohc=M8EMvTpecvMQ7kNvwERay0T&_nc_oc=Adpfk0BenWv2xHIQL51BBjxH76tAEBCirFop0hj-eOoHja-DNK1Ib3f1yyOewPnYBuya0k53ZyjhbGEyklppWF8n&_nc_zt=23&_nc_ht=scontent.fsdu36-1.fna&edm=AAwGEdEEAAAA&_nc_gid=YNVXyGh29GaSfHE7DubPaw&_nc_tpa=Q5bMBQElCElaFI7oJKAaCOAxPKDTcW9qxSOmBRClO5r8tXK0VIcOiQ2MCjY7BS1LcSkQShGcdsY1q6lbCA&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&ur=5fad0e&_nc_sid=58080a&oh=00_Af7hSbeheK_6iqgemJRYNY7xz5md3fiHtltNPOEtZAmHiw&oe=6A1A96BD"
       },
       "vencedorCtr": "b",
       "vencedorCpc": "a",
@@ -4796,7 +4771,7 @@ const DADOS_META = {
         "cpc": 0.105,
         "cpm": 5.289,
         "alcance": 408721,
-        "thumbnail": "https://scontent.fsdu36-1.fna.fbcdn.net/v/t15.5256-10/663307979_1318845760088758_4444161616552990535_n.jpg?_nc_cat=110&ccb=1-7&_nc_ohc=pzezl7nFJXAQ7kNvwGaCdkC&_nc_oc=AdpZZ2LHl_IPCQAD2lAWsw67piVcJUvwtqj7EKkUzC4uXmIzXCBaG0koQC2BKh7B2G2OzyNnlezBAeam5NzT6XDS&_nc_zt=23&_nc_ht=scontent.fsdu36-1.fna&edm=AAwGEdEEAAAA&_nc_gid=c4C2Z2sjmQa7g6Q38Ag1Jw&_nc_tpa=Q5bMBQFwBnfJq_cltDXjON5bZIsUP4K6ZXgleHfxbWB9E8yAYgTrP3Xlsj2ocFwDY25AvUf--0Sqo6NK1Q&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&ur=5fad0e&_nc_sid=58080a&oh=00_Af4p4tPiL5zGyjg9C1Hy4CIOPYwpUEvAo78vR1kmdYzlTw&oe=6A1A91CE"
+        "thumbnail": "https://scontent.fsdu36-1.fna.fbcdn.net/v/t15.5256-10/663307979_1318845760088758_4444161616552990535_n.jpg?_nc_cat=110&ccb=1-7&_nc_ohc=pzezl7nFJXAQ7kNvwGaCdkC&_nc_oc=AdpZZ2LHl_IPCQAD2lAWsw67piVcJUvwtqj7EKkUzC4uXmIzXCBaG0koQC2BKh7B2G2OzyNnlezBAeam5NzT6XDS&_nc_zt=23&_nc_ht=scontent.fsdu36-1.fna&edm=AAwGEdEEAAAA&_nc_gid=YNVXyGh29GaSfHE7DubPaw&_nc_tpa=Q5bMBQGG5MDzt26NV8PlFmFHKZLKpK45CUPBCpn9003K46cpubNRIxmzmr6bgSFtVgz8OXHbrhTGXsSmCA&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&ur=5fad0e&_nc_sid=58080a&oh=00_Af6nJL43ARN2XpARIG8hY_CN98Qoe5DHhS3cwBxTNN9yqQ&oe=6A1A91CE"
       },
       "b": {
         "adId": "120246140363610437",
@@ -4811,7 +4786,7 @@ const DADOS_META = {
         "cpc": 0.126,
         "cpm": 12.203,
         "alcance": 55645,
-        "thumbnail": "https://scontent.fsdu36-1.fna.fbcdn.net/v/t15.5256-10/679029218_1673758610417851_8744186241405712238_n.jpg?_nc_cat=105&ccb=1-7&_nc_ohc=zb0hG_0S-lAQ7kNvwFG5m48&_nc_oc=AdqO5fG93bgkkvo_3nHBsR05W5i5GMk4PNH2IgnbaRkJjWNdyXcR-NujE1-SWY8XoeGipWklbUOlKU6cEHp7MpIX&_nc_zt=23&_nc_ht=scontent.fsdu36-1.fna&edm=AAwGEdEEAAAA&_nc_gid=c4C2Z2sjmQa7g6Q38Ag1Jw&_nc_tpa=Q5bMBQFlYWzxSSr44snCBEi7draijcz1vhbyatA5JJwnbaM255vxmXww1V7-OBZpnuF10F9nnjdZEZFk8g&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&ur=5fad0e&_nc_sid=58080a&oh=00_Af7sImeJ_oNimbw6-eDvnOeBchxKSv6tW8dhAT1Fle2wfQ&oe=6A1A7FB3"
+        "thumbnail": "https://scontent.fsdu36-1.fna.fbcdn.net/v/t15.5256-10/679029218_1673758610417851_8744186241405712238_n.jpg?_nc_cat=105&ccb=1-7&_nc_ohc=zb0hG_0S-lAQ7kNvwFG5m48&_nc_oc=AdqO5fG93bgkkvo_3nHBsR05W5i5GMk4PNH2IgnbaRkJjWNdyXcR-NujE1-SWY8XoeGipWklbUOlKU6cEHp7MpIX&_nc_zt=23&_nc_ht=scontent.fsdu36-1.fna&edm=AAwGEdEEAAAA&_nc_gid=YNVXyGh29GaSfHE7DubPaw&_nc_tpa=Q5bMBQEA1mcnZx8bh79KTxwDf41qoOt46ewKykcUU-TQzr2dkEZHzhd4M9nYZhAMZmjzDCaE6V_bt2mErg&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&ur=5fad0e&_nc_sid=58080a&oh=00_Af6UetnfsVN4_lH8nVV8XwQpD2LqmPQ9Y6hWpilTVGq8qA&oe=6A1A7FB3"
       },
       "vencedorCtr": "b",
       "vencedorCpc": "a",
@@ -107888,8 +107863,22 @@ function mostrarAba(id, btn) {
   if(id==="googleAdsPage")   renderizarGoogleAds();
   if(id==="analyticsPage")   renderizarAnalytics();
   if(id==="rezdyPage")       carregarRezdy();
-  if(id==="passageirosPage") renderizarPassageiros();
   if(id==="respondioPage")  renderizarRespondio();
+}
+
+function mostrarSubAba(id, el) {
+  // Hide all sub-panels
+  document.querySelectorAll('.subpainel').forEach(p => p.classList.remove('ativo'));
+  // Deactivate all sub-tab buttons
+  document.querySelectorAll('.subaba').forEach(b => b.classList.remove('ativa'));
+  // Show selected panel
+  const panel = document.getElementById(id);
+  if(panel) panel.classList.add('ativo');
+  if(el) el.classList.add('ativa');
+  // Render content for the activated sub-tab
+  if(id === 'metaCriativos') renderizarAbTests();
+  if(id === 'metaOrganico') renderizarLinktree();
+  if(id === 'metaInsightsIA') renderizarInsightsMetaIA();
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -108004,7 +107993,6 @@ function reRenderAbaAtiva() {
     else if(id==="googleAdsPage")renderizarGoogleAds();
     else if(id==="analyticsPage")renderizarAnalytics();
     else if(id==="rezdyPage")    carregarRezdy();
-    else if(id==="passageirosPage")renderizarPassageiros();
     else if(id==="respondioPage")  renderizarRespondio();
   } catch(e){ console.error("reRenderAbaAtiva:",e); }
   habilitarDrag();
@@ -108154,6 +108142,29 @@ function renderizarMetaAds() { try {
   _sh("varMsgConversas",  _varBadge(msg.conversas,  ant.conversas,  false));
   const cores = ["#3b82f6","#8b5cf6","#22c55e","#f97316","#06b6d4","#eab308","#ec4899","#f87171","#94a3b8","#10b981"];
 
+  // ── Gráfico diário (dados reais) ─────────────────────────────────
+  const diario = (DADOS_META.diario || []).slice(-30);
+  if(diario.length > 0) {
+    criarGrafico("graficoMetaDiario",{
+      type:"line",
+      data:{
+        labels: diario.map(d=>d.data ? d.data.slice(5) : ''),
+        datasets:[
+          {label:"Gasto (R$)",data:diario.map(d=>d.gasto||0),borderColor:"#3b82f6",backgroundColor:"rgba(59,130,246,.15)",fill:true,tension:.4,yAxisID:"y"},
+          {label:"Cliques",data:diario.map(d=>d.cliques||0),borderColor:"#22c55e",backgroundColor:"transparent",tension:.4,yAxisID:"y1"},
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
+        plugins:{legend:{labels:{color:"#94a3b8",font:{size:11}}}},
+        scales:{
+          x:{ticks:{color:"#64748b",maxTicksLimit:15},grid:{color:"#1e2540"}},
+          y:{ticks:{color:"#60a5fa",callback:v=>"R$"+v.toLocaleString('pt-BR')},grid:{color:"#1e2540"},position:"left"},
+          y1:{ticks:{color:"#4ade80"},grid:{display:false},position:"right"}
+        }
+      }
+    });
+  }
+
   criarGrafico("graficoMetaBarra",{
     type:"bar",
     data:{labels:top10.map(c=>c.nome.slice(0,26)+"…"),datasets:[{label:"Gasto (R$)",data:top10.map(c=>c.gasto),backgroundColor:"#3b82f6",borderRadius:5,borderSkipped:false}]},
@@ -108241,9 +108252,27 @@ function renderizarMetaAds() { try {
     if(lbl) lbl.textContent="Total Gasto ("+(FILTRO.ini&&FILTRO.fim?'custom':FILTRO.dias==='max'?'maximo':FILTRO.dias?FILTRO.dias+'d':'todos')+")";
     const elCount=document.getElementById("kpiMetaCampanhasCount");
     if(elCount){ const n=(_meta.campanhas||[]).filter(c=>c.gasto>0).length; elCount.textContent=n+" campanha"+(n!==1?"s":""); }
+    const cpc = _meta.totalCliques > 0 ? _meta.totalGasto/_meta.totalCliques : 0;
+    const cpm = _meta.totalImpressoes > 0 ? _meta.totalGasto/_meta.totalImpressoes*1000 : 0;
+    const ctr = _meta.totalImpressoes > 0 ? _meta.totalCliques/_meta.totalImpressoes*100 : 0;
+    const elCpc = document.getElementById("kpiMetaCpc");
+    if(elCpc) elCpc.textContent = "R$ "+formatarMoeda(cpc);
+    const elCpm = document.getElementById("kpiMetaCpm");
+    if(elCpm) elCpm.textContent = "R$ "+formatarMoeda(cpm);
+    const elCtr = document.getElementById("kpiMetaCtr");
+    if(elCtr) elCtr.textContent = ctr.toFixed(2)+"%";
+    // Sync organic tab followers
+    const elIgOrg = document.getElementById("kpiIgFollowersOrg");
+    if(elIgOrg) elIgOrg.textContent = perfil.igFollowers ? formatarNumero(perfil.igFollowers) : "—";
+    const elFbOrg = document.getElementById("kpiFbFollowersOrg");
+    if(elFbOrg) elFbOrg.textContent = perfil.fbFollowers ? formatarNumero(perfil.fbFollowers) : "—";
   }
 
-  // ── Testes A/B ──────────────────────────────────────────────────────
+  renderizarAbTests();
+  renderizarLinktree();
+} catch(e){ console.error("renderizarMetaAds:",e); }}
+
+function renderizarAbTests() { try {
   const abContainer = document.getElementById("abTestsContainer");
   if(abContainer){
     const testes = DADOS_META.abTests || [];
@@ -108309,9 +108338,11 @@ function renderizarMetaAds() { try {
       }).join("");
     }
   }
+} catch(e){ console.error("renderizarAbTests:",e); }}
 
-  // ── Linktree ────────────────────────────────────────────────────────
+function renderizarLinktree() { try {
   const lt = DADOS_LINKTREE || {};
+  const _s  = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
   _s("ltTotalCliques",  lt.totalCliques  ? formatarNumero(lt.totalCliques)  : "—");
   _s("ltVisualizacoes", lt.visualizacoes ? formatarNumero(lt.visualizacoes) : "—");
   _s("ltCtr",           lt.ctr           ? lt.ctr.toFixed(1)+"%" : "—");
@@ -108327,7 +108358,82 @@ function renderizarMetaAds() { try {
       </tr>`).join("");
     }
   }
-} catch(e){ console.error("renderizarMetaAds:",e); }}
+} catch(e){ console.error("renderizarLinktree:",e); }}
+
+function renderizarInsightsMetaIA() { try {
+  const _meta = getMeta();
+  const container = document.getElementById("metaInsightsContainer");
+  if(!container) return;
+
+  const totalGasto = _meta.totalGasto || 0;
+  const totalCliques = _meta.totalCliques || 0;
+  const totalImpressoes = _meta.totalImpressoes || 0;
+  const campanhas = (_meta.campanhas || []).filter(c=>c.gasto>0);
+  const perfil = DADOS_META.perfil || {};
+  const ctr = totalImpressoes>0 ? (totalCliques/totalImpressoes*100) : 0;
+  const cpc = totalCliques>0 ? totalGasto/totalCliques : 0;
+  const cpm = totalImpressoes>0 ? totalGasto/totalImpressoes*1000 : 0;
+
+  const topCamp = [...campanhas].sort((a,b)=>b.gasto-a.gasto)[0];
+  const topCtr  = [...campanhas].sort((a,b)=>(b.ctr||0)-(a.ctr||0))[0];
+  const topCpc  = [...campanhas].filter(c=>c.cpc>0).sort((a,b)=>a.cpc-b.cpc)[0];
+  const worseConv = [...campanhas].filter(c=>c.ctr!=null&&c.ctr<1.5);
+  const msg = _meta.mensagens || {};
+
+  const topShare = topCamp ? ((topCamp.gasto/totalGasto)*100).toFixed(0) : 0;
+
+  const insights = [
+    {
+      tipo:'📊 Visao Geral', cor:'#3b82f6', borda:'#1d4ed8',
+      titulo: `R$ ${formatarNumero(Math.round(totalGasto))} investidos — ${campanhas.length} campanhas ativas`,
+      texto: `CTR medio de ${ctr.toFixed(2)}%, CPC medio R$ ${formatarMoeda(cpc)} e CPM de R$ ${formatarMoeda(cpm)}.
+              ${topCamp ? `A campanha "${topCamp.nome.slice(0,40)}" concentra ${topShare}% do investimento.` : ''}`,
+    },
+    {
+      tipo:'🚀 Melhor CTR', cor:'#22c55e', borda:'#15803d',
+      titulo: topCtr ? `"${topCtr.nome.slice(0,45)}" tem o melhor CTR` : 'Analise de CTR',
+      texto: topCtr ? `CTR de ${(topCtr.ctr||0).toFixed(2)}%, acima da media geral de ${ctr.toFixed(2)}%.
+                       CPC de R$ ${formatarMoeda(topCtr.cpc||0)}. Considere aumentar o budget desta campanha.`
+                    : 'Execute atualizar_meta.py para gerar analise de CTR.',
+    },
+    {
+      tipo:'💰 Melhor CPC', cor:'#f97316', borda:'#c2410c',
+      titulo: topCpc ? `"${topCpc.nome.slice(0,45)}" tem o menor CPC` : 'Analise de CPC',
+      texto: topCpc ? `CPC de R$ ${formatarMoeda(topCpc.cpc)}, o mais eficiente do portfolio.
+                       Cliques: ${formatarNumero(topCpc.cliques||0)}. Alta eficiencia de custo por clique.`
+                    : 'Dados insuficientes para analise de CPC.',
+    },
+    {
+      tipo:'💬 Mensagens', cor:'#8b5cf6', borda:'#6d28d9',
+      titulo: `${formatarNumero(msg.conexoes||0)} conexoes de mensagem via anuncios`,
+      texto: `${formatarNumero(msg.firstReply||0)} primeiras respostas e ${formatarNumero(msg.conversas||0)} conversas iniciadas (janela 7d).
+              Mensagens sao leads diretos — cada conexao representa interesse real no produto.`,
+    },
+    {
+      tipo:'⚠️ CTR Baixo', cor:'#f87171', borda:'#b91c1c',
+      titulo: worseConv.length ? `${worseConv.length} campanha(s) com CTR abaixo de 1.5%` : 'Todas campanhas com CTR aceitavel',
+      texto: worseConv.length
+        ? `Campanhas: ${worseConv.map(c=>'"'+c.nome.slice(0,25)+'"').join(', ')}. CTR baixo indica criativo ou publico desalinhado.
+           Recomendado: testar novos criativos ou revisar segmentacao de publico.`
+        : `Todas as campanhas com gasto relevante estao com CTR acima de 1.5%. Bom sinal de relevancia dos criativos.`,
+    },
+    {
+      tipo:'👥 Seguidores', cor:'#06b6d4', borda:'#0e7490',
+      titulo: `${formatarNumero(perfil.igFollowers||0)} seguidores no Instagram`,
+      texto: `Facebook: ${formatarNumero(perfil.fbFollowers||0)} fas. O crescimento organico de seguidores e amplificado
+              pelo investimento em midia paga — especialmente campanhas de awareness que geram alcance de novos usuarios.`,
+    },
+  ];
+
+  container.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    ${insights.map(ins=>`
+    <div style="background:#0d1020;border:1px solid #1e2540;border-left:4px solid ${ins.borda};border-radius:10px;padding:16px">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${ins.cor};margin-bottom:6px">${ins.tipo}</div>
+      <div style="font-size:13px;font-weight:700;color:#e2e8f0;margin-bottom:6px">${ins.titulo}</div>
+      <div style="font-size:12px;color:#64748b;line-height:1.6">${ins.texto}</div>
+    </div>`).join('')}
+  </div>`;
+} catch(e){ console.error("renderizarInsightsMetaIA:",e); }}
 
 // ────────────────────────────────────────────────────────────────────────────
 // ABA: GOOGLE ADS
@@ -108772,128 +108878,6 @@ function renderizarHeatmapLeadTime() {
   el.innerHTML = `<table style="border-collapse:separate;border-spacing:2px;width:100%">
     <thead>${header}</thead><tbody>${rows}</tbody>
   </table>`;
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// ABA: PASSAGEIROS
-// ────────────────────────────────────────────────────────────────────────────
-
-function renderizarPassageiros() {
-  const d = DADOS_PASSAGEIROS;
-  const meses = (d.voosMensais || []).filter(m => m.voos > 0 || m.pax > 0);
-  const _s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-
-  // ── KPIs ──────────────────────────────────────────────────────────────
-  _s("paxTotalPax",  (d.totalPax  || 0).toLocaleString("pt-BR"));
-  _s("paxTotalVoos", (d.totalVoos || 0).toLocaleString("pt-BR"));
-  const ocupMedia = d.totalVoos > 0 ? (d.totalPax / d.totalVoos).toFixed(1) : "—";
-  _s("paxOcupMedia", ocupMedia);
-  _s("paxTopPais",   (d.paises && d.paises[0]) ? d.paises[0].pais : "—");
-  _s("paxReceita",   "R$ " + formatarMoeda(d.totalReceita || 0));
-  _s("dataPassageiros", d.dataAtualizacao || "");
-
-  const CORES12 = ["#3b82f6","#22c55e","#f97316","#a855f7","#06b6d4","#eab308",
-                   "#ec4899","#f87171","#94a3b8","#84cc16","#fb923c","#38bdf8"];
-  const scaleOpts = {
-    x: { ticks:{color:"#64748b",font:{size:9},maxRotation:45}, grid:{color:"#1e2540"} },
-    y: { ticks:{color:"#64748b"}, grid:{color:"#1e2540"} },
-  };
-
-  // ── Voos por mês ──────────────────────────────────────────────────────
-  criarGrafico("graficoVoosMes", {
-    type: "bar",
-    data: {
-      labels: meses.map(m => m.label),
-      datasets: [{ label:"Voos", data:meses.map(m=>m.voos), backgroundColor:"#3b82f6", borderRadius:5, borderSkipped:false }],
-    },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:scaleOpts },
-  });
-
-  // ── PAX por mês ───────────────────────────────────────────────────────
-  criarGrafico("graficoPaxMes", {
-    type: "line",
-    data: {
-      labels: meses.map(m => m.label),
-      datasets: [{ label:"PAX", data:meses.map(m=>m.pax), borderColor:"#22c55e", backgroundColor:"rgba(34,197,94,.15)", borderWidth:2, fill:true, tension:.4, pointBackgroundColor:"#22c55e", pointRadius:4 }],
-    },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:scaleOpts },
-  });
-
-  // ── Países (doughnut) ─────────────────────────────────────────────────
-  criarGrafico("graficoPaises", {
-    type: "doughnut",
-    data: {
-      labels: d.paises.map(p => p.pais),
-      datasets: [{ data:d.paises.map(p=>p.count), backgroundColor:CORES12, borderWidth:2, borderColor:"#13162a" }],
-    },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:"right",labels:{color:"#94a3b8",font:{size:9},boxWidth:8}} } },
-  });
-
-  // ── Pilotos (bar horizontal) ──────────────────────────────────────────
-  if (d.pilotos && d.pilotos.length) {
-    criarGrafico("graficoPilotos", {
-      type: "bar",
-      data: {
-        labels: d.pilotos.map(p => p.piloto),
-        datasets: [
-          { label:"Voos", data:d.pilotos.map(p=>p.voos), backgroundColor:"#3b82f6", borderRadius:4, borderSkipped:false },
-          { label:"PAX",  data:d.pilotos.map(p=>p.pax),  backgroundColor:"#22c55e", borderRadius:4, borderSkipped:false },
-        ],
-      },
-      options: {
-        responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{labels:{color:"#94a3b8",font:{size:10},boxWidth:10}} },
-        scales: {
-          x: { ticks:{color:"#64748b",font:{size:9}}, grid:{color:"#1e2540"} },
-          y: { ticks:{color:"#64748b"}, grid:{color:"#1e2540"} },
-        },
-      },
-    });
-  }
-
-  // ── Tours (doughnut) ─────────────────────────────────────────────────
-  if (d.tours && d.tours.length) {
-    criarGrafico("graficoTours", {
-      type: "doughnut",
-      data: {
-        labels: d.tours.map(t => t.tour),
-        datasets: [{ data:d.tours.map(t=>t.pax), backgroundColor:CORES12, borderWidth:2, borderColor:"#13162a" }],
-      },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:"right",labels:{color:"#94a3b8",font:{size:10},boxWidth:9}} } },
-    });
-  }
-
-  // ── Aeronaves (doughnut) ──────────────────────────────────────────────
-  if (d.aeronaves && d.aeronaves.length) {
-    criarGrafico("graficoAeronaves", {
-      type: "doughnut",
-      data: {
-        labels: d.aeronaves.map(a => a.aeronave),
-        datasets: [{ data:d.aeronaves.map(a=>a.pax), backgroundColor:CORES12, borderWidth:2, borderColor:"#13162a" }],
-      },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:"right",labels:{color:"#94a3b8",font:{size:11},boxWidth:10}} } },
-    });
-  }
-
-  // ── Ocupação média por mês (line) ─────────────────────────────────────
-  criarGrafico("graficoOcupacao", {
-    type: "line",
-    data: {
-      labels: meses.map(m => m.label),
-      datasets: [{ label:"PAX/Voo", data:meses.map(m=>m.ocupacaoMedia), borderColor:"#a855f7", backgroundColor:"rgba(168,85,247,.12)", borderWidth:2, fill:true, tension:.4, pointBackgroundColor:"#a855f7", pointRadius:4 }],
-    },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:scaleOpts },
-  });
-
-  // ── Tabela mensal ─────────────────────────────────────────────────────
-  const tbody = document.getElementById("tabelaVoos");
-  tbody.innerHTML = meses.map(m => `<tr>
-    <td style="font-weight:500">${m.label}</td>
-    <td style="text-align:center;font-weight:600;color:#60a5fa">${m.voos}</td>
-    <td style="text-align:center;font-weight:600;color:#4ade80">${m.pax.toLocaleString("pt-BR")}</td>
-    <td style="text-align:center;color:#c084fc">${m.ocupacaoMedia.toFixed(1)}</td>
-    <td style="color:#fbbf24">R$ ${formatarMoeda(m.receita)}</td>
-  </tr>`).join("");
 }
 
 // ────────────────────────────────────────────────────────────────────────────
