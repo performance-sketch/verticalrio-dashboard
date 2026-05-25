@@ -661,56 +661,69 @@
 <!-- ═══════════════ ABA: PASSAGEIROS ═══════════════ -->
 <div id="passageirosPage" class="conteudo">
 
-  <div class="grade-kpi">
-    <div class="card-kpi kpi-verde">
-      <div class="kpi-label">Voos Executados 2023</div>
-      <div class="kpi-valor">411</div>
-      <div class="kpi-sub">Dados do Ministerio do Turismo</div>
-    </div>
-    <div class="card-kpi kpi-azul">
-      <div class="kpi-label">Passageiros 2023</div>
-      <div class="kpi-valor">1.969</div>
-      <div class="kpi-sub">Total transportado</div>
-    </div>
-    <div class="card-kpi kpi-roxo">
-      <div class="kpi-label">Ocupacao Media</div>
-      <div class="kpi-valor">4,79</div>
-      <div class="kpi-sub">Pax por voo (2023)</div>
-    </div>
-    <div class="card-kpi kpi-amarelo">
-      <div class="kpi-label">Top Pais</div>
-      <div class="kpi-valor">Brasil</div>
-      <div class="kpi-sub">Maior volume de pax</div>
+  <!-- Header -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <div>
+      <h2 style="font-size:16px;font-weight:700;color:#e2e8f0;margin:0">&#x2708; Passageiros &mdash; Voos Executados</h2>
+      <span id="dataPassageiros" style="font-size:11px;color:#475569">Aguardando atualizacao</span>
     </div>
   </div>
 
+  <!-- KPIs dinâmicos -->
+  <div class="grade-kpi" id="kpiPassageiros">
+    <div class="card-kpi kpi-verde"><div class="kpi-label">Total PAX</div><div class="kpi-valor" id="paxTotalPax">—</div><div class="kpi-sub">Passageiros transportados</div></div>
+    <div class="card-kpi kpi-azul"><div class="kpi-label">Total Voos</div><div class="kpi-valor" id="paxTotalVoos">—</div><div class="kpi-sub">Voos executados</div></div>
+    <div class="card-kpi kpi-roxo"><div class="kpi-label">Media PAX/Voo</div><div class="kpi-valor" id="paxOcupMedia">—</div><div class="kpi-sub">Ocupacao media</div></div>
+    <div class="card-kpi kpi-amarelo"><div class="kpi-label">Top Pais</div><div class="kpi-valor" id="paxTopPais" style="font-size:18px">—</div><div class="kpi-sub">Maior volume de pax</div></div>
+    <div class="card-kpi kpi-ciano"><div class="kpi-label">Receita Total</div><div class="kpi-valor" id="paxReceita" style="font-size:16px">—</div><div class="kpi-sub">Soma dos voos</div></div>
+  </div>
+
+  <!-- Voos e PAX por mês -->
   <div class="grade-21">
     <div class="card">
-      <div class="card-titulo">Voos Executados por Mes (2023)</div>
+      <div class="card-titulo">Voos Executados por Mes</div>
       <div class="grafico-alto"><canvas id="graficoVoosMes"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-titulo">Passageiros por Mes (2023)</div>
+      <div class="card-titulo">Passageiros por Mes</div>
       <div class="grafico-alto"><canvas id="graficoPaxMes"></canvas></div>
     </div>
   </div>
 
-  <div class="grade-2">
+  <!-- Países, pilotos, tours -->
+  <div class="grade-3">
     <div class="card">
-      <div class="card-titulo">Ocupacao Media por Periodo</div>
-      <div class="grafico-box"><canvas id="graficoOcupacao"></canvas></div>
+      <div class="card-titulo">Nacionalidade dos Passageiros</div>
+      <div class="grafico-box"><canvas id="graficoPaises"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-titulo">Nacionalidade dos Passageiros (amostra)</div>
-      <div class="grafico-box"><canvas id="graficoPaises"></canvas></div>
+      <div class="card-titulo">Pilotos</div>
+      <div class="grafico-box"><canvas id="graficoPilotos"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Tipo de Tour</div>
+      <div class="grafico-box"><canvas id="graficoTours"></canvas></div>
     </div>
   </div>
 
+  <!-- Aeronaves e ocupação -->
+  <div class="grade-2">
+    <div class="card">
+      <div class="card-titulo">Aeronaves</div>
+      <div class="grafico-box"><canvas id="graficoAeronaves"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">Ocupacao Media por Mes</div>
+      <div class="grafico-box"><canvas id="graficoOcupacao"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Tabela mensal -->
   <div class="card">
-    <div class="card-titulo">Historico Mensal — Voos Executados (2023)</div>
+    <div class="card-titulo">Historico Mensal</div>
     <div class="tabela-scroll">
       <table>
-        <thead><tr><th>Periodo</th><th>Voos Executados</th><th>Ocupacao Media</th><th>Total Passageiros</th><th>Taxa Ocupacao Hotel</th></tr></thead>
+        <thead><tr><th>Mes</th><th>Voos</th><th>Passageiros</th><th>Media PAX/Voo</th><th>Receita</th></tr></thead>
         <tbody id="tabelaVoos"></tbody>
       </table>
     </div>
@@ -4617,30 +4630,298 @@ const DADOS_GA = {
 };
 
 const DADOS_PASSAGEIROS = {
-  voosMensais: [
-    { periodo:"Dez 22 / Jan 23", voos:6,  ocupacao:4.50, pax:27,  taxaHotel:null },
-    { periodo:"Jan / Fev 23",    voos:44, ocupacao:4.77, pax:210, taxaHotel:null },
-    { periodo:"Fev / Mar 23",    voos:37, ocupacao:4.70, pax:174, taxaHotel:null },
-    { periodo:"Mar / Abr 23",    voos:42, ocupacao:4.76, pax:200, taxaHotel:null },
-    { periodo:"Abr / Mai 23",    voos:38, ocupacao:4.74, pax:180, taxaHotel:null },
-    { periodo:"Mai / Jun 23",    voos:35, ocupacao:4.69, pax:164, taxaHotel:null },
-    { periodo:"Jun / Jul 23",    voos:41, ocupacao:4.80, pax:197, taxaHotel:null },
-    { periodo:"Jul / Ago 23",    voos:52, ocupacao:4.90, pax:255, taxaHotel:null },
-    { periodo:"Ago / Set 23",    voos:45, ocupacao:4.82, pax:217, taxaHotel:null },
-    { periodo:"Set / Out 23",    voos:36, ocupacao:4.75, pax:171, taxaHotel:null },
-    { periodo:"Out / Nov 23",    voos:35, ocupacao:4.74, pax:166, taxaHotel:null },
+  "voosMensais": [
+    {
+      "mes": "2023-03",
+      "label": "Mar/2023",
+      "voos": 0,
+      "pax": 1,
+      "receita": 0.0,
+      "ocupacaoMedia": 0.0
+    },
+    {
+      "mes": "2024-01",
+      "label": "Jan/2024",
+      "voos": 0,
+      "pax": 1,
+      "receita": 0.0,
+      "ocupacaoMedia": 0.0
+    },
+    {
+      "mes": "2024-05",
+      "label": "Mai/2024",
+      "voos": 0,
+      "pax": 1,
+      "receita": 0.0,
+      "ocupacaoMedia": 0.0
+    },
+    {
+      "mes": "2024-08",
+      "label": "Ago/2024",
+      "voos": 0,
+      "pax": 1,
+      "receita": 0.0,
+      "ocupacaoMedia": 0.0
+    },
+    {
+      "mes": "2025-03",
+      "label": "Mar/2025",
+      "voos": 1,
+      "pax": 1,
+      "receita": 0.0,
+      "ocupacaoMedia": 1.0
+    },
+    {
+      "mes": "2025-05",
+      "label": "Mai/2025",
+      "voos": 0,
+      "pax": 2,
+      "receita": 0.0,
+      "ocupacaoMedia": 0.0
+    },
+    {
+      "mes": "2025-08",
+      "label": "Ago/2025",
+      "voos": 0,
+      "pax": 7,
+      "receita": 0.0,
+      "ocupacaoMedia": 0.0
+    },
+    {
+      "mes": "2025-10",
+      "label": "Out/2025",
+      "voos": 0,
+      "pax": 1,
+      "receita": 0.0,
+      "ocupacaoMedia": 0.0
+    },
+    {
+      "mes": "2026-01",
+      "label": "Jan/2026",
+      "voos": 168,
+      "pax": 621,
+      "receita": 532711.12,
+      "ocupacaoMedia": 3.7
+    },
+    {
+      "mes": "2026-02",
+      "label": "Fev/2026",
+      "voos": 287,
+      "pax": 1486,
+      "receita": 1041929.15,
+      "ocupacaoMedia": 5.2
+    },
+    {
+      "mes": "2026-03",
+      "label": "Mar/2026",
+      "voos": 148,
+      "pax": 779,
+      "receita": 448829.05,
+      "ocupacaoMedia": 5.3
+    },
+    {
+      "mes": "2026-04",
+      "label": "Abr/2026",
+      "voos": 172,
+      "pax": 868,
+      "receita": 615215.71,
+      "ocupacaoMedia": 5.0
+    },
+    {
+      "mes": "2026-05",
+      "label": "Mai/2026",
+      "voos": 105,
+      "pax": 550,
+      "receita": 37945.09,
+      "ocupacaoMedia": 5.2
+    }
   ],
-  paises: [
-    { pais:"Brasil",          count:35 },
-    { pais:"EUA",             count:28 },
-    { pais:"Alemanha",        count:18 },
-    { pais:"Argentina",       count:15 },
-    { pais:"Reino Unido",     count:12 },
-    { pais:"Franca",          count:10 },
-    { pais:"Turquia",         count:8  },
-    { pais:"EAU",             count:7  },
-    { pais:"Outros",          count:22 },
-  ]
+  "paises": [
+    {
+      "pais": "United States",
+      "count": 784
+    },
+    {
+      "pais": "United Kingdom",
+      "count": 431
+    },
+    {
+      "pais": "Brazil",
+      "count": 416
+    },
+    {
+      "pais": "Germany",
+      "count": 204
+    },
+    {
+      "pais": "France",
+      "count": 201
+    },
+    {
+      "pais": "Portugal",
+      "count": 184
+    },
+    {
+      "pais": "Canada",
+      "count": 151
+    },
+    {
+      "pais": "Netherlands",
+      "count": 137
+    },
+    {
+      "pais": "Switzerland",
+      "count": 122
+    },
+    {
+      "pais": "Mexico",
+      "count": 122
+    },
+    {
+      "pais": "United Arab Emirates",
+      "count": 120
+    },
+    {
+      "pais": "Spain",
+      "count": 113
+    },
+    {
+      "pais": "Colombia",
+      "count": 112
+    },
+    {
+      "pais": "Peru",
+      "count": 110
+    },
+    {
+      "pais": "Australia",
+      "count": 96
+    },
+    {
+      "pais": "Outros",
+      "count": 1014
+    }
+  ],
+  "pilotos": [
+    {
+      "piloto": "André",
+      "voos": 477,
+      "pax": 2428
+    },
+    {
+      "piloto": "Renan",
+      "voos": 234,
+      "pax": 1176
+    },
+    {
+      "piloto": "Italo",
+      "voos": 49,
+      "pax": 226
+    },
+    {
+      "piloto": "Assad",
+      "voos": 51,
+      "pax": 190
+    },
+    {
+      "piloto": "Davidson",
+      "voos": 32,
+      "pax": 159
+    },
+    {
+      "piloto": "Ítalo",
+      "voos": 18,
+      "pax": 85
+    },
+    {
+      "piloto": "Neto",
+      "voos": 13,
+      "pax": 29
+    },
+    {
+      "piloto": "Ítalo / Renan",
+      "voos": 2,
+      "pax": 7
+    },
+    {
+      "piloto": "Pedro",
+      "voos": 1,
+      "pax": 6
+    },
+    {
+      "piloto": "ítalo",
+      "voos": 1,
+      "pax": 6
+    },
+    {
+      "piloto": "ítalo / Renan",
+      "voos": 1,
+      "pax": 4
+    },
+    {
+      "piloto": "Renan/Felipe",
+      "voos": 1,
+      "pax": 3
+    }
+  ],
+  "aeronaves": [
+    {
+      "aeronave": "PT-YHN",
+      "voos": 366,
+      "pax": 1981
+    },
+    {
+      "aeronave": "PS-ERR",
+      "voos": 368,
+      "pax": 1882
+    },
+    {
+      "aeronave": "PT-HQW (MTA)",
+      "voos": 51,
+      "pax": 190
+    },
+    {
+      "aeronave": "PR-HHH",
+      "voos": 63,
+      "pax": 183
+    },
+    {
+      "aeronave": "PS-TVD",
+      "voos": 32,
+      "pax": 79
+    },
+    {
+      "aeronave": "PR-YHN",
+      "voos": 1,
+      "pax": 4
+    }
+  ],
+  "tours": [
+    {
+      "tour": "Doors off 30min",
+      "voos": 836,
+      "pax": 4110
+    },
+    {
+      "tour": "Doors off 45min",
+      "voos": 35,
+      "pax": 161
+    },
+    {
+      "tour": "Doors on 30min",
+      "voos": 8,
+      "pax": 44
+    },
+    {
+      "tour": "Doors on 60min",
+      "voos": 1,
+      "pax": 4
+    }
+  ],
+  "totalPax": 4319,
+  "totalVoos": 881,
+  "totalReceita": 2676630.12,
+  "dataAtualizacao": "25/05/2026 13:16:44"
 };
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -108121,42 +108402,121 @@ function renderizarHeatmapLeadTime() {
 // ────────────────────────────────────────────────────────────────────────────
 
 function renderizarPassageiros() {
-  const meses = DADOS_PASSAGEIROS.voosMensais;
+  const d = DADOS_PASSAGEIROS;
+  const meses = (d.voosMensais || []).filter(m => m.voos > 0 || m.pax > 0);
+  const _s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
 
-  criarGrafico("graficoVoosMes",{
-    type:"bar",
-    data:{labels:meses.map(m=>m.periodo),datasets:[{label:"Voos Executados",data:meses.map(m=>m.voos),backgroundColor:"#3b82f6",borderRadius:5,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b",font:{size:9},maxRotation:45},grid:{color:"#1e2540"}},y:{ticks:{color:"#64748b"},grid:{color:"#1e2540"}}}}
+  // ── KPIs ──────────────────────────────────────────────────────────────
+  _s("paxTotalPax",  (d.totalPax  || 0).toLocaleString("pt-BR"));
+  _s("paxTotalVoos", (d.totalVoos || 0).toLocaleString("pt-BR"));
+  const ocupMedia = d.totalVoos > 0 ? (d.totalPax / d.totalVoos).toFixed(1) : "—";
+  _s("paxOcupMedia", ocupMedia);
+  _s("paxTopPais",   (d.paises && d.paises[0]) ? d.paises[0].pais : "—");
+  _s("paxReceita",   "R$ " + formatarMoeda(d.totalReceita || 0));
+  _s("dataPassageiros", d.dataAtualizacao || "");
+
+  const CORES12 = ["#3b82f6","#22c55e","#f97316","#a855f7","#06b6d4","#eab308",
+                   "#ec4899","#f87171","#94a3b8","#84cc16","#fb923c","#38bdf8"];
+  const scaleOpts = {
+    x: { ticks:{color:"#64748b",font:{size:9},maxRotation:45}, grid:{color:"#1e2540"} },
+    y: { ticks:{color:"#64748b"}, grid:{color:"#1e2540"} },
+  };
+
+  // ── Voos por mês ──────────────────────────────────────────────────────
+  criarGrafico("graficoVoosMes", {
+    type: "bar",
+    data: {
+      labels: meses.map(m => m.label),
+      datasets: [{ label:"Voos", data:meses.map(m=>m.voos), backgroundColor:"#3b82f6", borderRadius:5, borderSkipped:false }],
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:scaleOpts },
   });
 
-  criarGrafico("graficoPaxMes",{
-    type:"line",
-    data:{labels:meses.map(m=>m.periodo),datasets:[{label:"Passageiros",data:meses.map(m=>m.pax),borderColor:"#22c55e",backgroundColor:"rgba(34,197,94,.15)",borderWidth:2,fill:true,tension:.4,pointBackgroundColor:"#22c55e",pointRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b",font:{size:9},maxRotation:45},grid:{color:"#1e2540"}},y:{ticks:{color:"#64748b"},grid:{color:"#1e2540"}}}}
+  // ── PAX por mês ───────────────────────────────────────────────────────
+  criarGrafico("graficoPaxMes", {
+    type: "line",
+    data: {
+      labels: meses.map(m => m.label),
+      datasets: [{ label:"PAX", data:meses.map(m=>m.pax), borderColor:"#22c55e", backgroundColor:"rgba(34,197,94,.15)", borderWidth:2, fill:true, tension:.4, pointBackgroundColor:"#22c55e", pointRadius:4 }],
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:scaleOpts },
   });
 
-  criarGrafico("graficoOcupacao",{
-    type:"bar",
-    data:{labels:meses.map(m=>m.periodo),datasets:[{label:"Ocupacao Media",data:meses.map(m=>m.ocupacao),backgroundColor:"#a855f7",borderRadius:5,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#64748b",font:{size:9},maxRotation:45},grid:{color:"#1e2540"}},y:{min:3,max:6,ticks:{color:"#64748b"},grid:{color:"#1e2540"}}}}
+  // ── Países (doughnut) ─────────────────────────────────────────────────
+  criarGrafico("graficoPaises", {
+    type: "doughnut",
+    data: {
+      labels: d.paises.map(p => p.pais),
+      datasets: [{ data:d.paises.map(p=>p.count), backgroundColor:CORES12, borderWidth:2, borderColor:"#13162a" }],
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:"right",labels:{color:"#94a3b8",font:{size:9},boxWidth:8}} } },
   });
 
-  const coresPaises = ["#3b82f6","#22c55e","#f97316","#a855f7","#06b6d4","#eab308","#ec4899","#f87171","#94a3b8"];
-  criarGrafico("graficoPaises",{
-    type:"doughnut",
-    data:{labels:DADOS_PASSAGEIROS.paises.map(p=>p.pais),datasets:[{data:DADOS_PASSAGEIROS.paises.map(p=>p.count),backgroundColor:coresPaises,borderWidth:2,borderColor:"#13162a"}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{color:"#94a3b8",font:{size:10},boxWidth:10}}}}
+  // ── Pilotos (bar horizontal) ──────────────────────────────────────────
+  if (d.pilotos && d.pilotos.length) {
+    criarGrafico("graficoPilotos", {
+      type: "bar",
+      data: {
+        labels: d.pilotos.map(p => p.piloto),
+        datasets: [
+          { label:"Voos", data:d.pilotos.map(p=>p.voos), backgroundColor:"#3b82f6", borderRadius:4, borderSkipped:false },
+          { label:"PAX",  data:d.pilotos.map(p=>p.pax),  backgroundColor:"#22c55e", borderRadius:4, borderSkipped:false },
+        ],
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{labels:{color:"#94a3b8",font:{size:10},boxWidth:10}} },
+        scales: {
+          x: { ticks:{color:"#64748b",font:{size:9}}, grid:{color:"#1e2540"} },
+          y: { ticks:{color:"#64748b"}, grid:{color:"#1e2540"} },
+        },
+      },
+    });
+  }
+
+  // ── Tours (doughnut) ─────────────────────────────────────────────────
+  if (d.tours && d.tours.length) {
+    criarGrafico("graficoTours", {
+      type: "doughnut",
+      data: {
+        labels: d.tours.map(t => t.tour),
+        datasets: [{ data:d.tours.map(t=>t.pax), backgroundColor:CORES12, borderWidth:2, borderColor:"#13162a" }],
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:"right",labels:{color:"#94a3b8",font:{size:10},boxWidth:9}} } },
+    });
+  }
+
+  // ── Aeronaves (doughnut) ──────────────────────────────────────────────
+  if (d.aeronaves && d.aeronaves.length) {
+    criarGrafico("graficoAeronaves", {
+      type: "doughnut",
+      data: {
+        labels: d.aeronaves.map(a => a.aeronave),
+        datasets: [{ data:d.aeronaves.map(a=>a.pax), backgroundColor:CORES12, borderWidth:2, borderColor:"#13162a" }],
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:"right",labels:{color:"#94a3b8",font:{size:11},boxWidth:10}} } },
+    });
+  }
+
+  // ── Ocupação média por mês (line) ─────────────────────────────────────
+  criarGrafico("graficoOcupacao", {
+    type: "line",
+    data: {
+      labels: meses.map(m => m.label),
+      datasets: [{ label:"PAX/Voo", data:meses.map(m=>m.ocupacaoMedia), borderColor:"#a855f7", backgroundColor:"rgba(168,85,247,.12)", borderWidth:2, fill:true, tension:.4, pointBackgroundColor:"#a855f7", pointRadius:4 }],
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:scaleOpts },
   });
 
+  // ── Tabela mensal ─────────────────────────────────────────────────────
   const tbody = document.getElementById("tabelaVoos");
-  tbody.innerHTML = meses.map(m=>`
-    <tr>
-      <td style="font-weight:500">${m.periodo}</td>
-      <td style="text-align:center;font-weight:600;color:#60a5fa">${m.voos}</td>
-      <td style="text-align:center;color:#c084fc">${m.ocupacao.toFixed(2)}</td>
-      <td style="text-align:center;font-weight:600;color:#4ade80">${m.pax}</td>
-      <td style="text-align:center;color:#64748b">${m.taxaHotel||"—"}</td>
-    </tr>`).join("");
+  tbody.innerHTML = meses.map(m => `<tr>
+    <td style="font-weight:500">${m.label}</td>
+    <td style="text-align:center;font-weight:600;color:#60a5fa">${m.voos}</td>
+    <td style="text-align:center;font-weight:600;color:#4ade80">${m.pax.toLocaleString("pt-BR")}</td>
+    <td style="text-align:center;color:#c084fc">${m.ocupacaoMedia.toFixed(1)}</td>
+    <td style="color:#fbbf24">R$ ${formatarMoeda(m.receita)}</td>
+  </tr>`).join("");
 }
 
 // ────────────────────────────────────────────────────────────────────────────
