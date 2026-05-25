@@ -17,7 +17,7 @@ from collections import defaultdict
 CHAVE_API_REZDY   = "dc7f8d97256e484b8763a983ded2ba22"
 URL_BASE_REZDY    = "https://api.rezdy.com/v1"
 ARQUIVO_DASHBOARD = "index.html"
-LIMITE_TOTAL      = 3000   # cobre ~7-9 meses de historico
+LIMITE_TOTAL      = 6000   # cobre ~12-14 meses de historico
 # ──────────────────────────────────────────────────────────────────────────────
 
 DIAS_PT = ["Segunda", "Terca", "Quarta", "Quinta", "Sexta", "Sabado", "Domingo"]
@@ -252,6 +252,31 @@ def computar_por_semana(reservas, n_semanas=8):
     return semanas
 
 
+def computar_lead_time_heatmap(reservas):
+    """Matriz booking_mes x fulfillment_mes para confirmados."""
+    matriz   = defaultdict(lambda: defaultdict(int))
+    bm_set   = set()
+    fm_set   = set()
+    for r in reservas:
+        if r.get("status") != "CONFIRMED":
+            continue
+        bm = r.get("dateCreated", "")[:7]
+        if not bm:
+            continue
+        for item in r.get("items", []):
+            stl = (item.get("startTimeLocal") or "")[:7]
+            if stl:
+                matriz[bm][stl] += 1
+                bm_set.add(bm)
+                fm_set.add(stl)
+
+    return {
+        "bookingMeses":  sorted(bm_set),
+        "fulfillMeses":  sorted(fm_set),
+        "dados":         {bm: dict(fm_d) for bm, fm_d in matriz.items()},
+    }
+
+
 def processar_produtos(produtos):
     resultado = []
     for p in produtos:
@@ -297,6 +322,7 @@ def main():
     por_fonte       = computar_por_fonte(reservas)
     ds_booking, ds_fulfil = computar_dia_semana(reservas)
     por_semana      = computar_por_semana(reservas, n_semanas=8)
+    lead_time       = computar_lead_time_heatmap(reservas)
 
     dados_rezdy_js = {
         "resumo":           resumo_rezdy,
@@ -305,6 +331,7 @@ def main():
         "diaSemanaBooking": ds_booking,
         "diaSemanaFulfil":  ds_fulfil,
         "porSemana":        por_semana,
+        "leadTimeHeatmap":  lead_time,
         "produtos":         lista_produtos,
         "dataAtualizacao":  datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
     }
