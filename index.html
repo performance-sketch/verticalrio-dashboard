@@ -254,8 +254,37 @@
 <!-- ═══════════════ ABA: META ADS ═══════════════ -->
 <div id="midiaPage" class="conteudo">
 
+  <!-- Perfil: seguidores e mensagens -->
+  <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Perfil &amp; Mensagens</div>
+  <div class="grade-kpi" style="margin-bottom:20px">
+    <div class="card-kpi" style="background:linear-gradient(135deg,#833ab4 0%,#fd1d1d 50%,#fcb045 100%);border:none">
+      <div class="kpi-label" style="color:#fff">Instagram</div>
+      <div class="kpi-valor" id="kpiIgFollowers" style="color:#fff">—</div>
+      <div class="kpi-sub" style="color:rgba(255,255,255,.75)">seguidores &bull; <span id="kpiIgMedia">—</span> posts</div>
+    </div>
+    <div class="card-kpi kpi-azul">
+      <div class="kpi-label">Facebook</div>
+      <div class="kpi-valor" id="kpiFbFollowers">—</div>
+      <div class="kpi-sub">seguidores na pagina</div>
+    </div>
+    <div class="card-kpi kpi-verde">
+      <div class="kpi-label">Conexoes Mensagem</div>
+      <div class="kpi-valor" id="kpiMsgConexoes">—</div>
+      <div class="kpi-sub">via anuncios (pago)</div>
+    </div>
+    <div class="card-kpi kpi-ciano">
+      <div class="kpi-label">Primeiras Respostas</div>
+      <div class="kpi-valor" id="kpiMsgFirstReply">—</div>
+      <div class="kpi-sub">via anuncios (pago)</div>
+    </div>
+    <div class="card-kpi kpi-amarelo">
+      <div class="kpi-label">Conversas Iniciadas</div>
+      <div class="kpi-valor" id="kpiMsgConversas">—</div>
+      <div class="kpi-sub">janela 7d (pago)</div>
+    </div>
+  </div>
 
-
+  <div style="font-size:11px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Anuncios</div>
   <div class="grade-kpi">
     <div class="card-kpi kpi-azul">
       <div class="kpi-label" id="kpiLabelMetaGasto">Total Gasto (30d)</div>
@@ -861,196 +890,208 @@
 // ────────────────────────────────────────────────────────────────────────────
 
 const DADOS_META = {
+  "perfil": {
+    "igFollowers": 138545,
+    "igMedia": 909,
+    "fbFollowers": 2082,
+    "fbNome": "Vertical.Rio"
+  },
   "d7": {
-    "totalGasto": 3213.94,
-    "totalImpressoes": 381953,
-    "totalCliques": 17261,
-    "cpcMedio": 0.186,
+    "totalGasto": 3355.61,
+    "totalImpressoes": 356541,
+    "totalCliques": 16384,
+    "cpcMedio": 0.205,
     "campanhas": [
       {
         "id": "120214656968890437",
         "nome": "[LX][TRAFEGO-SEGUIDORES][ABO][PUBLICO_FRIO]",
-        "gasto": 1396.32,
-        "impressoes": 164640,
-        "cliques": 5648,
-        "cpc": 0.25,
-        "ctr": 3.43,
-        "cpm": 8.48,
-        "alcance": 145183,
-        "conv": null
-      },
-      {
-        "id": "120226714217400437",
-        "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO]",
-        "gasto": 930.0,
-        "impressoes": 153275,
-        "cliques": 7937,
-        "cpc": 0.12,
-        "ctr": 5.18,
-        "cpm": 6.07,
-        "alcance": 127815,
+        "gasto": 1324.03,
+        "impressoes": 148795,
+        "cliques": 5140,
+        "cpc": 0.26,
+        "ctr": 3.45,
+        "cpm": 8.9,
+        "alcance": 129806,
         "conv": null
       },
       {
         "id": "120247060568150437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO] [TESTE]",
-        "gasto": 663.26,
-        "impressoes": 48488,
-        "cliques": 3534,
-        "cpc": 0.19,
-        "ctr": 7.29,
-        "cpm": 13.68,
-        "alcance": 42715,
+        "gasto": 838.23,
+        "impressoes": 57695,
+        "cliques": 4076,
+        "cpc": 0.21,
+        "ctr": 7.06,
+        "cpm": 14.53,
+        "alcance": 50232,
+        "conv": null
+      },
+      {
+        "id": "120226714217400437",
+        "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO]",
+        "gasto": 827.07,
+        "impressoes": 124178,
+        "cliques": 6929,
+        "cpc": 0.12,
+        "ctr": 5.58,
+        "cpm": 6.66,
+        "alcance": 108634,
         "conv": null
       },
       {
         "id": "120243998081540437",
         "nome": "[MSG][GRINGO][RJ][NUVENS-ORG]",
-        "gasto": 224.36,
-        "impressoes": 15550,
-        "cliques": 142,
-        "cpc": 1.58,
-        "ctr": 0.91,
-        "cpm": 14.43,
-        "alcance": 12273,
+        "gasto": 366.28,
+        "impressoes": 25873,
+        "cliques": 239,
+        "cpc": 1.53,
+        "ctr": 0.92,
+        "cpm": 14.16,
+        "alcance": 18872,
         "conv": null
       }
     ],
     "idades": [
       {
         "faixa": "18-24",
-        "gasto": 272.68,
-        "impressoes": 51866,
-        "cliques": 1693
+        "gasto": 281.58,
+        "impressoes": 50306,
+        "cliques": 1585
       },
       {
         "faixa": "25-34",
-        "gasto": 1511.71,
-        "impressoes": 203368,
-        "cliques": 8037
+        "gasto": 1605.5,
+        "impressoes": 188450,
+        "cliques": 7667
       },
       {
         "faixa": "35-44",
-        "gasto": 637.76,
-        "impressoes": 66146,
-        "cliques": 3262
+        "gasto": 670.86,
+        "impressoes": 62366,
+        "cliques": 3147
       },
       {
         "faixa": "45-54",
-        "gasto": 377.9,
-        "impressoes": 30254,
-        "cliques": 1872
+        "gasto": 390.44,
+        "impressoes": 29017,
+        "cliques": 1840
       },
       {
         "faixa": "55-64",
-        "gasto": 237.51,
-        "impressoes": 17611,
-        "cliques": 1316
+        "gasto": 238.42,
+        "impressoes": 15628,
+        "cliques": 1213
       },
       {
         "faixa": "65+",
-        "gasto": 176.3,
-        "impressoes": 12702,
-        "cliques": 1081
+        "gasto": 168.7,
+        "impressoes": 10766,
+        "cliques": 932
       }
     ],
     "geos": [
       {
         "local": "Brasil",
-        "gasto": 1398.95,
-        "impressoes": 184359,
-        "cliques": 7874
+        "gasto": 1427.79,
+        "impressoes": 170747,
+        "cliques": 7054
       },
       {
         "local": "EUA",
-        "gasto": 651.58,
-        "impressoes": 21786,
-        "cliques": 1645
+        "gasto": 743.55,
+        "impressoes": 24568,
+        "cliques": 1868
       },
       {
         "local": "Franca",
-        "gasto": 125.74,
-        "impressoes": 13639,
-        "cliques": 818
+        "gasto": 134.65,
+        "impressoes": 13385,
+        "cliques": 800
+      },
+      {
+        "local": "AE",
+        "gasto": 114.06,
+        "impressoes": 15447,
+        "cliques": 835
+      },
+      {
+        "local": "Portugal",
+        "gasto": 107.9,
+        "impressoes": 17552,
+        "cliques": 602
+      },
+      {
+        "local": "Argentina",
+        "gasto": 101.87,
+        "impressoes": 11483,
+        "cliques": 792
       },
       {
         "local": "Equador",
-        "gasto": 110.04,
-        "impressoes": 20105,
-        "cliques": 875
-      },
-      {
-        "local": "Colombia",
-        "gasto": 109.06,
-        "impressoes": 18901,
-        "cliques": 841
-      },
-      {
-        "local": "Peru",
-        "gasto": 99.72,
-        "impressoes": 14830,
-        "cliques": 729
-      },
-      {
-        "local": "Italia",
-        "gasto": 93.55,
-        "impressoes": 15710,
-        "cliques": 373
+        "gasto": 99.46,
+        "impressoes": 16223,
+        "cliques": 731
       }
-    ]
+    ],
+    "mensagens": {
+      "conexoes": 53,
+      "firstReply": 52,
+      "conversas": 53,
+      "bloqueios": 6
+    }
   },
   "d14": {
-    "totalGasto": 10571.84,
-    "totalImpressoes": 1198295,
-    "totalCliques": 53480,
-    "cpcMedio": 0.198,
+    "totalGasto": 7150.78,
+    "totalImpressoes": 821713,
+    "totalCliques": 36520,
+    "cpcMedio": 0.196,
     "campanhas": [
       {
         "id": "120214656968890437",
         "nome": "[LX][TRAFEGO-SEGUIDORES][ABO][PUBLICO_FRIO]",
-        "gasto": 4784.54,
-        "impressoes": 524039,
-        "cliques": 18219,
+        "gasto": 3183.4,
+        "impressoes": 361842,
+        "cliques": 12023,
         "cpc": 0.26,
-        "ctr": 3.48,
-        "cpm": 9.13,
-        "alcance": 416566,
+        "ctr": 3.32,
+        "cpm": 8.8,
+        "alcance": 296722,
         "conv": 1.0
-      },
-      {
-        "id": "120247060568150437",
-        "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO] [TESTE]",
-        "gasto": 3010.36,
-        "impressoes": 221199,
-        "cliques": 14644,
-        "cpc": 0.21,
-        "ctr": 6.62,
-        "cpm": 13.61,
-        "alcance": 154830,
-        "conv": null
       },
       {
         "id": "120226714217400437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO]",
-        "gasto": 2552.58,
-        "impressoes": 437507,
-        "cliques": 20475,
+        "gasto": 1861.26,
+        "impressoes": 305389,
+        "cliques": 15420,
         "cpc": 0.12,
-        "ctr": 4.68,
-        "cpm": 5.83,
-        "alcance": 291859,
+        "ctr": 5.05,
+        "cpm": 6.09,
+        "alcance": 226490,
+        "conv": null
+      },
+      {
+        "id": "120247060568150437",
+        "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO] [TESTE]",
+        "gasto": 1739.84,
+        "impressoes": 128609,
+        "cliques": 8838,
+        "cpc": 0.2,
+        "ctr": 6.87,
+        "cpm": 13.53,
+        "alcance": 95029,
         "conv": null
       },
       {
         "id": "120243998081540437",
         "nome": "[MSG][GRINGO][RJ][NUVENS-ORG]",
-        "gasto": 224.36,
-        "impressoes": 15550,
-        "cliques": 142,
-        "cpc": 1.58,
-        "ctr": 0.91,
-        "cpm": 14.43,
-        "alcance": 12273,
+        "gasto": 366.28,
+        "impressoes": 25873,
+        "cliques": 239,
+        "cpc": 1.53,
+        "ctr": 0.92,
+        "cpm": 14.16,
+        "alcance": 18872,
         "conv": null
       },
       {
@@ -1069,138 +1110,144 @@ const DADOS_META = {
     "idades": [
       {
         "faixa": "18-24",
-        "gasto": 928.41,
-        "impressoes": 166898,
-        "cliques": 5417
+        "gasto": 617.52,
+        "impressoes": 113024,
+        "cliques": 3610
       },
       {
         "faixa": "25-34",
-        "gasto": 5057.89,
-        "impressoes": 645652,
-        "cliques": 25469
+        "gasto": 3392.77,
+        "impressoes": 438648,
+        "cliques": 17266
       },
       {
         "faixa": "35-44",
-        "gasto": 2025.89,
-        "impressoes": 198927,
-        "cliques": 9653
+        "gasto": 1389.26,
+        "impressoes": 140135,
+        "cliques": 6689
       },
       {
         "faixa": "45-54",
-        "gasto": 1172.26,
-        "impressoes": 89661,
-        "cliques": 5481
+        "gasto": 807.46,
+        "impressoes": 63331,
+        "cliques": 3856
       },
       {
         "faixa": "55-64",
-        "gasto": 800.7,
-        "impressoes": 56259,
-        "cliques": 4211
+        "gasto": 537.62,
+        "impressoes": 38416,
+        "cliques": 2825
       },
       {
         "faixa": "65+",
-        "gasto": 586.48,
-        "impressoes": 40876,
-        "cliques": 3248
+        "gasto": 406.0,
+        "impressoes": 28143,
+        "cliques": 2274
       }
     ],
     "geos": [
       {
         "local": "Brasil",
-        "gasto": 4362.05,
-        "impressoes": 557791,
-        "cliques": 23203
+        "gasto": 2880.04,
+        "impressoes": 372223,
+        "cliques": 15440
       },
       {
         "local": "EUA",
-        "gasto": 2041.65,
-        "impressoes": 69721,
-        "cliques": 4977
-      },
-      {
-        "local": "Portugal",
-        "gasto": 692.22,
-        "impressoes": 86369,
-        "cliques": 3650
+        "gasto": 1514.99,
+        "impressoes": 49686,
+        "cliques": 3588
       },
       {
         "local": "Franca",
-        "gasto": 510.04,
-        "impressoes": 51149,
-        "cliques": 3075
+        "gasto": 310.29,
+        "impressoes": 31869,
+        "cliques": 1858
+      },
+      {
+        "local": "Portugal",
+        "gasto": 282.13,
+        "impressoes": 42208,
+        "cliques": 1519
       },
       {
         "local": "AE",
-        "gasto": 401.45,
-        "impressoes": 54795,
-        "cliques": 2858
+        "gasto": 245.63,
+        "impressoes": 34586,
+        "cliques": 1817
       },
       {
-        "local": "Italia",
-        "gasto": 392.19,
-        "impressoes": 53957,
-        "cliques": 1336
+        "local": "Equador",
+        "gasto": 236.92,
+        "impressoes": 44314,
+        "cliques": 1813
       },
       {
-        "local": "Espanha",
-        "gasto": 377.28,
-        "impressoes": 44226,
-        "cliques": 1349
+        "local": "Colombia",
+        "gasto": 234.7,
+        "impressoes": 41541,
+        "cliques": 1737
       }
-    ]
+    ],
+    "mensagens": {
+      "conexoes": 56,
+      "firstReply": 57,
+      "conversas": 58,
+      "bloqueios": 20
+    }
   },
   "d30": {
-    "totalGasto": 30883.42,
-    "totalImpressoes": 4597496,
-    "totalCliques": 165087,
-    "cpcMedio": 0.187,
+    "totalGasto": 29431.84,
+    "totalImpressoes": 4249214,
+    "totalCliques": 155401,
+    "cpcMedio": 0.189,
     "campanhas": [
       {
         "id": "120214656968890437",
         "nome": "[LX][TRAFEGO-SEGUIDORES][ABO][PUBLICO_FRIO]",
-        "gasto": 14100.11,
-        "impressoes": 2220061,
-        "cliques": 53067,
+        "gasto": 13170.35,
+        "impressoes": 2000434,
+        "cliques": 49255,
         "cpc": 0.27,
-        "ctr": 2.39,
-        "cpm": 6.35,
-        "alcance": 1240936,
+        "ctr": 2.46,
+        "cpm": 6.58,
+        "alcance": 1164717,
         "conv": 2.0
       },
       {
         "id": "120226714217400437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO]",
-        "gasto": 13476.13,
-        "impressoes": 2135673,
-        "cliques": 97182,
+        "gasto": 12376.27,
+        "impressoes": 1967729,
+        "cliques": 89191,
         "cpc": 0.14,
-        "ctr": 4.55,
-        "cpm": 6.31,
-        "alcance": 1039253,
+        "ctr": 4.53,
+        "cpm": 6.29,
+        "alcance": 1022237,
         "conv": null
       },
       {
         "id": "120247060568150437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO] [TESTE]",
-        "gasto": 3010.36,
-        "impressoes": 221199,
-        "cliques": 14644,
+        "gasto": 3446.48,
+        "impressoes": 250165,
+        "cliques": 16664,
         "cpc": 0.21,
-        "ctr": 6.62,
-        "cpm": 13.61,
-        "alcance": 154830,
+        "ctr": 6.66,
+        "cpm": 13.78,
+        "alcance": 165604,
         "conv": null
       },
       {
         "id": "120243998081540437",
         "nome": "[MSG][GRINGO][RJ][NUVENS-ORG]",
-        "gasto": 226.16,
-        "impressoes": 15680,
-        "cliques": 143,
-        "cpc": 1.58,
-        "ctr": 0.91,
-        "cpm": 14.42,
-        "alcance": 12369,
+        "gasto": 368.08,
+        "impressoes": 26003,
+        "cliques": 240,
+        "cpc": 1.53,
+        "ctr": 0.92,
+        "cpm": 14.16,
+        "alcance": 19006,
         "conv": null
       },
       {
@@ -1219,150 +1266,156 @@ const DADOS_META = {
     "idades": [
       {
         "faixa": "18-24",
-        "gasto": 2768.34,
-        "impressoes": 660554,
-        "cliques": 14934
+        "gasto": 2629.02,
+        "impressoes": 611222,
+        "cliques": 14196
       },
       {
         "faixa": "25-34",
-        "gasto": 13909.26,
-        "impressoes": 2499236,
-        "cliques": 73713
+        "gasto": 13234.49,
+        "impressoes": 2298128,
+        "cliques": 69120
       },
       {
         "faixa": "35-44",
-        "gasto": 6199.42,
-        "impressoes": 762645,
-        "cliques": 30952
+        "gasto": 5795.79,
+        "impressoes": 696201,
+        "cliques": 28411
       },
       {
         "faixa": "45-54",
-        "gasto": 3374.12,
-        "impressoes": 308203,
-        "cliques": 16579
+        "gasto": 3236.46,
+        "impressoes": 290270,
+        "cliques": 15762
       },
       {
         "faixa": "55-64",
-        "gasto": 2358.12,
-        "impressoes": 195212,
-        "cliques": 14024
+        "gasto": 2308.89,
+        "impressoes": 187827,
+        "cliques": 13537
       },
       {
         "faixa": "65+",
-        "gasto": 2273.52,
-        "impressoes": 171561,
-        "cliques": 14883
+        "gasto": 2226.62,
+        "impressoes": 165493,
+        "cliques": 14374
       }
     ],
     "geos": [
       {
         "local": "Brasil",
-        "gasto": 19119.32,
-        "impressoes": 3030238,
-        "cliques": 102837
+        "gasto": 17836.32,
+        "impressoes": 2761436,
+        "cliques": 94953
       },
       {
         "local": "EUA",
-        "gasto": 2063.23,
-        "impressoes": 76732,
-        "cliques": 5030
+        "gasto": 2405.7,
+        "impressoes": 86053,
+        "cliques": 5828
       },
       {
         "local": "Portugal",
-        "gasto": 1067.53,
-        "impressoes": 146931,
-        "cliques": 5015
+        "gasto": 1050.88,
+        "impressoes": 145171,
+        "cliques": 5055
       },
       {
         "local": "Colombia",
-        "gasto": 1055.91,
-        "impressoes": 182567,
-        "cliques": 7009
-      },
-      {
-        "local": "Argentina",
-        "gasto": 979.81,
-        "impressoes": 152942,
-        "cliques": 6514
+        "gasto": 932.88,
+        "impressoes": 162679,
+        "cliques": 6265
       },
       {
         "local": "Equador",
-        "gasto": 979.16,
-        "impressoes": 186341,
-        "cliques": 6930
+        "gasto": 901.47,
+        "impressoes": 174318,
+        "cliques": 6457
+      },
+      {
+        "local": "Argentina",
+        "gasto": 864.99,
+        "impressoes": 134942,
+        "cliques": 5815
       },
       {
         "local": "Peru",
-        "gasto": 913.41,
-        "impressoes": 143686,
-        "cliques": 6397
+        "gasto": 859.01,
+        "impressoes": 135904,
+        "cliques": 6039
       }
-    ]
+    ],
+    "mensagens": {
+      "conexoes": 86,
+      "firstReply": 94,
+      "conversas": 99,
+      "bloqueios": 59
+    }
   },
   "d90": {
-    "totalGasto": 46318.57,
-    "totalImpressoes": 7089669,
-    "totalCliques": 233568,
+    "totalGasto": 47315.35,
+    "totalImpressoes": 7169110,
+    "totalCliques": 238575,
     "cpcMedio": 0.198,
     "campanhas": [
       {
         "id": "120214656968890437",
         "nome": "[LX][TRAFEGO-SEGUIDORES][ABO][PUBLICO_FRIO]",
-        "gasto": 19990.23,
-        "impressoes": 3407706,
-        "cliques": 81982,
-        "cpc": 0.24,
-        "ctr": 2.41,
-        "cpm": 5.87,
-        "alcance": 1653935,
+        "gasto": 20434.97,
+        "impressoes": 3440854,
+        "cliques": 83271,
+        "cpc": 0.25,
+        "ctr": 2.42,
+        "cpm": 5.94,
+        "alcance": 1674783,
         "conv": 2.0
       },
       {
         "id": "120226714217400437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO]",
-        "gasto": 16623.1,
-        "impressoes": 2873367,
-        "cliques": 127232,
+        "gasto": 16874.66,
+        "impressoes": 2900246,
+        "cliques": 129232,
         "cpc": 0.13,
-        "ctr": 4.43,
-        "cpm": 5.79,
-        "alcance": 1268041,
+        "ctr": 4.46,
+        "cpm": 5.82,
+        "alcance": 1279140,
         "conv": null
       },
       {
         "id": "120243998081540437",
         "nome": "[MSG][GRINGO][RJ][NUVENS-ORG]",
-        "gasto": 3398.51,
-        "impressoes": 332122,
-        "cliques": 5313,
-        "cpc": 0.64,
-        "ctr": 1.6,
-        "cpm": 10.23,
-        "alcance": 201872,
+        "gasto": 3540.43,
+        "impressoes": 342445,
+        "cliques": 5410,
+        "cpc": 0.65,
+        "ctr": 1.58,
+        "cpm": 10.34,
+        "alcance": 209300,
         "conv": 1.0
       },
       {
         "id": "120247060568150437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO] [TESTE]",
-        "gasto": 3010.36,
-        "impressoes": 221199,
-        "cliques": 14644,
+        "gasto": 3446.48,
+        "impressoes": 250165,
+        "cliques": 16664,
         "cpc": 0.21,
-        "ctr": 6.62,
-        "cpm": 13.61,
-        "alcance": 154830,
+        "ctr": 6.66,
+        "cpm": 13.78,
+        "alcance": 165604,
         "conv": null
       },
       {
         "id": "120242268312180437",
         "nome": "[LX] [MENSAGEM] [ADV] [TESTE]",
-        "gasto": 2857.38,
-        "impressoes": 196201,
-        "cliques": 3479,
-        "cpc": 0.82,
-        "ctr": 1.77,
-        "cpm": 14.56,
-        "alcance": 116527,
+        "gasto": 2579.82,
+        "impressoes": 176326,
+        "cliques": 3080,
+        "cpc": 0.84,
+        "ctr": 1.75,
+        "cpm": 14.63,
+        "alcance": 106914,
         "conv": 2.0
       },
       {
@@ -1393,126 +1446,132 @@ const DADOS_META = {
     "idades": [
       {
         "faixa": "18-24",
-        "gasto": 4996.42,
-        "impressoes": 1159687,
-        "cliques": 25886
+        "gasto": 5038.51,
+        "impressoes": 1163027,
+        "cliques": 26115
       },
       {
         "faixa": "25-34",
-        "gasto": 20965.69,
-        "impressoes": 3869814,
-        "cliques": 108926
+        "gasto": 21504.31,
+        "impressoes": 3916446,
+        "cliques": 111422
       },
       {
         "faixa": "35-44",
-        "gasto": 9631.77,
-        "impressoes": 1165426,
-        "cliques": 43246
+        "gasto": 9817.65,
+        "impressoes": 1180266,
+        "cliques": 44235
       },
       {
         "faixa": "45-54",
-        "gasto": 4935.55,
-        "impressoes": 438628,
-        "cliques": 21441
+        "gasto": 5030.46,
+        "impressoes": 445476,
+        "cliques": 22010
       },
       {
         "faixa": "55-64",
-        "gasto": 3099.97,
-        "impressoes": 251016,
-        "cliques": 16993
+        "gasto": 3172.78,
+        "impressoes": 255324,
+        "cliques": 17384
       },
       {
         "faixa": "65+",
-        "gasto": 2687.79,
-        "impressoes": 204926,
-        "cliques": 17070
+        "gasto": 2750.23,
+        "impressoes": 208397,
+        "cliques": 17403
       }
     ],
     "geos": [
       {
         "local": "Brasil",
-        "gasto": 30388.48,
-        "impressoes": 4641862,
-        "cliques": 144448
+        "gasto": 30583.63,
+        "impressoes": 4661592,
+        "cliques": 146098
       },
       {
         "local": "EUA",
-        "gasto": 2076.46,
-        "impressoes": 85350,
-        "cliques": 5117
+        "gasto": 2420.16,
+        "impressoes": 95603,
+        "cliques": 5920
       },
       {
         "local": "Colombia",
-        "gasto": 1520.34,
-        "impressoes": 286851,
-        "cliques": 10461
+        "gasto": 1547.24,
+        "impressoes": 289446,
+        "cliques": 10615
       },
       {
         "local": "Equador",
-        "gasto": 1453.99,
-        "impressoes": 297935,
-        "cliques": 10481
+        "gasto": 1485.78,
+        "impressoes": 301954,
+        "cliques": 10638
       },
       {
         "local": "Portugal",
-        "gasto": 1392.33,
-        "impressoes": 206887,
-        "cliques": 6420
+        "gasto": 1440.7,
+        "impressoes": 213862,
+        "cliques": 6671
       },
       {
         "local": "Argentina",
-        "gasto": 1340.89,
-        "impressoes": 244297,
-        "cliques": 9176
+        "gasto": 1374.88,
+        "impressoes": 247029,
+        "cliques": 9426
       },
       {
         "local": "Chile",
-        "gasto": 1314.6,
-        "impressoes": 247335,
-        "cliques": 9130
+        "gasto": 1345.48,
+        "impressoes": 251204,
+        "cliques": 9330
       }
-    ]
+    ],
+    "mensagens": {
+      "conexoes": 1718,
+      "firstReply": 1656,
+      "conversas": 1735,
+      "bloqueios": 110
+    }
   },
   "max": {
-    "totalGasto": 431475.8,
-    "totalImpressoes": 76315247,
-    "totalCliques": 1512624,
+    "totalGasto": 432742.38,
+    "totalImpressoes": 76406066,
+    "totalCliques": 1518759,
     "cpcMedio": 0.285,
     "campanhas": [
       {
         "id": "120214656968890437",
         "nome": "[LX][TRAFEGO-SEGUIDORES][ABO][PUBLICO_FRIO]",
-        "gasto": 92822.36,
-        "impressoes": 17514141,
-        "cliques": 396164,
+        "gasto": 93363.25,
+        "impressoes": 17564718,
+        "cliques": 397959,
         "cpc": 0.23,
-        "ctr": 2.26,
-        "cpm": 5.3,
-        "alcance": 6403145,
+        "ctr": 2.27,
+        "cpm": 5.32,
+        "alcance": 6418036,
         "conv": null
       },
       {
         "id": "120226714217400437",
         "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO]",
-        "gasto": 56797.6,
-        "impressoes": 9177531,
-        "cliques": 425458,
+        "gasto": 57114.15,
+        "impressoes": 9220185,
+        "cliques": 427936,
         "cpc": 0.13,
         "ctr": 4.64,
         "cpm": 6.19,
-        "alcance": 3532120,
+        "alcance": 3550888,
         "conv": 1.0
       },
       {
         "id": "23853853154300436",
         "nome": "[AG7][CONVERSAO-SITE][ABO][PUBLICO_QUENTE] PAUSADA",
-        "gasto": 53598.23,
-        "impressoes": 5625178,
-        "cliques": 62513,
+        "gasto": 53486.79,
+        "impressoes": 5597014,
+        "cliques": 62291,
         "cpc": 0.86,
         "ctr": 1.11,
-        "cpm": 9.53,
-        "alcance": 1258478,
+        "cpm": 9.56,
+        "alcance": 1246051,
         "conv": null
       },
       {
@@ -1660,6 +1719,30 @@ const DADOS_META = {
         "conv": 5.0
       },
       {
+        "id": "120243998081540437",
+        "nome": "[MSG][GRINGO][RJ][NUVENS-ORG]",
+        "gasto": 3579.6,
+        "impressoes": 345047,
+        "cliques": 5438,
+        "cpc": 0.66,
+        "ctr": 1.58,
+        "cpm": 10.37,
+        "alcance": 204103,
+        "conv": 1.0
+      },
+      {
+        "id": "120247060568150437",
+        "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO] [TESTE]",
+        "gasto": 3524.3,
+        "impressoes": 254699,
+        "cliques": 17020,
+        "cpc": 0.21,
+        "ctr": 6.68,
+        "cpm": 13.84,
+        "alcance": 164549,
+        "conv": null
+      },
+      {
         "id": "120228898502700437",
         "nome": "[AG7] [MSG] [MARACANÃ]",
         "gasto": 3467.7,
@@ -1670,30 +1753,6 @@ const DADOS_META = {
         "cpm": 13.77,
         "alcance": 127100,
         "conv": 1.0
-      },
-      {
-        "id": "120243998081540437",
-        "nome": "[MSG][GRINGO][RJ][NUVENS-ORG]",
-        "gasto": 3417.22,
-        "impressoes": 333499,
-        "cliques": 5319,
-        "cpc": 0.64,
-        "ctr": 1.59,
-        "cpm": 10.25,
-        "alcance": 194750,
-        "conv": 1.0
-      },
-      {
-        "id": "120247060568150437",
-        "nome": "[LX][TRAFEGO-SITE][PAGE VIEW][ABO][PUBLICO_FRIO] [TESTE]",
-        "gasto": 3082.51,
-        "impressoes": 225730,
-        "cliques": 14947,
-        "cpc": 0.21,
-        "ctr": 6.62,
-        "cpm": 13.66,
-        "alcance": 151900,
-        "conv": null
       },
       {
         "id": "120218705087410437",
@@ -2104,18 +2163,6 @@ const DADOS_META = {
         "conv": null
       },
       {
-        "id": "23854277486600436",
-        "nome": "20/04 - [VG] - [ENGAJAMENTO]",
-        "gasto": 136.45,
-        "impressoes": 27168,
-        "cliques": 132,
-        "cpc": 1.03,
-        "ctr": 0.49,
-        "cpm": 5.02,
-        "alcance": 12935,
-        "conv": null
-      },
-      {
         "id": "120232070136660437",
         "nome": "[LX] [MENSAGEM] [ABO] [PQ] [TESTE]",
         "gasto": 111.6,
@@ -2125,6 +2172,18 @@ const DADOS_META = {
         "ctr": 0.49,
         "cpm": 23.91,
         "alcance": 2730,
+        "conv": null
+      },
+      {
+        "id": "23854277486600436",
+        "nome": "20/04 - [VG] - [ENGAJAMENTO]",
+        "gasto": 103.78,
+        "impressoes": 19448,
+        "cliques": 76,
+        "cpc": 1.37,
+        "ctr": 0.39,
+        "cpm": 5.34,
+        "alcance": 10168,
         "conv": null
       },
       {
@@ -2149,18 +2208,6 @@ const DADOS_META = {
         "ctr": 1.92,
         "cpm": 5.31,
         "alcance": 11377,
-        "conv": null
-      },
-      {
-        "id": "23854316604740436",
-        "nome": "Publicação do Instagram: 🚨 WARNING: This game is...",
-        "gasto": 56.61,
-        "impressoes": 9264,
-        "cliques": 50,
-        "cpc": 1.13,
-        "ctr": 0.54,
-        "cpm": 6.11,
-        "alcance": 4588,
         "conv": null
       },
       {
@@ -2212,15 +2259,15 @@ const DADOS_META = {
         "conv": null
       },
       {
-        "id": "23853853321920436",
-        "nome": "23/03 - [VG] - [CONVERSÃO] - [COMPRA] - [FRIO]",
-        "gasto": 28.63,
-        "impressoes": 2295,
-        "cliques": 26,
-        "cpc": 1.1,
-        "ctr": 1.13,
-        "cpm": 12.47,
-        "alcance": 1083,
+        "id": "23854316604740436",
+        "nome": "Publicação do Instagram: 🚨 WARNING: This game is...",
+        "gasto": 26.13,
+        "impressoes": 4036,
+        "cliques": 22,
+        "cpc": 1.19,
+        "ctr": 0.55,
+        "cpm": 6.47,
+        "alcance": 2528,
         "conv": null
       },
       {
@@ -2296,6 +2343,18 @@ const DADOS_META = {
         "conv": null
       },
       {
+        "id": "23853853321920436",
+        "nome": "23/03 - [VG] - [CONVERSÃO] - [COMPRA] - [FRIO]",
+        "gasto": 8.19,
+        "impressoes": 478,
+        "cliques": 2,
+        "cpc": 4.09,
+        "ctr": 0.42,
+        "cpm": 17.13,
+        "alcance": 273,
+        "conv": null
+      },
+      {
         "id": "23858041881150436",
         "nome": "vg-reconhecimento-alcance-emirates",
         "gasto": 3.77,
@@ -2329,70 +2388,70 @@ const DADOS_META = {
       },
       {
         "faixa": "18-24",
-        "gasto": 89452.03,
-        "impressoes": 22846508,
-        "cliques": 362929
+        "gasto": 89533.53,
+        "impressoes": 22852252,
+        "cliques": 363467
       },
       {
         "faixa": "25-34",
-        "gasto": 198072.15,
-        "impressoes": 35550048,
-        "cliques": 643005
+        "gasto": 198639.49,
+        "impressoes": 35596218,
+        "cliques": 645858
       },
       {
         "faixa": "35-44",
-        "gasto": 83398.5,
-        "impressoes": 11333409,
-        "cliques": 237607
+        "gasto": 83652.12,
+        "impressoes": 11351926,
+        "cliques": 238749
       },
       {
         "faixa": "45-54",
-        "gasto": 31091.79,
-        "impressoes": 3187845,
-        "cliques": 118458
+        "gasto": 31264.35,
+        "impressoes": 3198246,
+        "cliques": 119161
       },
       {
         "faixa": "55-64",
-        "gasto": 17098.2,
-        "impressoes": 1883403,
-        "cliques": 84174
+        "gasto": 17209.12,
+        "impressoes": 1889486,
+        "cliques": 84695
       },
       {
         "faixa": "65+",
-        "gasto": 12360.67,
-        "impressoes": 1513710,
-        "cliques": 66442
+        "gasto": 12441.31,
+        "impressoes": 1517613,
+        "cliques": 66820
       }
     ],
     "geos": [
       {
         "local": "Brasil",
-        "gasto": 262956.16,
-        "impressoes": 43307140,
-        "cliques": 692598
+        "gasto": 263389.32,
+        "impressoes": 43337375,
+        "cliques": 694857
       },
       {
         "local": "Colombia",
-        "gasto": 13840.42,
-        "impressoes": 2525171,
-        "cliques": 114762
+        "gasto": 13874.41,
+        "impressoes": 2529622,
+        "cliques": 114996
       },
       {
         "local": "Chile",
-        "gasto": 10833.11,
-        "impressoes": 1926852,
-        "cliques": 52451
+        "gasto": 10865.64,
+        "impressoes": 1931461,
+        "cliques": 52640
       },
       {
         "local": "Argentina",
-        "gasto": 6870.44,
-        "impressoes": 1332246,
-        "cliques": 37051
+        "gasto": 6907.75,
+        "impressoes": 1336710,
+        "cliques": 37312
       },
       {
         "local": "Canada",
-        "gasto": 3282.42,
-        "impressoes": 159557,
+        "gasto": 3282.67,
+        "impressoes": 159693,
         "cliques": 2786
       },
       {
@@ -2403,31 +2462,19 @@ const DADOS_META = {
       },
       {
         "local": "BE",
-        "gasto": 775.3,
-        "impressoes": 120290,
-        "cliques": 1815
+        "gasto": 774.6,
+        "impressoes": 120135,
+        "cliques": 1811
       }
-    ]
+    ],
+    "mensagens": {
+      "conexoes": 11988,
+      "firstReply": 11436,
+      "conversas": 14237,
+      "bloqueios": 128
+    }
   },
   "diario": [
-    {
-      "data": "2025-05-22",
-      "gasto": 694.94,
-      "impressoes": 113821,
-      "cliques": 3917
-    },
-    {
-      "data": "2025-05-23",
-      "gasto": 786.84,
-      "impressoes": 109764,
-      "cliques": 4970
-    },
-    {
-      "data": "2025-05-24",
-      "gasto": 701.84,
-      "impressoes": 106447,
-      "cliques": 4770
-    },
     {
       "data": "2025-05-25",
       "gasto": 802.41,
@@ -4566,15 +4613,33 @@ const DADOS_META = {
     },
     {
       "data": "2026-05-21",
-      "gasto": 472.3,
-      "impressoes": 52107,
+      "gasto": 472.32,
+      "impressoes": 52109,
       "cliques": 2399
     },
     {
       "data": "2026-05-22",
-      "gasto": 223.82,
-      "impressoes": 22808,
-      "cliques": 1014
+      "gasto": 429.62,
+      "impressoes": 42938,
+      "cliques": 1919
+    },
+    {
+      "data": "2026-05-23",
+      "gasto": 467.46,
+      "impressoes": 48467,
+      "cliques": 2337
+    },
+    {
+      "data": "2026-05-24",
+      "gasto": 531.7,
+      "impressoes": 45439,
+      "cliques": 2254
+    },
+    {
+      "data": "2026-05-25",
+      "gasto": 256.63,
+      "impressoes": 19710,
+      "cliques": 969
     }
   ]
 };
@@ -107860,6 +107925,17 @@ function renderizarVisaoGeral() { try {
 function renderizarMetaAds() { try {
   const _meta = getMeta();
   const top10 = _meta.campanhas.slice(0,10);
+
+  // ── Perfil: seguidores e mensagens ────────────────────────────────────
+  const _s = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  const perfil = DADOS_META.perfil || {};
+  _s("kpiIgFollowers", perfil.igFollowers ? formatarNumero(perfil.igFollowers) : "—");
+  _s("kpiIgMedia",     perfil.igMedia     ? formatarNumero(perfil.igMedia)     : "—");
+  _s("kpiFbFollowers", perfil.fbFollowers ? formatarNumero(perfil.fbFollowers) : "—");
+  const msg = _meta.mensagens || {};
+  _s("kpiMsgConexoes",   msg.conexoes   != null ? formatarNumero(msg.conexoes)   : "—");
+  _s("kpiMsgFirstReply", msg.firstReply != null ? formatarNumero(msg.firstReply) : "—");
+  _s("kpiMsgConversas",  msg.conversas  != null ? formatarNumero(msg.conversas)  : "—");
   const cores = ["#3b82f6","#8b5cf6","#22c55e","#f97316","#06b6d4","#eab308","#ec4899","#f87171","#94a3b8","#10b981"];
 
   criarGrafico("graficoMetaBarra",{

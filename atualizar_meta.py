@@ -15,6 +15,9 @@ from datetime import datetime, timedelta
 # ─── CONFIGURACAO ─────────────────────────────────────────────────────────────
 ACCESS_TOKEN  = "EAASW2NZCdwiwBRjZBpgb4Unpo2rqHB8iSJfZAt3BkkHB3pxrkevSo0UYx5RnF5hN7dnZCUV5yqwuPtfVUqhE3gAyOcfbLvYVhmMb5Cq1OAZBtJQ9cCRQAIce6wU7QNiX1iy11KH8tELm38U8HKTZCIgriWrUZBUdP4l60xZB4zxDgJVyZAC2bllLHsyDHnos83noLfm9SX14s0ZCmAP0iLTZBAw5OShUTb84yf4AgQCz201"
 AD_ACCOUNT_ID = "act_2613909812239242"
+PAGE_TOKEN    = "EAASW2NZCdwiwBRhnRP1xyNqDBEZAApFHZAUL3jD9FOUwmxi0xrCCPW4vuqhEy2RlGkM9naT2aMipZAtOipJu7Kd7qkCrAos5iH65C9jSDFzcJzMp1C3vJcRauHF9YtVFxlJNq6yX4QaXJjRZAMbZCkQYeeTk4ZArF5jVlaD24Hn1waMocOEPUSfL94Ryu0u8Q1cle0ZD"
+PAGE_ID       = "187791431625497"
+IG_ID         = "17841404363695690"
 ARQUIVO_DASH  = "index.html"
 API_VERSION   = "v19.0"
 BASE_URL      = f"https://graph.facebook.com/{API_VERSION}"
@@ -37,12 +40,28 @@ NOMES_PAIS = {
 }
 
 
-def api_get(endpoint, params=None):
-    p = {"access_token": ACCESS_TOKEN, **(params or {})}
+def api_get(endpoint, params=None, token=None):
+    p = {"access_token": token or ACCESS_TOKEN, **(params or {})}
     r = requests.get(f"{BASE_URL}/{endpoint}", params=p, timeout=30)
     if not r.ok:
         raise RuntimeError(f"Erro Meta API {r.status_code}: {r.text[:300]}")
     return r.json()
+
+
+def buscar_perfil():
+    """Busca seguidores do Instagram e Facebook."""
+    try:
+        ig = api_get(IG_ID, {"fields": "followers_count,media_count"}, token=PAGE_TOKEN)
+        fb = api_get(PAGE_ID, {"fields": "fan_count,name"}, token=PAGE_TOKEN)
+        return {
+            "igFollowers":  ig.get("followers_count", 0),
+            "igMedia":      ig.get("media_count", 0),
+            "fbFollowers":  fb.get("fan_count", 0),
+            "fbNome":       fb.get("name", ""),
+        }
+    except Exception as e:
+        print(f"  [AVISO] Nao foi possivel buscar perfil: {e}")
+        return {"igFollowers": 0, "igMedia": 0, "fbFollowers": 0, "fbNome": ""}
 
 
 def buscar_conjuntos(date_params):
@@ -192,6 +211,20 @@ def processar(conjuntos_raw, idades_raw, paises_raw):
 
     cpc_medio = round(total_gasto / total_cliques, 3) if total_cliques else 0
 
+    # Agregar ações de mensagens de todas as campanhas
+    msg = {"conexoes": 0, "firstReply": 0, "conversas": 0, "bloqueios": 0}
+    MSG_KEYS = {
+        "onsite_conversion.total_messaging_connection":   "conexoes",
+        "onsite_conversion.messaging_first_reply":        "firstReply",
+        "onsite_conversion.messaging_conversation_started_7d": "conversas",
+        "onsite_conversion.messaging_block":              "bloqueios",
+    }
+    for c in conjuntos_raw:
+        for a in (c.get("actions") or []):
+            chave = MSG_KEYS.get(a.get("action_type", ""))
+            if chave:
+                msg[chave] += float(a.get("value", 0) or 0)
+
     return {
         "totalGasto":      round(total_gasto, 2),
         "totalImpressoes": int(total_impressoes),
@@ -200,6 +233,12 @@ def processar(conjuntos_raw, idades_raw, paises_raw):
         "campanhas":       campanhas,
         "idades":          idades,
         "geos":            geos,
+        "mensagens": {
+            "conexoes":   int(msg["conexoes"]),
+            "firstReply": int(msg["firstReply"]),
+            "conversas":  int(msg["conversas"]),
+            "bloqueios":  int(msg["bloqueios"]),
+        },
     }
 
 
@@ -227,6 +266,11 @@ def main():
 
     resultado = {}
 
+    print("Buscando perfil (Instagram + Facebook)...")
+    perfil = buscar_perfil()
+    resultado["perfil"] = perfil
+    print(f"  Instagram: {perfil['igFollowers']:,} seguidores | Facebook: {perfil['fbFollowers']:,}")
+
     for chave, preset in PERIODOS:
         print(f"Buscando periodo {preset}...")
         dp = {"date_preset": preset}
@@ -234,7 +278,8 @@ def main():
         resultado[chave] = dados_periodo
         print(f"  Gasto: R$ {dados_periodo['totalGasto']:,.2f} | "
               f"Impressoes: {dados_periodo['totalImpressoes']:,} | "
-              f"Cliques: {dados_periodo['totalCliques']:,}")
+              f"Cliques: {dados_periodo['totalCliques']:,} | "
+              f"Mensagens: {dados_periodo['mensagens']['conexoes']}")
 
     print("\nBuscando totais diarios (365 dias para ranges customizados)...")
     diario = buscar_diario()
