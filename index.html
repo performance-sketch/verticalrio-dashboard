@@ -442,10 +442,13 @@ tbody td {
   font-weight: 600;
 }
 
-.s-confirmed { background: rgba(16,185,129,0.15); color: var(--green); }
-.s-pending   { background: rgba(234,179,8,0.15);   color: var(--yellow); }
-.s-cancelled { background: rgba(239,68,68,0.15);   color: var(--red); }
-.s-abandoned { background: rgba(100,116,139,0.15); color: var(--muted); }
+.s-confirmed         { background: rgba(16,185,129,0.15);  color: var(--green); }
+.s-pending           { background: rgba(234,179,8,0.15);   color: var(--yellow); }
+.s-cancelled         { background: rgba(239,68,68,0.15);   color: var(--red); }
+.s-abandoned         { background: rgba(100,116,139,0.15); color: var(--muted); }
+.s-onhold            { background: rgba(249,115,22,0.15);  color: #f97316; }
+.s-pending-customer  { background: rgba(59,130,246,0.15);  color: #60a5fa; }
+.s-pending-supplier  { background: rgba(139,92,246,0.15);  color: var(--purple); }
 
 /* ── A/B Tests ── */
 .ab-grid {
@@ -109114,6 +109117,18 @@ const DADOS_LINKTREE = { "totalCliques": 0, "visualizacoes": 0, "ctr": 0.0, "lin
 
   <!-- ── Tab: Reservas ── -->
   <div id="aba-rezdy" class="tab-panel">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <span style="color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.05em">STATUS</span>
+      <div class="period-btns" style="flex-wrap:wrap">
+        <button class="period-btn status-filter-btn active" onclick="aplicarFiltroStatus(null,this)">Todos</button>
+        <button class="period-btn status-filter-btn" onclick="aplicarFiltroStatus('CONFIRMED',this)">✅ Confirmed</button>
+        <button class="period-btn status-filter-btn" onclick="aplicarFiltroStatus('ABANDONED_CART',this)">🛒 Abandoned Cart</button>
+        <button class="period-btn status-filter-btn" onclick="aplicarFiltroStatus('CANCELLED',this)">❌ Cancelled</button>
+        <button class="period-btn status-filter-btn" onclick="aplicarFiltroStatus('ON_HOLD',this)">⏸ On Hold</button>
+        <button class="period-btn status-filter-btn" onclick="aplicarFiltroStatus('PENDING_CUSTOMER',this)">⏳ Pending Customer</button>
+        <button class="period-btn status-filter-btn" onclick="aplicarFiltroStatus('PENDING_SUPPLIER',this)">🔄 Pending Supplier</button>
+      </div>
+    </div>
     <div id="rz-kpi1" class="kpi-row kpi-row-6"></div>
     <div class="chart-row chart-row-2">
       <div class="chart-card">
@@ -109184,7 +109199,7 @@ const DADOS_LINKTREE = { "totalCliques": 0, "visualizacoes": 0, "ctr": 0.0, "lin
 'use strict';
 
 /* ─── State ─── */
-const FILTRO = { dias: 30, ini: null, fim: null, iniStr: null, fimStr: null };
+const FILTRO = { dias: 30, ini: null, fim: null, iniStr: null, fimStr: null, status: null };
 const chartReg = {};
 let abaAtiva    = 'aba-geral';
 let subAbaAtiva = 'sub-resumo';
@@ -109395,6 +109410,13 @@ function aplicarFiltroCustom() {
   FILTRO.fim    = new Date(fim + 'T23:59:59');
   FILTRO.dias   = null;
   document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  renderAtiva();
+}
+
+function aplicarFiltroStatus(status, btn) {
+  FILTRO.status = status;
+  document.querySelectorAll('.status-filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
   renderAtiva();
 }
 
@@ -109924,9 +109946,12 @@ function renderMetaInsights() {
    RENDER: Rezdy
 ══════════════════════════════════════════════ */
 function renderRezdy() {
-  const tabela = filtrarTabela();
-  const allTab = (DADOS_REZDY_LIVE.resumo && DADOS_REZDY_LIVE.resumo.tabela) || [];
-  const conf   = tabela.filter(r => (r.status || '').toUpperCase() === 'CONFIRMED');
+  const _byDate = filtrarTabela();
+  const allTab  = (DADOS_REZDY_LIVE.resumo && DADOS_REZDY_LIVE.resumo.tabela) || [];
+  const tabela  = FILTRO.status
+    ? _byDate.filter(r => (r.status || '').toUpperCase() === FILTRO.status)
+    : _byDate;
+  const conf    = tabela.filter(r => (r.status || '').toUpperCase() === 'CONFIRMED');
 
   const totalBk  = tabela.length;
   const receita  = conf.reduce((s, r) => s + (parseFloat(r.valorTotal) || 0), 0);
@@ -109935,8 +109960,9 @@ function renderRezdy() {
   const ticket   = fulfil ? receita / fulfil : 0;
   const taxaConf = totalBk ? (fulfil / totalBk) * 100 : 0;
 
+  const statusLabel = FILTRO.status ? FILTRO.status.replace(/_/g,' ').toLowerCase() : 'todos os status';
   document.getElementById('rz-kpi1').innerHTML =
-    card('🚁', 'Total Reservas',    fmtNum(totalBk),    'período selecionado') +
+    card('🚁', 'Total Reservas',    fmtNum(totalBk),    statusLabel) +
     card('💵', 'Receita Total',     fmtBRL(receita),    'bookings CONFIRMED') +
     card('✅', 'Fulfillments',      fmtNum(fulfil),     'confirmados') +
     card('👥', 'Passageiros',       fmtNum(paxTotal),   'pax CONFIRMED') +
@@ -110086,20 +110112,26 @@ function renderRezdy() {
     }
   });
 
-  // Recent bookings — last 20, most recent first
-  const recentes = [...allTab].reverse().slice(0, 20);
+  // Recent bookings — last 20 from status-filtered set, most recent first
+  const allFiltered = FILTRO.status
+    ? allTab.filter(r => (r.status || '').toUpperCase() === FILTRO.status)
+    : allTab;
+  const recentes = [...allFiltered].reverse().slice(0, 20);
   document.getElementById('recent-header').textContent = `🕒 Reservas Recentes (${recentes.length})`;
 
   function statusBadge(s) {
     s = (s || '').toUpperCase();
     const map = {
-      CONFIRMED: ['s-confirmed', '✅'],
-      PENDING:   ['s-pending',   '⏳'],
-      CANCELLED: ['s-cancelled', '❌'],
-      ABANDONED: ['s-abandoned', '○']
+      CONFIRMED:        ['s-confirmed',        '✅', 'Confirmed'],
+      PENDING:          ['s-pending',           '⏳', 'Pending'],
+      CANCELLED:        ['s-cancelled',         '❌', 'Cancelled'],
+      ABANDONED_CART:   ['s-abandoned',         '🛒', 'Abandoned Cart'],
+      ON_HOLD:          ['s-onhold',            '⏸',  'On Hold'],
+      PENDING_CUSTOMER: ['s-pending-customer',  '⏳', 'Pending Customer'],
+      PENDING_SUPPLIER: ['s-pending-supplier',  '🔄', 'Pending Supplier'],
     };
-    const [cls, ico] = map[s] || ['s-abandoned', '○'];
-    return `<span class="status-badge ${cls}">${ico} ${s || '—'}</span>`;
+    const [cls, ico, label] = map[s] || ['s-abandoned', '○', s || '—'];
+    return `<span class="status-badge ${cls}">${ico} ${label}</span>`;
   }
 
   document.getElementById('recent-tbody').innerHTML = recentes.map(r =>
