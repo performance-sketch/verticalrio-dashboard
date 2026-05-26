@@ -282,9 +282,13 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
   <!-- Funnel + Canais -->
   <div class="row-col-2-1">
     <div class="chart-card">
-      <div class="chart-card-title">🔻 Funil de Atendimento</div>
-      <div class="chart-card-sub">Volume e taxa de conversão por etapa · 28 dias</div>
+      <div class="chart-card-title">🔻 Funil de Jornada do Ciclo de Vida</div>
+      <div class="chart-card-sub">Contatos por etapa · taxa de conversão e tempo médio na etapa</div>
       <div id="funil-wrap" class="funnel-wrap" style="margin-top:8px"></div>
+      <div id="outras-etapas-wrap" style="margin-top:14px;display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:8px">OUTRAS ETAPAS</div>
+        <div id="outras-etapas-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
     </div>
     <div class="chart-card">
       <div class="chart-card-title">📡 Distribuição por Canal</div>
@@ -356,6 +360,23 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
     </div>
   </div>
 
+  <!-- Por Anuncio -->
+  <!-- Por Origem -->
+  <div class="section-title" id="sec-por-origem">🌐 Leads por Origem</div>
+  <div class="chart-card">
+    <div class="chart-card-title">📡 De onde chegam seus leads?</div>
+    <div class="chart-card-sub">Distribuição de New Leads por canal de entrada</div>
+    <div id="por-origem-wrap" style="margin-top:16px"></div>
+  </div>
+
+
+  <div class="section-title">📣 Leads por Anúncio · Ciclo de Vida</div>
+  <div class="chart-card">
+    <div class="chart-card-title">🎯 Jornada do Lead por Campanha</div>
+    <div class="chart-card-sub">Quantidade de contatos em cada etapa do ciclo, por anúncio de origem</div>
+    <div class="chart-wrap" style="height:260px"><canvas id="ch-por-anuncio"></canvas></div>
+  </div>
+
   <!-- Comercial -->
   <div class="section-title">💰 Performance Comercial</div>
   <div class="comercial-grid" id="comercial-grid"></div>
@@ -396,78 +417,419 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
    DATA
    ════════════════════════════════ */
 const DADOS_RESPONDIO = {
-  dataAtualizacao: "25/05/2026 16:54",
+  dataAtualizacao: "26/05/2026 09:31",
 
   kpis: {
-    hoje: {
-      abertas:12, fechadas:8, novas:20, tmPrimResp:3.1, tmResol:21.3,
-      pendentes:5, taxaResol:72.7, taxaConversao:22.2,
-      mensagensRecebidas:164, mensagensEnviadas:190, clientesUnicos:19,
-      slaCumprido:92.3, slaViolado:7.7,
-      ant:{ abertas:15, fechadas:6, novas:18, tmPrimResp:4.8, tmResol:29.5,
-            pendentes:7, taxaResol:66.7, taxaConversao:18.0,
-            mensagensRecebidas:140, mensagensEnviadas:163, clientesUnicos:17,
-            slaCumprido:86.7, slaViolado:13.3 }
-    },
-    d7: {
-      abertas:12, fechadas:43, novas:55, tmPrimResp:3.8, tmResol:24.2,
-      pendentes:8, taxaResol:78.2, taxaConversao:20.1,
-      mensagensRecebidas:448, mensagensEnviadas:521, clientesUnicos:52,
-      slaCumprido:89.4, slaViolado:10.6,
-      ant:{ abertas:15, fechadas:37, novas:49, tmPrimResp:5.2, tmResol:31.8,
-            pendentes:11, taxaResol:75.5, taxaConversao:16.3,
-            mensagensRecebidas:382, mensagensEnviadas:443, clientesUnicos:46,
-            slaCumprido:85.1, slaViolado:14.9 }
-    },
-    d28: {
-      abertas:47, fechadas:183, novas:230, tmPrimResp:4.2, tmResol:28.5,
-      pendentes:12, taxaResol:79.6, taxaConversao:18.3,
-      mensagensRecebidas:1847, mensagensEnviadas:2134, clientesUnicos:218,
-      slaCumprido:87.4, slaViolado:12.6,
-      ant:{ abertas:51, fechadas:165, novas:208, tmPrimResp:5.8, tmResol:34.2,
-            pendentes:18, taxaResol:75.3, taxaConversao:14.9,
-            mensagensRecebidas:1624, mensagensEnviadas:1887, clientesUnicos:195,
-            slaCumprido:84.6, slaViolado:15.4 }
-    },
-    d90: {
-      abertas:89, fechadas:621, novas:710, tmPrimResp:5.1, tmResol:31.2,
-      pendentes:21, taxaResol:87.5, taxaConversao:16.8,
-      mensagensRecebidas:5824, mensagensEnviadas:6741, clientesUnicos:672,
-      slaCumprido:85.8, slaViolado:14.2,
-      ant:{ abertas:103, fechadas:551, novas:632, tmPrimResp:6.8, tmResol:37.5,
-            pendentes:28, taxaResol:87.2, taxaConversao:13.1,
-            mensagensRecebidas:5112, mensagensEnviadas:5923, clientesUnicos:598,
-            slaCumprido:82.4, slaViolado:17.6 }
+  "hoje": {
+    "abertas": 7,
+    "fechadas": 15,
+    "novas": 22,
+    "tmPrimResp": 2.5,
+    "tmResol": 20.0,
+    "pendentes": 7,
+    "taxaResol": 68.2,
+    "taxaConversao": 0,
+    "mensagensRecebidas": 132,
+    "mensagensEnviadas": 154,
+    "clientesUnicos": 19,
+    "slaCumprido": 0,
+    "slaViolado": 0,
+    "ant": {
+      "abertas": 7,
+      "fechadas": 15,
+      "novas": 22,
+      "tmPrimResp": 2.5,
+      "tmResol": 20.0,
+      "pendentes": 7,
+      "taxaResol": 68.2,
+      "taxaConversao": 0,
+      "mensagensRecebidas": 132,
+      "mensagensEnviadas": 154,
+      "clientesUnicos": 19,
+      "slaCumprido": 0,
+      "slaViolado": 0
     }
   },
+  "d7": {
+    "abertas": 52,
+    "fechadas": 103,
+    "novas": 155,
+    "tmPrimResp": 2.5,
+    "tmResol": 20.0,
+    "pendentes": 52,
+    "taxaResol": 66.5,
+    "taxaConversao": 0,
+    "mensagensRecebidas": 930,
+    "mensagensEnviadas": 1085,
+    "clientesUnicos": 130,
+    "slaCumprido": 0,
+    "slaViolado": 0,
+    "ant": {
+      "abertas": 0,
+      "fechadas": 593,
+      "novas": 550,
+      "tmPrimResp": 2.5,
+      "tmResol": 20.0,
+      "pendentes": 0,
+      "taxaResol": 107.8,
+      "taxaConversao": 0,
+      "mensagensRecebidas": 3300,
+      "mensagensEnviadas": 3850,
+      "clientesUnicos": 478,
+      "slaCumprido": 0,
+      "slaViolado": 0
+    }
+  },
+  "d28": {
+    "abertas": 192,
+    "fechadas": 382,
+    "novas": 574,
+    "tmPrimResp": 2.5,
+    "tmResol": 20.0,
+    "pendentes": 192,
+    "taxaResol": 66.6,
+    "taxaConversao": 0,
+    "mensagensRecebidas": 3444,
+    "mensagensEnviadas": 4018,
+    "clientesUnicos": 483,
+    "slaCumprido": 0,
+    "slaViolado": 0,
+    "ant": {
+      "abertas": 0,
+      "fechadas": 2201,
+      "novas": 2042,
+      "tmPrimResp": 2.5,
+      "tmResol": 20.0,
+      "pendentes": 0,
+      "taxaResol": 107.8,
+      "taxaConversao": 0,
+      "mensagensRecebidas": 12252,
+      "mensagensEnviadas": 14294,
+      "clientesUnicos": 1777,
+      "slaCumprido": 0,
+      "slaViolado": 0
+    }
+  },
+  "d90": {
+    "abertas": 0,
+    "fechadas": 4787,
+    "novas": 4768,
+    "tmPrimResp": 2.5,
+    "tmResol": 20.0,
+    "pendentes": 0,
+    "taxaResol": 100.4,
+    "taxaConversao": 0,
+    "mensagensRecebidas": 28608,
+    "mensagensEnviadas": 33376,
+    "clientesUnicos": 4105,
+    "slaCumprido": 0,
+    "slaViolado": 0,
+    "ant": {
+      "abertas": 285,
+      "fechadas": 6845,
+      "novas": 7130,
+      "tmPrimResp": 2.5,
+      "tmResol": 20.0,
+      "pendentes": 285,
+      "taxaResol": 96.0,
+      "taxaConversao": 0,
+      "mensagensRecebidas": 42780,
+      "mensagensEnviadas": 49910,
+      "clientesUnicos": 5981,
+      "slaCumprido": 0,
+      "slaViolado": 0
+    }
+  }
+},
 
-  // Daily data — last 28 days (Apr 28 to May 25)
+  // Monthly trend — Jul 2025 to May 2026
   diario: [
-    {d:"28/04",ab:8, fe:7, pr:4.5,re:28.3},{d:"29/04",ab:10,fe:8, pr:3.9,re:25.1},
-    {d:"30/04",ab:11,fe:9, pr:4.2,re:27.8},{d:"01/05",ab:9, fe:8, pr:4.8,re:30.2},
-    {d:"02/05",ab:8, fe:7, pr:4.1,re:26.5},{d:"03/05",ab:4, fe:3, pr:5.8,re:35.1},
-    {d:"04/05",ab:3, fe:2, pr:6.2,re:38.4},{d:"05/05",ab:9, fe:7, pr:4.3,re:29.1},
-    {d:"06/05",ab:11,fe:9, pr:3.8,re:24.8},{d:"07/05",ab:12,fe:10,pr:3.5,re:23.4},
-    {d:"08/05",ab:10,fe:9, pr:4.0,re:26.7},{d:"09/05",ab:8, fe:7, pr:4.4,re:28.9},
-    {d:"10/05",ab:5, fe:4, pr:5.5,re:33.8},{d:"11/05",ab:3, fe:2, pr:6.8,re:41.2},
-    {d:"12/05",ab:8, fe:7, pr:4.6,re:30.5},{d:"13/05",ab:10,fe:8, pr:4.0,re:26.1},
-    {d:"14/05",ab:11,fe:9, pr:3.7,re:24.5},{d:"15/05",ab:9, fe:8, pr:4.1,re:27.3},
-    {d:"16/05",ab:8, fe:6, pr:4.7,re:31.2},{d:"17/05",ab:4, fe:3, pr:6.0,re:36.8},
-    {d:"18/05",ab:2, fe:2, pr:7.1,re:43.5},{d:"19/05",ab:9, fe:7, pr:4.2,re:28.1},
-    {d:"20/05",ab:11,fe:9, pr:3.6,re:23.9},{d:"21/05",ab:12,fe:10,pr:3.4,re:22.8},
-    {d:"22/05",ab:10,fe:8, pr:3.8,re:25.4},{d:"23/05",ab:8, fe:7, pr:4.3,re:28.2},
-    {d:"24/05",ab:5, fe:4, pr:5.7,re:34.6},{d:"25/05",ab:5, fe:8, pr:3.1,re:21.3}
-  ],
+  {
+    "d": "Jul",
+    "ab": 253,
+    "fe": 127,
+    "pr": 2.5,
+    "re": 20.0
+  },
+  {
+    "d": "Ago",
+    "ab": 3115,
+    "fe": 2863,
+    "pr": 2.5,
+    "re": 20.0
+  },
+  {
+    "d": "Set",
+    "ab": 2159,
+    "fe": 2375,
+    "pr": 2.5,
+    "re": 20.0
+  },
+  {
+    "d": "Out",
+    "ab": 1617,
+    "fe": 1661,
+    "pr": 2.5,
+    "re": 20.0
+  },
+  {
+    "d": "Nov",
+    "ab": 1732,
+    "fe": 1704,
+    "pr": 2.5,
+    "re": 20.0
+  },
+  {
+    "d": "Dez",
+    "ab": 1768,
+    "fe": 1727,
+    "pr": 2.5,
+    "re": 20.0
+  },
+  {
+    "d": "Jan",
+    "ab": 2183,
+    "fe": 2081,
+    "pr": 2.5,
+    "re": 20.0
+  },
+  {
+    "d": "Fev",
+    "ab": 3179,
+    "fe": 3037,
+    "pr": 2.5,
+    "re": 20.0
+  },
+  {
+    "d": "Mar",
+    "ab": 2152,
+    "fe": 2204,
+    "pr": 2.5,
+    "re": 20.0
+  },
+  {
+    "d": "Abr",
+    "ab": 2042,
+    "fe": 2201,
+    "pr": 2.5,
+    "re": 20.0
+  },
+  {
+    "d": "Mai",
+    "ab": 574,
+    "fe": 382,
+    "pr": 2.5,
+    "re": 20.0
+  }
+],
 
   funil: [
-    {label:"Nova Conversa",       count:230, icon:"💬", cor:"#6366f1"},
-    {label:"Atribuída",           count:215, icon:"👤", cor:"#3b82f6"},
-    {label:"1ª Resposta Enviada", count:203, icon:"📤", cor:"#06b6d4"},
-    {label:"Em Andamento",        count:195, icon:"🔄", cor:"#10b981"},
-    {label:"Lead Qualificado",    count:89,  icon:"⭐", cor:"#f59e0b"},
-    {label:"Conversão / Venda",   count:42,  icon:"💰", cor:"#f97316"},
-    {label:"Conversa Fechada",    count:183, icon:"✅", cor:"#8b5cf6"},
-  ],
+  {
+    "label": "1. New Lead",
+    "count": 13346,
+    "icon": "💬",
+    "cor": "#6366f1",
+    "taxaConversao": 34.9,
+    "tempoHumano": "1.2d",
+    "taxaAbandono": 0.18
+  },
+  {
+    "label": "2. Negociando",
+    "count": 4668,
+    "icon": "💼",
+    "cor": "#3b82f6",
+    "taxaConversao": 45.17,
+    "tempoHumano": "3.3d",
+    "taxaAbandono": 0.57
+  },
+  {
+    "label": "3. Reservando",
+    "count": 1899,
+    "icon": "📋",
+    "cor": "#06b6d4",
+    "taxaConversao": 87.13,
+    "tempoHumano": "15.9d",
+    "taxaAbandono": 3.17
+  },
+  {
+    "label": "4. Reservado 1",
+    "count": 0,
+    "icon": "🔖",
+    "cor": "#10b981",
+    "taxaConversao": 100.0,
+    "tempoHumano": "—",
+    "taxaAbandono": 0.0
+  },
+  {
+    "label": "6. Reservado 2 (etapa de Venda Fechada)",
+    "count": 1227,
+    "icon": "💰",
+    "cor": "#f97316",
+    "taxaConversao": 0,
+    "tempoHumano": "—",
+    "taxaAbandono": 0
+  }
+],
+
+  outrasEtapas: [
+  {
+    "label": "X Parceria",
+    "count": 1632,
+    "icon": "🤝",
+    "cor": "#8b5cf6",
+    "taxaConversao": 84.85,
+    "tempoHumano": "2.2d"
+  },
+  {
+    "label": "4. On Hold",
+    "count": 1343,
+    "icon": "⏸",
+    "cor": "#f59e0b",
+    "taxaConversao": 97.78,
+    "tempoHumano": "18.7d"
+  },
+  {
+    "label": "5. Guias",
+    "count": 1238,
+    "icon": "👥",
+    "cor": "#ec4899",
+    "taxaConversao": 89.81,
+    "tempoHumano": "13.4d"
+  },
+  {
+    "label": "1. Prospecção",
+    "count": 4,
+    "icon": "🔍",
+    "cor": "#06b6d4",
+    "taxaConversao": 100.0,
+    "tempoHumano": "—"
+  },
+  {
+    "label": "2. Aguardando Data",
+    "count": 4,
+    "icon": "📅",
+    "cor": "#3b82f6",
+    "taxaConversao": 100.0,
+    "tempoHumano": "—"
+  },
+  {
+    "label": "3. Voo Confirmado",
+    "count": 4,
+    "icon": "✅",
+    "cor": "#10b981",
+    "taxaConversao": 100.0,
+    "tempoHumano": "—"
+  },
+  {
+    "label": "4. Voo Realizado - Pendência Entrega",
+    "count": 4,
+    "icon": "📦",
+    "cor": "#f59e0b",
+    "taxaConversao": 100.0,
+    "tempoHumano": "—"
+  },
+  {
+    "label": "5. Voo Realizado - Entrega Feita",
+    "count": 4,
+    "icon": "🎉",
+    "cor": "#f97316",
+    "taxaConversao": 100.0,
+    "tempoHumano": "—"
+  }
+],
+
+  porAnuncio: [
+  {
+    "nome": "No Ads",
+    "cor": "#8b5cf6",
+    "total": 25223,
+    "etapas": {
+      "1. New Lead": 13200,
+      "2. Negociando": 4666,
+      "3. Reservando": 1898,
+      "X Parceria": 1631,
+      "4. On Hold": 1343,
+      "5. Guias": 1238,
+      "1. Prospecção": 4,
+      "2. Aguardando Data": 4,
+      "3. Voo Confirmado": 4,
+      "4. Voo Realizado - Pendência Entrega": 4,
+      "5. Voo Realizado - Entrega Feita": 4,
+      "6. Reservado 2 (etapa de Venda Fechada)": 1227
+    }
+  },
+  {
+    "nome": "Other",
+    "cor": "#ef4444",
+    "total": 110,
+    "etapas": {
+      "1. New Lead": 107,
+      "2. Negociando": 1,
+      "3. Reservando": 1,
+      "X Parceria": 1
+    }
+  },
+  {
+    "nome": "E aí Topariam um passeio de helicóptero sem portas sobre os cartões postais do Rio de Janeiro?",
+    "cor": "#6366f1",
+    "total": 40,
+    "etapas": {
+      "1. New Lead": 39,
+      "2. Negociando": 1
+    }
+  }
+],
+
+  porOrigem: [
+  {
+    "origem": "Incoming Message",
+    "label": "Mensagem Direta",
+    "cor": "#25D366",
+    "icone": "💬",
+    "count": 11191,
+    "pct": 81.2
+  },
+  {
+    "origem": "Paid Ads",
+    "label": "Anúncios Pagos",
+    "cor": "#3b82f6",
+    "icone": "📢",
+    "count": 2469,
+    "pct": 17.9
+  },
+  {
+    "origem": "Other",
+    "label": "Outro",
+    "cor": "#94a3b8",
+    "icone": "📌",
+    "count": 46,
+    "pct": 0.3
+  },
+  {
+    "origem": "Incoming Call",
+    "label": "Chamada Recebida",
+    "cor": "#f59e0b",
+    "icone": "📞",
+    "count": 42,
+    "pct": 0.3
+  },
+  {
+    "origem": "No Source",
+    "label": "Sem Origem",
+    "cor": "#cbd5e1",
+    "icone": "❓",
+    "count": 20,
+    "pct": 0.1
+  },
+  {
+    "origem": "User",
+    "label": "Time Interno",
+    "cor": "#8b5cf6",
+    "icone": "👤",
+    "count": 16,
+    "pct": 0.1
+  }
+],
 
   canais: [
     {nome:"WhatsApp",  icon:"📱",cor:"#25D366",pct:64.8,conversas:149,fechadas:121,tmResposta:3.2,sla:91.3,conversao:22.1,mensagens:1197},
@@ -485,55 +847,403 @@ const DADOS_RESPONDIO = {
   ],
 
   heatmapAbertas: {
-    labels: ["7h","8h","9h","10h","11h","12h","13h","14h","15h","16h","17h","18h","19h","20h"],
-    dias:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],
-    data:{
-      Dom:[0,1,2, 3, 3, 2, 2, 1, 1, 1, 0, 0, 0, 0],
-      Seg:[0,1,3, 6, 8, 7, 6, 5, 4, 3, 3, 2, 1, 0],
-      Ter:[0,2,4, 9,11,10, 9, 8, 6, 5, 4, 3, 2, 1],
-      Qua:[0,2,4,10,12,11,10, 9, 7, 5, 4, 3, 2, 1],
-      Qui:[0,2,4, 8,10, 9, 8, 7, 5, 4, 3, 2, 1, 0],
-      Sex:[0,1,3, 7, 8, 7, 6, 5, 4, 3, 2, 2, 1, 0],
-      Sab:[0,1,2, 4, 5, 4, 3, 2, 2, 1, 1, 0, 0, 0],
-    }
-  },
+  "labels": [
+    "6h",
+    "7h",
+    "8h",
+    "9h",
+    "10h",
+    "11h",
+    "12h",
+    "13h",
+    "14h",
+    "15h",
+    "16h",
+    "17h",
+    "18h",
+    "19h",
+    "20h",
+    "21h",
+    "22h"
+  ],
+  "dias": [
+    "Dom",
+    "Seg",
+    "Ter",
+    "Qua",
+    "Qui",
+    "Sex",
+    "Sáb"
+  ],
+  "data": {
+    "Dom": [
+      34,
+      91,
+      123,
+      186,
+      183,
+      212,
+      191,
+      219,
+      174,
+      185,
+      159,
+      168,
+      147,
+      143,
+      126,
+      119,
+      110
+    ],
+    "Seg": [
+      46,
+      101,
+      154,
+      187,
+      216,
+      229,
+      198,
+      246,
+      244,
+      213,
+      208,
+      177,
+      158,
+      149,
+      165,
+      121,
+      109
+    ],
+    "Ter": [
+      41,
+      84,
+      169,
+      165,
+      187,
+      239,
+      227,
+      219,
+      220,
+      169,
+      183,
+      192,
+      159,
+      143,
+      119,
+      134,
+      117
+    ],
+    "Qua": [
+      46,
+      110,
+      125,
+      190,
+      191,
+      228,
+      208,
+      197,
+      173,
+      173,
+      178,
+      143,
+      133,
+      140,
+      114,
+      124,
+      95
+    ],
+    "Qui": [
+      46,
+      96,
+      157,
+      178,
+      199,
+      213,
+      225,
+      181,
+      178,
+      168,
+      162,
+      151,
+      155,
+      128,
+      137,
+      115,
+      114
+    ],
+    "Sex": [
+      44,
+      84,
+      161,
+      160,
+      200,
+      186,
+      229,
+      176,
+      190,
+      197,
+      204,
+      175,
+      182,
+      144,
+      142,
+      130,
+      132
+    ],
+    "Sáb": [
+      53,
+      86,
+      163,
+      174,
+      211,
+      217,
+      231,
+      193,
+      178,
+      205,
+      172,
+      152,
+      145,
+      123,
+      136,
+      128,
+      97
+    ]
+  }
+},
   heatmapFechadas: {
-    labels: ["7h","8h","9h","10h","11h","12h","13h","14h","15h","16h","17h","18h","19h","20h"],
-    dias:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"],
-    data:{
-      Dom:[0,0,1, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0],
-      Seg:[0,0,2, 5, 7, 6, 5, 4, 3, 3, 2, 1, 1, 0],
-      Ter:[0,1,3, 8,10, 9, 8, 7, 5, 4, 3, 2, 1, 0],
-      Qua:[0,1,3, 9,11,10, 9, 8, 6, 4, 3, 2, 1, 0],
-      Qui:[0,1,3, 7, 9, 8, 7, 6, 4, 3, 2, 2, 1, 0],
-      Sex:[0,1,2, 6, 7, 6, 5, 4, 3, 2, 2, 1, 0, 0],
-      Sab:[0,0,1, 3, 4, 3, 2, 2, 1, 1, 0, 0, 0, 0],
-    }
-  },
+  "labels": [
+    "6h",
+    "7h",
+    "8h",
+    "9h",
+    "10h",
+    "11h",
+    "12h",
+    "13h",
+    "14h",
+    "15h",
+    "16h",
+    "17h",
+    "18h",
+    "19h",
+    "20h",
+    "21h",
+    "22h"
+  ],
+  "dias": [
+    "Dom",
+    "Seg",
+    "Ter",
+    "Qua",
+    "Qui",
+    "Sex",
+    "Sáb"
+  ],
+  "data": {
+    "Dom": [
+      0,
+      34,
+      437,
+      628,
+      157,
+      162,
+      81,
+      161,
+      233,
+      217,
+      88,
+      227,
+      38,
+      0,
+      0,
+      0,
+      0
+    ],
+    "Seg": [
+      0,
+      4,
+      1196,
+      1338,
+      904,
+      922,
+      109,
+      413,
+      203,
+      151,
+      207,
+      109,
+      4,
+      1,
+      0,
+      0,
+      0
+    ],
+    "Ter": [
+      0,
+      52,
+      472,
+      278,
+      343,
+      153,
+      126,
+      175,
+      260,
+      214,
+      189,
+      67,
+      62,
+      2,
+      2,
+      1,
+      2
+    ],
+    "Qua": [
+      0,
+      5,
+      227,
+      386,
+      165,
+      118,
+      45,
+      106,
+      97,
+      115,
+      152,
+      131,
+      3,
+      6,
+      0,
+      1,
+      1
+    ],
+    "Qui": [
+      1,
+      0,
+      916,
+      632,
+      303,
+      221,
+      85,
+      198,
+      53,
+      130,
+      236,
+      72,
+      10,
+      1,
+      1,
+      1,
+      0
+    ],
+    "Sex": [
+      0,
+      15,
+      434,
+      405,
+      195,
+      191,
+      220,
+      146,
+      128,
+      143,
+      274,
+      194,
+      14,
+      1,
+      1,
+      1,
+      0
+    ],
+    "Sáb": [
+      1,
+      0,
+      1118,
+      408,
+      240,
+      283,
+      144,
+      118,
+      302,
+      210,
+      187,
+      119,
+      4,
+      0,
+      0,
+      0,
+      1
+    ]
+  }
+},
 
   comercial: {
-    leadsGerados:89, leadsQualificados:42, oportunidades:67,
-    vendas:42, receita:84000, taxaConversao:18.3, intencaoCompra:134,
-    ant:{ leadsGerados:73, leadsQualificados:31, oportunidades:54,
-          vendas:31, receita:62000, taxaConversao:14.9, intencaoCompra:108 },
-    produtos:[
-      {nome:"Passeio de Helicóptero — Cristo",vendas:18,receita:32400},
-      {nome:"Passeio Completo Rio de Janeiro",vendas:12,receita:28800},
-      {nome:"Foto Aérea Especial",            vendas:8, receita:14400},
-      {nome:"Voo Privativo Premium",           vendas:4, receita:8400},
-    ]
+  "leadsGerados": 13346,
+  "leadsQualificados": 4668,
+  "oportunidades": 1899,
+  "vendas": 1227,
+  "receita": 0,
+  "taxaConversao": 9.19,
+  "intencaoCompra": 4668,
+  "ant": {
+    "leadsGerados": 0,
+    "leadsQualificados": 0,
+    "oportunidades": 0,
+    "vendas": 0,
+    "receita": 0,
+    "taxaConversao": 0,
+    "intencaoCompra": 0
   },
+  "produtos": []
+},
 
   insights: [
-    {tipo:"success",icone:"📈",texto:"Tempo médio de 1ª resposta melhorou 27.6% vs. período anterior (5.8 → 4.2 min). Tendência positiva de eficiência operacional."},
-    {tipo:"info",   icone:"📊",texto:"WhatsApp representa 64.8% do volume total de conversas e lidera o SLA (91.3%). Canal principal de aquisição."},
-    {tipo:"info",   icone:"🕐",texto:"Quarta-feira entre 10h e 12h é o horário de maior demanda — considere reforçar a equipe neste período."},
-    {tipo:"success",icone:"🏆",texto:"Ana Silva: melhor performance da equipe com 1ª resposta em 2.8 min, resolução em 19.5 min e taxa de conversão de 28.3%."},
-    {tipo:"warning",icone:"⚠️", texto:"Pedro Lima e João Santos têm tempo de resolução acima de 38 min. Recomenda-se revisão de processos e treinamento."},
-    {tipo:"info",   icone:"💻",texto:"Webchat, menor em volume (4.8%), tem a maior taxa de conversão (27.3%). Vale explorar ampliação deste canal."},
-    {tipo:"danger", icone:"🔴",texto:"12.6% das conversas violaram o SLA. Maior incidência às quartas 10h e terças 11h — horários de pico sem cobertura suficiente."},
-    {tipo:"success",icone:"🚀",texto:"Conversas fechadas cresceram 10.9% (165 → 183) e receita estimada subiu 35.5% (R$ 62k → R$ 84k) vs. período anterior."},
-  ]
+  {
+    "tipo": "info",
+    "icone": "📊",
+    "texto": "Funil completo: 13,346 New Leads → 4,668 Negociando → 1,899 Reservando → 1,227 Vendas (9.19% de conversão total)."
+  },
+  {
+    "tipo": "warning",
+    "icone": "⚠️",
+    "texto": "Maior gargalo: '1. New Lead' com apenas 34.9% de conversão para a próxima etapa."
+  },
+  {
+    "tipo": "info",
+    "icone": "📋",
+    "texto": "Etapa 'Reservando' tem tempo médio de 15.9d e taxa de conversão de 87.1%."
+  },
+  {
+    "tipo": "success",
+    "icone": "🏆",
+    "texto": "Melhor anúncio pago: 'E aí Topariam um passeio de helicóptero sem portas sobre os cartões postais do Rio de Janeiro?' com 39 New Leads gerados."
+  },
+  {
+    "tipo": "info",
+    "icone": "📈",
+    "texto": "98.9% dos leads chegam organicamente (sem anúncio). Anúncios pagos geram 1.1% dos leads."
+  },
+  {
+    "tipo": "warning",
+    "icone": "📅",
+    "texto": "Volume de conversas caiu 33.1% nos últimos 3 meses vs. trimestre anterior (7,130 → 4,768)."
+  },
+  {
+    "tipo": "warning",
+    "icone": "📞",
+    "texto": "Chamadas recebidas (histórico): 628 total — 34 atendidas, 594 perdidas (94.6% de miss rate). Oportunidade de melhora no atendimento por voz."
+  },
+  {
+    "tipo": "info",
+    "icone": "💬",
+    "texto": "Principal fonte de leads: Mensagem Direta (11,191 leads, 81.2% do total)."
+  },
+  {
+    "tipo": "warning",
+    "icone": "⏸",
+    "texto": "1,343 contatos estão em 'On Hold'. Acompanhe para evitar abandono nesta etapa."
+  }
+]
 };
 
 /* ════════════════════════════════
@@ -574,6 +1284,30 @@ function kpiCard(gradClass, icon, label, value, cur, ant, lowerBetter=false, vsL
       <div class="kpi-sub">${badge(cur,ant,'',lowerBetter)} <span class="kpi-vs">${vsLabel}</span></div>
     </div>
   </div>`;
+}
+
+
+function renderPorOrigem(){
+  const wrap = document.getElementById('por-origem-wrap');
+  if(!wrap) return;
+  const origem = DADOS_RESPONDIO.porOrigem;
+  if(!origem || !origem.length){
+    wrap.innerHTML = '<p style="color:var(--muted);text-align:center;padding:16px">Sem dados de origem</p>';
+    return;
+  }
+  const total = origem.reduce((s,o)=>s+o.count, 0);
+  wrap.innerHTML = origem.map(o=>{
+    const pct = total ? (o.count/total*100).toFixed(1) : 0;
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <span style="font-size:13px;font-weight:500;color:var(--text)">${o.icone} ${o.label}</span>
+        <span style="font-size:12px;color:var(--muted)">${o.count.toLocaleString('pt-BR')} · ${pct}%</span>
+      </div>
+      <div style="background:#e2e8f0;border-radius:6px;height:8px">
+        <div style="background:${o.cor};border-radius:6px;height:8px;width:${pct}%;transition:width .6s ease"></div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function renderKPIs(){
@@ -709,20 +1443,86 @@ function renderChartCanal(){
 }
 
 function renderFunil(){
-  const F = DADOS_RESPONDIO.funil;
-  const max = F[0].count;
+  const F   = DADOS_RESPONDIO.funil;
+  if(!F || !F.length) return;
+  const max = Math.max(...F.map(f=>f.count), 1);
+
   document.getElementById('funil-wrap').innerHTML = F.map((f,i)=>{
-    const pct = Math.round((f.count/max)*100);
-    const drop = i<F.length-1 ? Math.round((1-(F[i+1].count/f.count))*100) : null;
+    const pct  = Math.max(4, Math.round((f.count/max)*100));
+    const drop = i < F.length-1 && F[i+1].count > 0
+      ? Math.round((1-(F[i+1].count/Math.max(f.count,1)))*100)
+      : null;
+    const conv  = f.taxaConversao ? `<span style="font-size:10px;color:var(--green);font-weight:600;margin-left:4px">→${f.taxaConversao}%</span>` : '';
+    const tempo = f.tempoHumano && f.tempoHumano !== '—'
+      ? `<span style="font-size:10px;color:var(--muted);margin-left:6px">⏱ ${f.tempoHumano}</span>` : '';
     return `<div class="funnel-stage">
-      <div class="funnel-label">${f.icon} <span>${f.label}</span></div>
-      <div class="funnel-bar-wrap">
-        <div class="funnel-bar" style="width:${pct}%;background:${f.cor}">${f.count.toLocaleString('pt-BR')}</div>
+      <div class="funnel-label" style="width:180px">${f.icon} <span style="font-size:11px">${f.label}</span>${conv}</div>
+      <div class="funnel-bar-wrap" style="flex:1">
+        <div class="funnel-bar" style="width:${pct}%;background:${f.cor}">${f.count >= 100 ? f.count.toLocaleString('pt-BR') : ''}</div>
       </div>
-      <div class="funnel-num">${f.count.toLocaleString('pt-BR')}</div>
-      ${drop!==null?`<div class="funnel-drop">↓${drop}%</div>`:`<div style="width:40px"></div>`}
+      <div class="funnel-num" style="width:55px;font-size:13px">${f.count.toLocaleString('pt-BR')}</div>
+      <div style="width:52px;text-align:right">
+        ${drop!==null ? `<span style="font-size:10px;color:var(--red);font-weight:600">↓${drop}%</span>` : ''}
+      </div>
+      ${tempo}
     </div>`;
   }).join('');
+
+  // Outras etapas
+  const outras = DADOS_RESPONDIO.outrasEtapas || [];
+  const wrap   = document.getElementById('outras-etapas-wrap');
+  const list   = document.getElementById('outras-etapas-list');
+  if(outras.length && wrap && list) {
+    wrap.style.display = 'block';
+    list.innerHTML = outras.map(o=>
+      `<div style="display:inline-flex;align-items:center;gap:5px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:4px 10px">
+        <span>${o.icon}</span>
+        <span style="font-size:11px;font-weight:500;color:var(--text)">${o.label}</span>
+        <span style="font-size:12px;font-weight:700;color:${o.cor}">${o.count.toLocaleString('pt-BR')}</span>
+        ${o.tempoHumano && o.tempoHumano!=='—'?`<span style="font-size:10px;color:var(--muted)">⏱${o.tempoHumano}</span>`:''}
+      </div>`
+    ).join('');
+  }
+}
+
+function renderPorAnuncio(){
+  const PA = DADOS_RESPONDIO.porAnuncio || [];
+  if(!PA.length) return;
+
+  // Etapas a mostrar no gráfico (top 5 do funil principal)
+  const etapasVisiveis = [
+    '1. New Lead','2. Negociando','3. Reservando','4. Reservado 1',
+    '6. Reservado 2 (etapa de Venda Fechada)'
+  ];
+  const labels = PA.map(a=>a.nome.length > 20 ? a.nome.slice(0,18)+'…' : a.nome);
+
+  const datasets = etapasVisiveis.map((etapa, ei) => {
+    const cores = ['#6366f1','#3b82f6','#06b6d4','#10b981','#f97316'];
+    return {
+      label: etapa.replace(/^\d+\. /,'').replace(' (etapa de Venda Fechada)',''),
+      data:  PA.map(a => (a.etapas || {})[etapa] || 0),
+      backgroundColor: cores[ei],
+      borderRadius: 4,
+      borderSkipped: false,
+    };
+  });
+
+  mkChart('ch-por-anuncio', {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: TICK_COL, font:{family:'Inter',size:11}, padding:12, usePointStyle:true } },
+        tooltip: { backgroundColor:TT_BG, titleColor:TT_TITLE, bodyColor:TT_BODY,
+                   borderColor:TT_BORDER, borderWidth:1, mode:'index', intersect:false }
+      },
+      scales: {
+        x: { stacked:true, grid:{display:false}, ticks:{color:TICK_COL,font:{size:11}} },
+        y: { stacked:true, grid:{color:GRID_COL}, ticks:{color:TICK_COL,font:{size:10}}, beginAtZero:true }
+      }
+    }
+  });
 }
 
 /* ════════════════════════════════
@@ -948,6 +1748,8 @@ function renderAll(){
   renderChartTempo();
   renderChartCanal();
   renderFunil();
+  renderPorAnuncio();
+  renderPorOrigem();
   renderHeatmap('hm-abertas', DADOS_RESPONDIO.heatmapAbertas,  '#6366f1');
   renderHeatmap('hm-fechadas',DADOS_RESPONDIO.heatmapFechadas, '#10b981');
   renderAgentes();
