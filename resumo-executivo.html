@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vertical Rio — Resumo Executivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0d0d14;
+  --bg-card:#14141f;
+  --bg-card-2:#181826;
+  --cyan:#00e5ff;
+  --green:#00ff88;
+  --red:#ff6b6b;
+  --gold:#ffd700;
+  --purple:#a855f7;
+  --orange:#ff9f43;
+  --yellow:#ffe14d;
+  --text:#e8e8f0;
+  --text-dim:#8a8aa0;
+  --text-faint:#5a5a70;
+  --border:rgba(255,255,255,0.06);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding:0 0 60px;
+  background-image:radial-gradient(circle at 15% 10%,rgba(0,229,255,0.04),transparent 40%),radial-gradient(circle at 85% 20%,rgba(0,255,136,0.04),transparent 40%);
+  background-attachment:fixed;
+}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+
+/* gradient border card helper */
+.gcard{
+  position:relative;
+  background:var(--bg-card);
+  border-radius:16px;
+  padding:1px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.45),rgba(0,255,136,0.45));
+}
+.gcard > .inner{
+  background:var(--bg-card);
+  border-radius:15px;
+  height:100%;
+  padding:22px;
+}
+
+/* ===== HEADER ===== */
+header{
+  padding:38px 0 28px;
+  margin-bottom:28px;
+  border-bottom:1px solid var(--border);
+}
+.head-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:18px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{
+  width:50px;height:50px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  background:linear-gradient(135deg,rgba(0,229,255,0.18),rgba(0,255,136,0.18));
+  border:1px solid rgba(0,229,255,0.3);
+}
+h1{
+  font-size:30px;font-weight:800;letter-spacing:-0.5px;
+  background:linear-gradient(90deg,#fff,var(--cyan) 60%,var(--green));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.subtitle{color:var(--text-dim);font-size:13px;margin-top:3px;font-weight:500}
+.period-box{text-align:right}
+.period-box .lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-faint);font-weight:600}
+.period-box .val{font-size:15px;font-weight:600;color:var(--text);margin-top:2px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.fbadge{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:7px 14px;border-radius:999px;font-size:12px;font-weight:600;
+  background:var(--bg-card-2);border:1px solid var(--border);
+}
+.fbadge .dot{width:7px;height:7px;border-radius:50%}
+.fbadge .k{color:var(--text-faint);font-weight:500}
+.dot.cyan{background:var(--cyan)}.dot.green{background:var(--green)}.dot.gold{background:var(--gold)}
+
+/* ===== SECTION TITLES ===== */
+.sec-title{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;
+  color:var(--text-dim);margin:36px 0 16px;
+}
+.sec-title::before{content:"";width:3px;height:16px;border-radius:2px;background:linear-gradient(var(--cyan),var(--green))}
+
+/* ===== GRID ===== */
+.grid{display:grid;gap:18px}
+.g6{grid-template-columns:repeat(6,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:1fr 1fr}
+@media(max-width:1080px){.g6{grid-template-columns:repeat(3,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){.g6,.g3,.g2{grid-template-columns:1fr}}
+
+/* ===== KPI CARDS ===== */
+.kpi{position:relative;overflow:hidden}
+.kpi .inner{display:flex;flex-direction:column;gap:6px;min-height:118px}
+.kpi .klabel{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);font-weight:600;display:flex;align-items:center;gap:6px}
+.kpi .kval{font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1.1;margin-top:2px}
+.kpi .kval.cyan{color:var(--cyan)}.kpi .kval.green{color:var(--green)}
+.kpi .ksub{font-size:11.5px;color:var(--text-faint);margin-top:auto;font-weight:500}
+.kpi .ksub b{color:var(--text-dim);font-weight:600}
+.kpi .ico{position:absolute;top:14px;right:16px;font-size:22px;opacity:0.25}
+
+/* tooltip */
+.tip{position:relative;cursor:help}
+.tip .tip-i{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--bg-card-2);border:1px solid var(--border);font-size:9px;color:var(--text-faint)}
+.tip .tip-body{
+  visibility:hidden;opacity:0;transition:.18s;
+  position:absolute;bottom:130%;left:0;z-index:30;
+  width:230px;padding:11px 13px;border-radius:10px;
+  background:#05050a;border:1px solid rgba(0,229,255,0.3);
+  font-size:11.5px;font-weight:500;color:var(--text);line-height:1.5;text-transform:none;letter-spacing:0;
+  box-shadow:0 12px 30px rgba(0,0,0,0.6);
+}
+.tip .tip-body b{color:var(--cyan)}
+.tip:hover .tip-body{visibility:visible;opacity:1}
+
+/* ===== CHART CARDS ===== */
+.chart-card .inner{display:flex;flex-direction:column}
+.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.chart-head h3{font-size:15px;font-weight:700}
+.chart-head .hint{font-size:11px;color:var(--text-faint)}
+.donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.donut-canvas{position:relative;width:190px;height:190px;flex-shrink:0}
+.legend{display:flex;flex-direction:column;gap:11px;flex:1;min-width:160px}
+.legend .li{display:flex;align-items:center;gap:10px;font-size:12.5px}
+.legend .sw{width:12px;height:12px;border-radius:4px;flex-shrink:0}
+.legend .ltxt{flex:1;color:var(--text-dim);font-weight:500}
+.legend .lval{font-weight:700;color:var(--text)}
+.bar-canvas{position:relative;width:100%;height:260px}
+
+/* ===== EXTRAS CARDS ===== */
+.extra .inner{display:flex;flex-direction:column;gap:14px}
+.extra .ehead{display:flex;justify-content:space-between;align-items:center}
+.extra .ename{font-size:15px;font-weight:700}
+.extra .eunits{font-size:11px;color:var(--text-faint);font-weight:600;background:var(--bg-card-2);padding:4px 10px;border-radius:999px}
+.attach{margin-top:2px}
+.attach .arow{display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:6px;font-weight:600}
+.attach .arow .pct{color:var(--cyan);font-weight:700}
+.bar-track{height:8px;border-radius:6px;background:var(--bg-card-2);overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--cyan),var(--green))}
+.estats{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--border);padding-top:14px}
+.estats .est{text-align:center;flex:1}
+.estats .est .v{font-size:18px;font-weight:800;color:var(--green)}
+.estats .est .v.c{color:var(--cyan)}
+.estats .est .l{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;font-weight:600}
+
+/* ===== PROFITABILITY METRIC CARDS ===== */
+.metcards{display:flex;flex-direction:column;gap:14px;height:100%}
+.metrow{display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:12px;background:var(--bg-card-2);border:1px solid var(--border)}
+.metrow .micon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.metrow .mbody{flex:1}
+.metrow .mlabel{font-size:12px;color:var(--text-dim);font-weight:600}
+.metrow .mval{font-size:22px;font-weight:800;margin-top:1px}
+.metrow .mform{font-size:10.5px;color:var(--text-faint);margin-top:2px;font-weight:500}
+
+/* ===== TABLE ===== */
+.tbl-card .inner{padding:0;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  text-align:left;padding:15px 22px;font-size:10.5px;text-transform:uppercase;letter-spacing:1px;
+  color:var(--text-faint);font-weight:700;border-bottom:1px solid var(--border);background:var(--bg-card-2);
+}
+thead th.num{text-align:right}
+tbody td{padding:15px 22px;border-bottom:1px solid var(--border);font-weight:500}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(0,229,255,0.03)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+td .pcode{display:inline-block;font-family:ui-monospace,monospace;font-size:11px;background:var(--bg-card-2);padding:3px 8px;border-radius:6px;color:var(--cyan);margin-right:10px;border:1px solid var(--border)}
+.sharebar{display:inline-flex;align-items:center;gap:10px;justify-content:flex-end;width:100%}
+.sharebar .mini{width:70px;height:6px;border-radius:4px;background:var(--bg-card-2);overflow:hidden}
+.sharebar .mini i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:4px}
+.sharebar .sp{font-weight:700;min-width:48px;text-align:right}
+tfoot td{padding:15px 22px;font-weight:700;background:var(--bg-card-2);font-size:13px}
+tfoot td.num{color:var(--green)}
+
+/* ===== INSIGHTS ===== */
+.insights{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.insights{grid-template-columns:1fr}}
+.ins{
+  display:flex;gap:14px;padding:18px 20px;border-radius:14px;
+  background:var(--bg-card);border:1px solid var(--border);position:relative;overflow:hidden;
+}
+.ins::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+.ins.pos::before{background:linear-gradient(var(--cyan),var(--green))}
+.ins.warn::before{background:linear-gradient(var(--gold),var(--orange))}
+.ins.alert::before{background:linear-gradient(var(--red),#ff3b3b)}
+.ins .iemoji{font-size:22px;line-height:1;flex-shrink:0}
+.ins .ititle{font-size:13.5px;font-weight:700;margin-bottom:4px}
+.ins.pos .ititle{color:var(--green)}
+.ins.warn .ititle{color:var(--gold)}
+.ins.alert .ititle{color:var(--red)}
+.ins .itext{font-size:12.5px;color:var(--text-dim);line-height:1.55;font-weight:500}
+.ins .itext b{color:var(--text)}
+
+/* ===== ALERT BADGES ROW ===== */
+.alerts-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.abadge{display:inline-flex;align-items:center;gap:9px;padding:10px 16px;border-radius:12px;font-size:12.5px;font-weight:700}
+.abadge .ad{width:8px;height:8px;border-radius:50%;animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.abadge.orange{background:rgba(255,159,67,0.12);border:1px solid rgba(255,159,67,0.4);color:var(--orange)}
+.abadge.orange .ad{background:var(--orange)}
+.abadge.red{background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.4);color:var(--red)}
+.abadge.red .ad{background:var(--red)}
+.abadge.yellow{background:rgba(255,225,77,0.12);border:1px solid rgba(255,225,77,0.4);color:var(--yellow)}
+.abadge.yellow .ad{background:var(--yellow)}
+.abadge .sub{font-weight:500;opacity:.8}
+
+/* ===== FOOTER ===== */
+footer{margin-top:48px;padding-top:28px;border-top:1px solid var(--border)}
+.foot-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+@media(max-width:720px){.foot-grid{grid-template-columns:1fr}}
+footer h4{font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-dim);margin-bottom:14px;font-weight:700}
+.formulas{display:flex;flex-direction:column;gap:9px}
+.formulas .f{display:flex;justify-content:space-between;gap:12px;font-size:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.formulas .f .fn{color:var(--text-dim);font-weight:600}
+.formulas .f .fe{color:var(--text-faint);font-family:ui-monospace,monospace;font-size:11px;text-align:right}
+.meth{font-size:12px;color:var(--text-faint);line-height:1.7}
+.meth b{color:var(--text-dim)}
+.copyright{text-align:center;color:var(--text-faint);font-size:11.5px;margin-top:34px;padding-top:20px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===================== HEADER ===================== -->
+  <header>
+    <div class="head-top">
+      <div class="brand">
+        <div class="logo">🚁</div>
+        <div>
+          <h1>Resumo Executivo</h1>
+          <div class="subtitle">Vertical Rio · Operação de Helicópteros · Rio de Janeiro</div>
+        </div>
+      </div>
+      <div class="period-box">
+        <div class="lbl">Período de Atendimento</div>
+        <div class="val">01/05/2026 – 27/05/2026</div>
+      </div>
+    </div>
+    <div class="filters">
+      <span class="fbadge"><span class="dot cyan"></span><span class="k">Booking Date:</span> Mês Anterior</span>
+      <span class="fbadge"><span class="dot green"></span><span class="k">Fulfilment Date:</span> 01/05 – 27/05/2026</span>
+      <span class="fbadge"><span class="dot gold"></span><span class="k">Status:</span> Confirmed | Paid</span>
+    </div>
+  </header>
+
+  <!-- ===================== KPI CARDS ===================== -->
+  <div class="sec-title">Indicadores Principais</div>
+  <div class="grid g6">
+    <div class="gcard kpi"><div class="inner">
+      <span class="ico">📋</span>
+      <div class="klabel">Total Bookings</div>
+      <div class="kval">61</div>
+      <div class="ksub"><b>126</b> passageiros no total</div>
+    </div></div>
+
+    <div class="gcard kpi"><div class="inner">
+      <span class="ico">💰</span>
+      <div class="klabel">Gross Sales</div>
+      <div class="kval cyan">R$ 191.735,73</div>
+      <div class="ksub">Booking Fee <b>R$ 1.832,73</b></div>
+    </div></div>
+
+    <div class="gcard kpi"><div class="inner">
+      <span class="ico">📈</span>
+      <div class="klabel">Net Sales</div>
+      <div class="kval green">R$ 174.168,08</div>
+      <div class="ksub">Refund <b style="color:var(--red)">−R$ 7.437,20</b></div>
+    </div></div>
+
+    <div class="gcard kpi"><div class="inner">
+      <span class="ico">👥</span>
+      <div class="klabel">Total Pax</div>
+      <div class="kval">126</div>
+      <div class="ksub"><b>2,07</b> pax por booking</div>
+    </div></div>
+
+    <div class="gcard kpi"><div class="inner">
+      <span class="ico">🎟️</span>
+      <div class="klabel tip">Ticket Médio
+        <span class="tip-i">?</span>
+        <span class="tip-body"><b>Fórmula:</b> Gross Sales ÷ Bookings<br>= 191.735,73 ÷ 61</span>
+      </div>
+      <div class="kval cyan">R$ 3.143,21</div>
+      <div class="ksub">Por reserva (gross)</div>
+    </div></div>
+
+    <div class="gcard kpi"><div class="inner">
+      <span class="ico">🧮</span>
+      <div class="klabel tip">Receita / Pax
+        <span class="tip-i">?</span>
+        <span class="tip-body"><b>Fórmula:</b> Net Sales ÷ Total Pax<br>= 174.168,08 ÷ 126</span>
+      </div>
+      <div class="kval green">R$ 1.382,29</div>
+      <div class="ksub">Receita líquida por passageiro</div>
+    </div></div>
+  </div>
+
+  <!-- ===================== ALERTAS ===================== -->
+  <div class="sec-title">Alertas do Período</div>
+  <div class="alerts-row">
+    <span class="abadge orange"><span class="ad"></span>Cobrança Pendente <span class="sub">· R$ 3.762,00 outstanding</span></span>
+    <span class="abadge red"><span class="ad"></span>Refund Acima do Limite <span class="sub">· 3,88% &gt; 3%</span></span>
+    <span class="abadge yellow"><span class="ad"></span>Alta Concentração de Produto <span class="sub">· 96,7% em Doors off 30min</span></span>
+  </div>
+
+  <!-- ===================== ROW: DONUTS CANAIS + COMPOSIÇÃO ===================== -->
+  <div class="sec-title">Canais & Composição de Receita</div>
+  <div class="grid g2">
+    <div class="gcard chart-card"><div class="inner">
+      <div class="chart-head"><h3>Canais (% de Bookings)</h3><span class="hint">61 reservas</span></div>
+      <div class="donut-wrap">
+        <div class="donut-canvas"><canvas id="chCanais"></canvas></div>
+        <div class="legend" id="legCanais"></div>
+      </div>
+    </div></div>
+
+    <div class="gcard chart-card"><div class="inner">
+      <div class="chart-head"><h3>Composição de Receita</h3><span class="hint">Bruto → Net Sales</span></div>
+      <div class="donut-wrap">
+        <div class="donut-canvas"><canvas id="chComp"></canvas></div>
+        <div class="legend" id="legComp"></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ===================== ROW: BARRAS PRODUTOS + PAGAMENTOS ===================== -->
+  <div class="grid g2">
+    <div class="gcard chart-card"><div class="inner">
+      <div class="chart-head"><h3>Top Produtos (Receita)</h3><span class="hint">R$ bruto</span></div>
+      <div class="bar-canvas"><canvas id="chProd"></canvas></div>
+    </div></div>
+
+    <div class="gcard chart-card"><div class="inner">
+      <div class="chart-head"><h3>Pagamentos por Método</h3><span class="hint">R$ recebido</span></div>
+      <div class="bar-canvas"><canvas id="chPag"></canvas></div>
+    </div></div>
+  </div>
+
+  <!-- ===================== EXTRAS ===================== -->
+  <div class="sec-title">Performance de Extras (Attach Rate)</div>
+  <div class="grid g3">
+    <div class="gcard extra"><div class="inner">
+      <div class="ehead"><span class="ename">Shoe-Selfie Pass</span><span class="eunits">45 vendidos</span></div>
+      <div class="attach">
+        <div class="arow"><span>Attach Rate</span><span class="pct">73,77%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:73.77%"></div></div>
+      </div>
+      <div class="estats">
+        <div class="est"><div class="v c">R$ 389,33</div><div class="l">Valor Médio</div></div>
+        <div class="est"><div class="v">R$ 17.520</div><div class="l">Total</div></div>
+      </div>
+    </div></div>
+
+    <div class="gcard extra"><div class="inner">
+      <div class="ehead"><span class="ename">GoPro Rental</span><span class="eunits">9 vendidos</span></div>
+      <div class="attach">
+        <div class="arow"><span>Attach Rate</span><span class="pct">14,75%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:14.75%"></div></div>
+      </div>
+      <div class="estats">
+        <div class="est"><div class="v c">R$ 195,56</div><div class="l">Valor Médio</div></div>
+        <div class="est"><div class="v">R$ 1.760</div><div class="l">Total</div></div>
+      </div>
+    </div></div>
+
+    <div class="gcard extra"><div class="inner">
+      <div class="ehead"><span class="ename">360º Video</span><span class="eunits">6 vendidos</span></div>
+      <div class="attach">
+        <div class="arow"><span>Attach Rate</span><span class="pct">9,84%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:9.84%"></div></div>
+      </div>
+      <div class="estats">
+        <div class="est"><div class="v c">R$ 455,00</div><div class="l">Valor Médio</div></div>
+        <div class="est"><div class="v">R$ 2.730</div><div class="l">Total</div></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ===================== ROW: PAX TIPO + RENTABILIDADE ===================== -->
+  <div class="sec-title">Passageiros & Rentabilidade</div>
+  <div class="grid g2">
+    <div class="gcard chart-card"><div class="inner">
+      <div class="chart-head"><h3>Pax por Tipo</h3><span class="hint">126 passageiros</span></div>
+      <div class="donut-wrap">
+        <div class="donut-canvas"><canvas id="chPax"></canvas></div>
+        <div class="legend" id="legPax"></div>
+      </div>
+    </div></div>
+
+    <div class="gcard"><div class="inner">
+      <div class="chart-head"><h3>Métricas de Rentabilidade</h3></div>
+      <div class="metcards">
+        <div class="metrow">
+          <div class="micon" style="background:rgba(255,107,107,0.14)">↩️</div>
+          <div class="mbody">
+            <div class="mlabel">Taxa de Refund</div>
+            <div class="mval" style="color:var(--red)">3,88%</div>
+            <div class="mform">Refund ÷ Gross = 7.437,20 ÷ 191.735,73</div>
+          </div>
+        </div>
+        <div class="metrow">
+          <div class="micon" style="background:rgba(0,255,136,0.14)">🎁</div>
+          <div class="mbody">
+            <div class="mlabel">% Receita de Extras</div>
+            <div class="mval" style="color:var(--green)">11,59%</div>
+            <div class="mform">Extras ÷ (Produto+Extras) = 22.010 ÷ 189.903</div>
+          </div>
+        </div>
+        <div class="metrow">
+          <div class="micon" style="background:rgba(0,229,255,0.14)">🏷️</div>
+          <div class="mbody">
+            <div class="mlabel">Receita Líquida de Fees (Rezdy)</div>
+            <div class="mval" style="color:var(--cyan)">R$ 172.335,35</div>
+            <div class="mform">Net Sales − Booking Fee = 174.168,08 − 1.832,73</div>
+          </div>
+        </div>
+        <div class="metrow">
+          <div class="micon" style="background:rgba(168,85,247,0.14)">💳</div>
+          <div class="mbody">
+            <div class="mlabel">Share PayPal</div>
+            <div class="mval" style="color:var(--purple)">78,70%</div>
+            <div class="mform">PayPal ÷ Total Recebido = 147.931,62 ÷ 187.973,73</div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ===================== TABELA PRODUTOS ===================== -->
+  <div class="sec-title">Tabela Completa de Produtos</div>
+  <div class="gcard tbl-card"><div class="inner">
+    <table>
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th class="num">Bookings</th>
+          <th class="num">Gross Value</th>
+          <th class="num">Share %</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pcode">DO-30</span>Doors off 30min</td>
+          <td class="num">59</td>
+          <td class="num">R$ 174.193,00</td>
+          <td class="num"><span class="sharebar"><span class="mini"><i style="width:96.7%"></i></span><span class="sp">90,8%</span></span></td>
+        </tr>
+        <tr>
+          <td><span class="pcode">DON-30</span>Doors on 30min</td>
+          <td class="num">1</td>
+          <td class="num">R$ 7.710,00</td>
+          <td class="num"><span class="sharebar"><span class="mini"><i style="width:4.4%"></i></span><span class="sp">4,0%</span></span></td>
+        </tr>
+        <tr>
+          <td><span class="pcode">DO-45</span>Doors off 45min</td>
+          <td class="num">2</td>
+          <td class="num">R$ 6.270,00</td>
+          <td class="num"><span class="sharebar"><span class="mini"><i style="width:3.6%"></i></span><span class="sp">3,3%</span></span></td>
+        </tr>
+        <tr>
+          <td><span class="pcode">NO-SHOW</span>No-Show Fee</td>
+          <td class="num">1</td>
+          <td class="num">R$ 1.190,00</td>
+          <td class="num"><span class="sharebar"><span class="mini"><i style="width:0.7%"></i></span><span class="sp">0,6%</span></span></td>
+        </tr>
+        <tr>
+          <td><span class="pcode">SHUTTLE</span>Shuttle Vertical Rio</td>
+          <td class="num">2</td>
+          <td class="num">R$ 540,00</td>
+          <td class="num"><span class="sharebar"><span class="mini"><i style="width:0.3%"></i></span><span class="sp">0,3%</span></span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Total</td>
+          <td class="num">65</td>
+          <td class="num">R$ 189.903,00</td>
+          <td class="num">100%</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div></div>
+  <div style="font-size:11px;color:var(--text-faint);margin-top:8px;font-weight:500">
+    * Gross Value soma o valor de produto por linha (R$ 189.903 = produto + variações). O total de bookings da tabela (65) inclui itens de fee/shuttle; o KPI de Total Bookings (61) refere-se a reservas de voo confirmadas/pagas.
+  </div>
+
+  <!-- ===================== INSIGHTS ===================== -->
+  <div class="sec-title">Insights Automáticos</div>
+  <div class="insights">
+    <div class="ins pos">
+      <div class="iemoji">⚡</div>
+      <div>
+        <div class="ititle">Produto dominante</div>
+        <div class="itext"><b>Doors off 30min</b> concentra <b>96,7%</b> da receita de produto (R$ 174.193 de R$ 180.103 em voos) e 59 das 61 reservas. É o motor absoluto da operação.</div>
+      </div>
+    </div>
+
+    <div class="ins pos">
+      <div class="iemoji">⚡</div>
+      <div>
+        <div class="ititle">Equilíbrio de receita entre canais</div>
+        <div class="itext">Apesar do <b>Online</b> gerar 56% das reservas e o <b>Internal</b> apenas 44%, a receita se divide <b>50% / 50%</b> — o canal Internal tem ticket médio mais alto por reserva.</div>
+      </div>
+    </div>
+
+    <div class="ins pos">
+      <div class="iemoji">⚡</div>
+      <div>
+        <div class="ititle">Extra campeão de attach</div>
+        <div class="itext">O <b>Shoe-Selfie Pass</b> tem attach rate de <b>73,77%</b> (45 de 61 reservas) e gera R$ 17.520 — 80% de toda a receita de extras. Oportunidade clara de upsell padrão.</div>
+      </div>
+    </div>
+
+    <div class="ins pos">
+      <div class="iemoji">⚡</div>
+      <div>
+        <div class="ititle">Dependência de PayPal</div>
+        <div class="itext"><b>PayPal</b> representa <b>78,70%</b> do total recebido (R$ 147.931,62), muito acima de Cartão (12,7%) e Free (8,9%). Concentração relevante em um único provedor.</div>
+      </div>
+    </div>
+
+    <div class="ins warn">
+      <div class="iemoji">⚠️</div>
+      <div>
+        <div class="ititle">Cobrança pendente</div>
+        <div class="itext"><b>R$ 3.762,00</b> em Payment Outstanding equivalem a <b>1,96%</b> do gross. Abaixo do limite de 2%, mas requer acompanhamento ativo de cobrança.</div>
+      </div>
+    </div>
+
+    <div class="ins alert">
+      <div class="iemoji">⚠️</div>
+      <div>
+        <div class="ititle">Refund acima do limite</div>
+        <div class="itext">A taxa de refund de <b>3,88%</b> (R$ 7.437,20) ultrapassa o threshold de <b>3%</b>. Recomenda-se investigar a causa raiz dos cancelamentos do período.</div>
+      </div>
+    </div>
+
+    <div class="ins warn">
+      <div class="iemoji">⚠️</div>
+      <div>
+        <div class="ititle">Ticket médio vs. receita por pax</div>
+        <div class="itext">Ticket médio (<b>R$ 3.143,21</b>) é 2,3× a receita/pax (<b>R$ 1.382,29</b>). A diferença reflete <b>grupos</b> e <b>extras</b> agregados por reserva — reservas multi-pax puxam o ticket.</div>
+      </div>
+    </div>
+
+    <div class="ins alert">
+      <div class="iemoji">⚠️</div>
+      <div>
+        <div class="ititle">Risco de concentração</div>
+        <div class="itext">Com <b>96,7%</b> da receita em um único produto, a operação é altamente sensível a sazonalidade e disrupção do Doors off 30min. Diversificação reduziria o risco.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FOOTER / FÓRMULAS ===================== -->
+  <footer>
+    <div class="foot-grid">
+      <div>
+        <h4>Fórmulas Utilizadas</h4>
+        <div class="formulas">
+          <div class="f"><span class="fn">Ticket Médio</span><span class="fe">Gross ÷ Bookings = 191.735,73 ÷ 61 = 3.143,21</span></div>
+          <div class="f"><span class="fn">Receita / Pax</span><span class="fe">Net ÷ Pax = 174.168,08 ÷ 126 = 1.382,29</span></div>
+          <div class="f"><span class="fn">Attach Shoe-Selfie</span><span class="fe">45 ÷ 61 × 100 = 73,77%</span></div>
+          <div class="f"><span class="fn">Attach GoPro</span><span class="fe">9 ÷ 61 × 100 = 14,75%</span></div>
+          <div class="f"><span class="fn">Attach 360º</span><span class="fe">6 ÷ 61 × 100 = 9,84%</span></div>
+          <div class="f"><span class="fn">Valor Médio Shoe-Selfie</span><span class="fe">17.520 ÷ 45 = 389,33</span></div>
+          <div class="f"><span class="fn">Valor Médio GoPro</span><span class="fe">1.760 ÷ 9 = 195,56</span></div>
+          <div class="f"><span class="fn">Valor Médio 360º</span><span class="fe">2.730 ÷ 6 = 455,00</span></div>
+          <div class="f"><span class="fn">Taxa de Refund</span><span class="fe">7.437,20 ÷ 191.735,73 × 100 = 3,88%</span></div>
+          <div class="f"><span class="fn">Share PayPal</span><span class="fe">147.931,62 ÷ 187.973,73 × 100 = 78,70%</span></div>
+          <div class="f"><span class="fn">% Receita de Extras</span><span class="fe">22.010 ÷ 189.903 × 100 = 11,59%</span></div>
+          <div class="f"><span class="fn">Receita Líquida de Fees</span><span class="fe">174.168,08 − 1.832,73 = 172.335,35</span></div>
+        </div>
+      </div>
+      <div>
+        <h4>Metodologia</h4>
+        <div class="meth">
+          <p>Os dados refletem reservas com status <b>Confirmed</b> e <b>Paid</b>, filtradas por <b>Booking Date</b> no mês anterior e <b>Fulfilment Date</b> entre 01/05/2026 e 27/05/2026.</p>
+          <br>
+          <p><b>Gross Sales</b> representa o valor bruto antes de refunds e descontos. <b>Net Sales</b> = Gross − Refund − Descontos/Free/Promo. <b>Payment Received</b> considera valores efetivamente liquidados; <b>Outstanding</b> são valores confirmados ainda não recebidos.</p>
+          <br>
+          <p>A <b>Composição de Receita</b> decompõe: Produto (R$ 167.893) + Extras (R$ 22.010) + Booking Fee (R$ 1.832,73) − Desconto/Free/Promo (R$ 16.639) − Refund (R$ 7.437,20) = Net Sales (R$ 174.168,08).</p>
+          <br>
+          <p><b>Thresholds de alerta:</b> Outstanding &gt; 2% do gross · Refund &gt; 3% do gross · Concentração de produto &gt; 80%.</p>
+          <br>
+          <p style="color:var(--text-dim)"><b>Nota:</b> valores fixos nesta versão — serão substituídos por dados dinâmicos (Rezdy/API) em produção.</p>
+        </div>
+      </div>
+    </div>
+    <div class="copyright">Vertical Rio · Dashboard Executivo · Gerado em 28/05/2026 · Dados do período 01–27/05/2026</div>
+  </footer>
+
+</div>
+
+<script>
+// ============ CONFIG GLOBAL CHART.JS ============
+const PAL = ['#00e5ff','#00ff88','#ff6b6b','#ffd700','#a855f7','#ff9f43','#5a5a70'];
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.color = '#8a8aa0';
+Chart.defaults.plugins.tooltip.backgroundColor = '#05050a';
+Chart.defaults.plugins.tooltip.borderColor = 'rgba(0,229,255,0.3)';
+Chart.defaults.plugins.tooltip.borderWidth = 1;
+Chart.defaults.plugins.tooltip.padding = 11;
+Chart.defaults.plugins.tooltip.cornerRadius = 8;
+Chart.defaults.plugins.tooltip.titleColor = '#fff';
+Chart.defaults.plugins.tooltip.bodyColor = '#e8e8f0';
+
+const BRL = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const BRL0 = v => 'R$ ' + v.toLocaleString('pt-BR',{maximumFractionDigits:0});
+
+// ============ HELPER: DONUT + LEGENDA CUSTOM ============
+function makeDonut(canvasId, legendId, labels, data, colors, valueFmt){
+  const ctx = document.getElementById(canvasId);
+  new Chart(ctx, {
+    type:'doughnut',
+    data:{ labels, datasets:[{
+      data, backgroundColor:colors, borderColor:'#14141f', borderWidth:3, hoverOffset:6
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'68%',
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:c=>` ${c.label}: ${valueFmt(c.raw)}`}}
+      }
+    }
+  });
+  const total = data.reduce((a,b)=>a+b,0);
+  const leg = document.getElementById(legendId);
+  labels.forEach((lb,i)=>{
+    const pct = ((data[i]/total)*100).toFixed(1).replace('.',',');
+    const el = document.createElement('div');
+    el.className='li';
+    el.innerHTML = `<span class="sw" style="background:${colors[i]}"></span>
+      <span class="ltxt">${lb}</span>
+      <span class="lval">${valueFmt(data[i])} · ${pct}%</span>`;
+    leg.appendChild(el);
+  });
+}
+
+// ============ DONUT: CANAIS ============
+makeDonut('chCanais','legCanais',
+  ['Online','Internal'], [56,44],
+  ['#00e5ff','#00ff88'],
+  v => v + '% bookings'
+);
+
+// ============ DONUT: COMPOSIÇÃO DE RECEITA ============
+makeDonut('chComp','legComp',
+  ['Produto','Extras','Booking Fee','Desconto/Free/Promo','Refund'],
+  [167893, 22010, 1832.73, 16639, 7437.20],
+  ['#00e5ff','#00ff88','#ffd700','#a855f7','#ff6b6b'],
+  v => BRL0(v)
+);
+
+// ============ PLUGIN: VALOR NO FINAL DA BARRA ============
+const barLabelPlugin = {
+  id:'barLabel',
+  afterDatasetsDraw(chart){
+    const {ctx} = chart;
+    const meta = chart.getDatasetMeta(0);
+    const fmt = chart.config.options.plugins.barLabel.fmt;
+    ctx.save();
+    ctx.font = '600 11px Inter';
+    ctx.fillStyle = '#e8e8f0';
+    ctx.textBaseline = 'middle';
+    meta.data.forEach((bar,i)=>{
+      const val = chart.data.datasets[0].data[i];
+      ctx.textAlign = 'left';
+      ctx.fillText(fmt(val), bar.x + 8, bar.y);
+    });
+    ctx.restore();
+  }
+};
+
+// ============ BARRA HORIZONTAL: TOP PRODUTOS ============
+new Chart(document.getElementById('chProd'), {
+  type:'bar',
+  plugins:[barLabelPlugin],
+  data:{
+    labels:['Doors off 30min','Doors on 30min','Doors off 45min','No-Show Fee','Shuttle Vertical Rio'],
+    datasets:[{
+      data:[174193, 7710, 6270, 1190, 540],
+      backgroundColor:['#00e5ff','#00ff88','#a855f7','#ffd700','#ff6b6b'],
+      borderRadius:6, barThickness:22
+    }]
+  },
+  options:{
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    layout:{padding:{right:78}},
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:c=>' '+BRL0(c.raw)}},
+      barLabel:{fmt:v=>BRL0(v)}
+    },
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{callback:v=>'R$'+(v/1000)+'k'},border:{display:false}},
+      y:{grid:{display:false},border:{display:false},ticks:{font:{size:11.5,weight:'500'}}}
+    }
+  }
+});
+
+// ============ BARRA HORIZONTAL: PAGAMENTOS ============
+new Chart(document.getElementById('chPag'), {
+  type:'bar',
+  plugins:[barLabelPlugin],
+  data:{
+    labels:['PayPal','Cartão','Free','Transferência','Promo Code','Refund'],
+    datasets:[{
+      data:[147931.62, 23878.06, 16639.00, 6033.60, 928.65, -7437.20],
+      backgroundColor:['#00e5ff','#00ff88','#a855f7','#ffd700','#ff9f43','#ff6b6b'],
+      borderRadius:6, barThickness:20
+    }]
+  },
+  options:{
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    layout:{padding:{right:82}},
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:c=>' '+BRL(c.raw)}},
+      barLabel:{fmt:v=>BRL0(v)}
+    },
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{callback:v=>'R$'+(v/1000)+'k'},border:{display:false}},
+      y:{grid:{display:false},border:{display:false},ticks:{font:{size:11.5,weight:'500'}}}
+    }
+  }
+});
+
+// ============ DONUT: PAX POR TIPO ============
+makeDonut('chPax','legPax',
+  ['Adult','Group','Unique Price','Fixed','Blank'],
+  [106, 9, 8, 2, 1],
+  ['#00e5ff','#00ff88','#a855f7','#ffd700','#ff6b6b'],
+  v => v + ' pax'
+);
+</script>
+</body>
+</html>
