@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Análise de Performance — Vertical Rio</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0d0d14; --card: #161622; --card2: #1e1e2e;
+    --border: #2a2a3e; --accent: #7c3aed; --accent2: #06b6d4;
+    --green: #10b981; --red: #ef4444; --yellow: #f59e0b;
+    --text: #e2e8f0; --muted: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; font-size: 14px; }
+  header { background: linear-gradient(135deg,#1e1e3a,#0d0d14); border-bottom: 1px solid var(--border); padding: 20px 32px; display: flex; align-items: center; gap: 16px; }
+  header h1 { font-size: 20px; font-weight: 700; color: #fff; }
+  header span { font-size: 12px; color: var(--muted); margin-left: auto; }
+  .badge { background: var(--accent); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+  h2 { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  h2 .icon { font-size: 18px; }
+  .section { margin-bottom: 32px; }
+  /* KPI cards */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .kpi-value { font-size: 26px; font-weight: 700; color: #fff; }
+  .kpi-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .up { color: var(--green); } .down { color: var(--red); } .neutral { color: var(--yellow); }
+  /* Period tabs */
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 7px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all .2s; }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  /* Tables */
+  .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: var(--card2); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing:.05em; padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--card2); }
+  tbody td { padding: 11px 16px; color: var(--text); }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .pill-green { background: #10b98120; color: var(--green); }
+  .pill-red { background: #ef444420; color: var(--red); }
+  .pill-yellow { background: #f59e0b20; color: var(--yellow); }
+  .pill-blue { background: #06b6d420; color: var(--accent2); }
+  .pill-purple { background: #7c3aed20; color: var(--accent); }
+  /* Charts */
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .chart-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  @media(max-width:900px) { .chart-grid,.chart-grid-3 { grid-template-columns: 1fr; } }
+  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .chart-card h3 { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+  canvas { max-height: 260px; }
+  /* Progress bars */
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .bar-label { width: 180px; font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+  .bar-track { flex: 1; background: var(--card2); border-radius: 4px; height: 8px; }
+  .bar-fill { height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .6s ease; }
+  .bar-val { width: 80px; text-align: right; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  /* Alert */
+  .alert { background: #f59e0b15; border: 1px solid #f59e0b40; border-radius: 10px; padding: 14px 18px; font-size: 13px; color: var(--yellow); margin-bottom: 20px; }
+  .alert-red { background: #ef444415; border-color: #ef444440; color: var(--red); }
+  .alert-green { background: #10b98115; border-color: #10b98140; color: var(--green); }
+  /* Star rating */
+  .stars { color: var(--yellow); font-size: 13px; }
+  /* Divider */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  /* Stat comparison */
+  .compare-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .compare-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .compare-card .period { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing:.05em; }
+  .compare-card .val { font-size: 22px; font-weight: 700; color: #fff; margin: 6px 0; }
+  .compare-card .meta { font-size: 12px; color: var(--muted); }
+  .tag { display: inline-block; background: var(--card2); border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-right: 4px; }
+  /* Rezdy placeholder */
+  .loading-box { background: var(--card); border: 1px dashed var(--border); border-radius: 12px; padding: 32px; text-align: center; color: var(--muted); }
+  .loading-box .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">VERTICAL RIO</div>
+    <h1>Análise de Performance</h1>
+  </div>
+  <span class="badge">Junho 2026</span>
+  <span>Gerado em 02/06/2026</span>
+</header>
+
+<div class="container">
+
+  <!-- ═══ SEÇÃO 1: REZDY ═══ -->
+  <div class="section">
+    <h2><span class="icon">🪂</span> Rezdy — Reservas & Receita</h2>
+
+    <div class="compare-grid" id="rezdyCards">
+      <!-- preenchido pelo JS abaixo -->
+    </div>
+
+    <div style="margin-top:20px">
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Receita Comparativa (R$)</h3>
+          <canvas id="chartRezdyReceita"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Reservas Confirmadas vs Canceladas</h3>
+          <canvas id="chartRezdyStatus"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert" style="margin-top:20px">
+      ⚠️ <strong>Queda MoM:</strong> Maio/26 registrou <strong>-21,6% em receita</strong> e <strong>-25,6% em confirmadas</strong> vs Abril/26. YoY estável (+1,6% receita, ticket médio +12%).
+    </div>
+
+    <div style="margin-top:20px">
+      <div class="chart-grid">
+        <div>
+          <h2 style="font-size:14px;margin-bottom:12px"><span class="icon">📦</span> Receita por Produto — Maio 2026</h2>
+          <div id="rezdyProdutos"></div>
+        </div>
+        <div class="chart-card">
+          <h3>Distribuição de Produtos (Receita)</h3>
+          <canvas id="chartRezdyProd"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px" id="rezdyTabela"></div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ═══ SEÇÃO 2: META ADS ═══ -->
+  <div class="section">
+    <h2><span class="icon">📣</span> Meta Ads — Investimento & Performance</h2>
+
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-label">Investimento Maio/26</div>
+        <div class="kpi-value">R$ 27.534</div>
+        <div class="kpi-sub up">▲ +43% vs Abril/26</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Investimento Abril/26</div>
+        <div class="kpi-value">R$ 19.240</div>
+        <div class="kpi-sub neutral">Mês anterior</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Investimento Maio/25</div>
+        <div class="kpi-value">R$ 16.120</div>
+        <div class="kpi-sub up">▲ +71% YoY</div>
+      </div>
+      <div class="kpi" id="roasCard">
+        <div class="kpi-label">ROAS Estimado</div>
+        <div class="kpi-value" id="roasValue">—</div>
+        <div class="kpi-sub" id="roasSub">Aguardando Rezdy</div>
+      </div>
+      <div class="kpi" id="cacCard">
+        <div class="kpi-label">CAC (Namorados)</div>
+        <div class="kpi-value" id="cacValue">—</div>
+        <div class="kpi-sub" id="cacSub">Aguardando Rezdy</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px">
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Investimento Mensal Meta Ads (R$)</h3>
+          <canvas id="chartMetaSpend"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Top Adsets — Maio 2026 (R$)</h3>
+          <canvas id="chartAdsets"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ═══ SEÇÃO 3: DIA DOS NAMORADOS ═══ -->
+  <div class="section">
+    <h2><span class="icon">💌</span> Campanha Dia dos Namorados (12/06)</h2>
+
+    <div class="alert alert-green">
+      ✅ Campanha ativa — 5 criativos rodando com público de remarketing (RMKT-7D). Total investido em Maio: <strong>R$ 327</strong>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns: repeat(5,1fr)">
+      <div class="kpi">
+        <div class="kpi-label">Total Gasto</div>
+        <div class="kpi-value">R$ 327</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Ações / Mensagens</div>
+        <div class="kpi-value">~19.900</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Melhor CPC</div>
+        <div class="kpi-value">R$ 2,02</div>
+        <div class="kpi-sub">namorados.PT2</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Melhor CTR</div>
+        <div class="kpi-value">1,26%</div>
+        <div class="kpi-sub">Namorados.ENG[8080]</div>
+      </div>
+      <div class="kpi" id="cacNamCard">
+        <div class="kpi-label">CAC Namorados</div>
+        <div class="kpi-value" id="cacNamValue">—</div>
+        <div class="kpi-sub" id="cacNamSub">Aguardando Rezdy</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Criativo</th>
+              <th>Público</th>
+              <th>Gasto</th>
+              <th>Impressões</th>
+              <th>Cliques</th>
+              <th>CTR</th>
+              <th>CPC</th>
+              <th>Ações</th>
+              <th>Eficiência</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>namorados.PT2</strong></td>
+              <td><span class="tag">RMKT-7D</span><span class="tag">8080</span></td>
+              <td>R$ 244,34</td>
+              <td>18.101</td>
+              <td>121</td>
+              <td>0,67%</td>
+              <td>R$ 2,02</td>
+              <td>15.919</td>
+              <td><span class="pill pill-green">Melhor</span></td>
+            </tr>
+            <tr>
+              <td><strong>namorados.PT2</strong></td>
+              <td><span class="tag">RMKT-7D</span></td>
+              <td>R$ 48,17</td>
+              <td>3.583</td>
+              <td>20</td>
+              <td>0,56%</td>
+              <td>R$ 2,41</td>
+              <td>2.944</td>
+              <td><span class="pill pill-yellow">Médio</span></td>
+            </tr>
+            <tr>
+              <td><strong>Namorados.ENG</strong></td>
+              <td><span class="tag">RMKT-7D</span></td>
+              <td>R$ 20,68</td>
+              <td>1.594</td>
+              <td>5</td>
+              <td>0,31%</td>
+              <td>R$ 4,14</td>
+              <td>886</td>
+              <td><span class="pill pill-red">Alto CPC</span></td>
+            </tr>
+            <tr>
+              <td><strong>Namorados.ENG</strong></td>
+              <td><span class="tag">RMKT-7D</span><span class="tag">8080</span></td>
+              <td>R$ 6,86</td>
+              <td>477</td>
+              <td>6</td>
+              <td>1,26%</td>
+              <td>R$ 1,14</td>
+              <td>198</td>
+              <td><span class="pill pill-blue">Eficiente</span></td>
+            </tr>
+            <tr>
+              <td><strong>namorados.PT</strong></td>
+              <td><span class="tag">RMKT-7D</span><span class="tag">8080</span></td>
+              <td>R$ 6,77</td>
+              <td>357</td>
+              <td>1</td>
+              <td>0,28%</td>
+              <td>R$ 6,77</td>
+              <td>189</td>
+              <td><span class="pill pill-red">Fraco</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ═══ SEÇÃO 4: CRIATIVOS ═══ -->
+  <div class="section">
+    <h2><span class="icon">🎨</span> Top Criativos — Maio 2026</h2>
+
+    <div class="chart-grid" style="margin-bottom:20px">
+      <div class="chart-card">
+        <h3>Top 8 por Gasto (R$)</h3>
+        <canvas id="chartCriativos"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>CTR vs CPC — Eficiência</h3>
+        <canvas id="chartCtrCpc"></canvas>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Criativo</th>
+            <th>Público</th>
+            <th>Gasto</th>
+            <th>Impressões</th>
+            <th>CTR</th>
+            <th>CPC</th>
+            <th>Ações</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaCriativos">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ═══ SEÇÃO 5: ADSETS ABRIL ═══ -->
+  <div class="section">
+    <h2><span class="icon">📅</span> Adsets por Período</h2>
+    <div class="tabs">
+      <div class="tab active" onclick="showPeriod('mai26',this)">Maio 2026</div>
+      <div class="tab" onclick="showPeriod('abr26',this)">Abril 2026</div>
+      <div class="tab" onclick="showPeriod('mai25',this)">Maio 2025</div>
+    </div>
+    <div id="periodoMai26" class="periodo-view">
+      <div id="barsMai26"></div>
+    </div>
+    <div id="periodoAbr26" class="periodo-view" style="display:none">
+      <div id="barsAbr26"></div>
+    </div>
+    <div id="periodoMai25" class="periodo-view" style="display:none">
+      <div id="barsMai25"></div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ═══ SEÇÃO 6: RESPOND.IO ═══ -->
+  <div class="section">
+    <h2><span class="icon">💬</span> Respond.IO — Status da Integração</h2>
+
+    <div class="alert alert-red">
+      ⚠️ <strong>API com problemas:</strong> Os endpoints de listagem da API pública v2 do Respond.IO retornam 404/400. A integração atual precisa de revisão.
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Diagnóstico dos Endpoints</h3>
+        <div style="margin-top:8px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px;background:var(--card2);border-radius:8px">
+            <span style="color:var(--red);font-size:16px">✗</span>
+            <div>
+              <div style="font-size:13px;color:var(--text)">GET /v2/conversation</div>
+              <div style="font-size:11px;color:var(--muted)">404 Not Found — endpoint não existe</div>
+            </div>
+            <span class="pill pill-red" style="margin-left:auto">404</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px;background:var(--card2);border-radius:8px">
+            <span style="color:var(--red);font-size:16px">✗</span>
+            <div>
+              <div style="font-size:13px;color:var(--text)">GET /v2/contact</div>
+              <div style="font-size:11px;color:var(--muted)">404 Not Found — endpoint não existe</div>
+            </div>
+            <span class="pill pill-red" style="margin-left:auto">404</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px;background:var(--card2);border-radius:8px">
+            <span style="color:var(--yellow);font-size:16px">~</span>
+            <div>
+              <div style="font-size:13px;color:var(--text)">POST /v2/contact/filter</div>
+              <div style="font-size:11px;color:var(--muted)">400 — precisa de identificadores específicos</div>
+            </div>
+            <span class="pill pill-yellow" style="margin-left:auto">400</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px;background:var(--card2);border-radius:8px">
+            <span style="color:var(--red);font-size:16px">✗</span>
+            <div>
+              <div style="font-size:13px;color:var(--text)">GET /v2/channel</div>
+              <div style="font-size:11px;color:var(--muted)">404 Not Found</div>
+            </div>
+            <span class="pill pill-red" style="margin-left:auto">404</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:8px">
+            <span style="color:var(--yellow);font-size:16px">~</span>
+            <div>
+              <div style="font-size:13px;color:var(--text)">POST /v2/contact/list</div>
+              <div style="font-size:11px;color:var(--muted)">400 — requer identificadores (phone/email)</div>
+            </div>
+            <span class="pill pill-yellow" style="margin-left:auto">400</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>Plano de Revisão</h3>
+        <div style="margin-top:8px">
+          <div style="margin-bottom:14px;padding:12px;background:var(--card2);border-radius:8px;border-left:3px solid var(--accent)">
+            <div style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:4px">1. Usar API por Webhook</div>
+            <div style="font-size:12px;color:var(--muted)">Configurar webhook no Respond.IO para receber eventos de conversas em tempo real e armazenar localmente.</div>
+          </div>
+          <div style="margin-bottom:14px;padding:12px;background:var(--card2);border-radius:8px;border-left:3px solid var(--accent2)">
+            <div style="font-size:12px;color:var(--accent2);font-weight:600;margin-bottom:4px">2. Exportação CSV Automática</div>
+            <div style="font-size:12px;color:var(--muted)">O arquivo <code>atualizar_respondio_csv.py</code> já existe — usar exportação periódica dos relatórios como fonte primária.</div>
+          </div>
+          <div style="padding:12px;background:var(--card2);border-radius:8px;border-left:3px solid var(--green)">
+            <div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:4px">3. Regenerar Token API</div>
+            <div style="font-size:12px;color:var(--muted)">Acessar <strong>app.respond.io → Settings → Developer API</strong> e gerar novo token. O atual (criado em 22/05) pode estar com permissões limitadas.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ═══ DADOS ═══════════════════════════════════════════════════════
+const META_SPEND = {
+  mai26: 27534,
+  abr26: 19240,
+  mai25: 16120
+};
+
+const CRIATIVOS_MAI26 = [
+  { nome:"Casal 02",           publico:"[VIDEOVIEW][RJ]",              gasto:2487, imp:460388, ctr:5.09, cpc:0.11, acoes:716208 },
+  { nome:"jessicatarin_",      publico:"[LAL-COMPRADORES][RJ]",        gasto:2324, imp:205725, ctr:3.90, cpc:0.29, acoes:217281 },
+  { nome:"🤍🇧🇷 #fyp (reels)", publico:"[AEROPORTO USA]",              gasto:2044, imp:102793, ctr:7.09, cpc:0.28, acoes:175772 },
+  { nome:"🤍🇧🇷 #fyp (reels)", publico:"[AEROPORTO OUTROS]",           gasto:1670, imp:185787, ctr:6.16, cpc:0.15, acoes:297976 },
+  { nome:"vertical.rio+Cristo",publico:"[LAL-COMPRADORES][BRASIL]",    gasto:1555, imp:148256, ctr:2.78, cpc:0.38, acoes:174538 },
+  { nome:"🤍🇧🇷 #fyp (reels)", publico:"[LATAM][PAGE VIEW]",           gasto:1160, imp:263096, ctr:3.01, cpc:0.15, acoes:327219 },
+  { nome:"Casal 01",           publico:"[LAL BASE COMPRADORES]",       gasto:1130, imp:146608, ctr:5.22, cpc:0.15, acoes:202876 },
+  { nome:"martideviaje",       publico:"[LAL-COMPRADORES][LATAM]",     gasto:1108, imp:204274, ctr:4.21, cpc:0.13, acoes:159085 },
+  { nome:"vertical.rio+Cristo",publico:"[AEROPORTO USA]",              gasto:1021, imp:14421,  ctr:5.10, cpc:1.39, acoes:24391  },
+  { nome:"vertical.rio+Cristo",publico:"[EUROPA/EUA]",                 gasto:897,  imp:123785, ctr:2.53, cpc:0.29, acoes:155461 },
+  { nome:"Juliahorta01",       publico:"[LAL ENVOLVIMENTO][LATAM]",    gasto:842,  imp:87794,  ctr:6.95, cpc:0.14, acoes:120017 },
+  { nome:"A MUST-DO 🚁",       publico:"[LAL-COMPRADORES][RJ]",        gasto:750,  imp:189959, ctr:1.40, cpc:0.28, acoes:48820  },
+  { nome:"Casal 02",           publico:"[MSG GRINGO][RMKT-7D]",        gasto:723,  imp:55002,  ctr:0.90, cpc:1.47, acoes:56530  },
+  { nome:"Juliahorta01",       publico:"[LAL BASE COMPRADORES]",       gasto:703,  imp:60443,  ctr:7.53, cpc:0.15, acoes:91123  },
+];
+
+const ADSETS_MAI26 = [
+  { nome:"[LAL-COMPRADORES][RJ]",               gasto:3769 },
+  { nome:"[AEROPORTO USA]",                      gasto:3602 },
+  { nome:"[VIDEOVIEW][TOP ESTADOS][RJ]",         gasto:2890 },
+  { nome:"[LAL BASE COMPRADORES]",               gasto:2734 },
+  { nome:"[LAL-COMPRADORES][BRASIL]",            gasto:2559 },
+  { nome:"[LAL ENVOLVIMENTO][LATAM]",            gasto:2328 },
+  { nome:"[AEROPORTO OUTROS PAÍSES]",            gasto:2090 },
+  { nome:"[LAL-COMPRADORES][EUROPA/EUA]",        gasto:1882 },
+  { nome:"[LAL-COMPRADORES][LATAM]",             gasto:1267 },
+  { nome:"[MSG GRINGO][RMKT-7D]",                gasto:762  },
+];
+
+const ADSETS_ABR26 = [
+  { nome:"[VIDEOVIEW][TOP ESTADOS][RJ]",         gasto:2657 },
+  { nome:"[LAL-COMPRADORES][RJ]",                gasto:2632 },
+  { nome:"[LAL ENVOLVIMENTO][LATAM]",            gasto:2516 },
+  { nome:"[LAL-COMPRADORES][BRASIL]",            gasto:1940 },
+  { nome:"[LAL BASE COMPRADORES]",               gasto:1663 },
+  { nome:"[LAL-COMPRADORES][EUROPA/EUA]",        gasto:1658 },
+  { nome:"[LAL-COMPRADORES][LATAM]",             gasto:1590 },
+  { nome:"[MSG GRINGO][NUVENS-ORG][Criativos]",  gasto:1226 },
+  { nome:"[LAL BASE][SHAKIRA]",                  gasto:1159 },
+  { nome:"[LAL-COMPRADORES][RJ][SHAKIRA]",       gasto:1104 },
+];
+
+const ADSETS_MAI25 = [
+  { nome:"[PQ-180D][BRASIL Segmentado]",         gasto:2682 },
+  { nome:"[PQ-30D][LATAM]",                      gasto:1492 },
+  { nome:"[PQ-30D][AMERICA-DO-NORTE]",           gasto:1424 },
+  { nome:"[PQ-30D][BRASIL]",                     gasto:1349 },
+  { nome:"[LAL-COMPRADORES][BRASIL]",            gasto:1349 },
+  { nome:"[PQ-180D][EUROPA+BRASIL+EUA]",         gasto:1022 },
+  { nome:"[LAL-COMPRADORES][LATAM]",             gasto:835  },
+  { nome:"[LAL ENVOLVIMENTO][MAX LINK CLICK]",   gasto:713  },
+  { nome:"[PQ-30D][EUROPA+BRASIL+EUA]",          gasto:695  },
+  { nome:"[LAL-COMPRADORES][AMERICA-DO-NORTE]",  gasto:646  },
+];
+
+// Rezdy — dados reais
+const REZDY = {
+  mai26: { total:620,  conf:279, canc:16, rec:1851847,   pago:null, pax:575  },
+  abr26: { total:745,  conf:375, canc:17, rec:2364030,   pago:null, pax:788  },
+  mai25: { total:664,  conf:308, canc:11, rec:1821901,   pago:null, pax:572  },
+};
+
+const REZDY_PRODUTOS_MAI26 = [
+  { nome:"Doors off | 30min",      rec:1503533 },
+  { nome:"Doors off | 45min",      rec:119210  },
+  { nome:"Doors off | 30min (GYG)",rec:20540   },
+  { nome:"No-Show Fee",            rec:10450   },
+  { nome:"Outros",                 rec:198114  },
+];
+
+// ═══ RENDER REZDY CARDS ═══════════════════════════════════════════
+function renderRezdyCards() {
+  const el = document.getElementById('rezdyCards');
+  const periods = [
+    { key:'mai26', label:'Maio 2026', color:'var(--accent)' },
+    { key:'abr26', label:'Abril 2026', color:'var(--accent2)' },
+    { key:'mai25', label:'Maio 2025', color:'var(--muted)' },
+  ];
+  el.innerHTML = periods.map(p => {
+    const d = REZDY[p.key];
+    const recFmt = d.rec !== null ? 'R$ ' + d.rec.toLocaleString('pt-BR',{minimumFractionDigits:0}) : '—';
+    const confFmt = d.conf !== null ? d.conf : '—';
+    const paxFmt  = d.pax  !== null ? d.pax  : '—';
+    const tk = (d.rec && d.conf) ? 'R$ ' + Math.round(d.rec / d.conf).toLocaleString('pt-BR') : '—';
+    return `
+    <div class="compare-card" style="border-top:3px solid ${p.color}">
+      <div class="period">${p.label}</div>
+      <div class="val">${recFmt}</div>
+      <div class="meta">Confirmadas: ${confFmt} · PAX: ${paxFmt}</div>
+      <div class="meta" style="margin-top:4px">Ticket médio: ${tk}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══ CHARTS ═══════════════════════════════════════════════════════
+const palette = ['#7c3aed','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6','#0ea5e9','#14b8a6'];
+
+function initCharts() {
+  // Receita Rezdy comparativa
+  const ctxRec = document.getElementById('chartRezdyReceita').getContext('2d');
+  window.chartRezdyRec = new Chart(ctxRec, {
+    type: 'bar',
+    data: {
+      labels: ['Maio 2026','Abril 2026','Maio 2025'],
+      datasets: [{
+        label: 'Receita (R$)',
+        data: [REZDY.mai26.rec, REZDY.abr26.rec, REZDY.mai25.rec],
+        backgroundColor: ['#7c3aed99','#06b6d499','#10b98199'],
+        borderColor: ['#7c3aed','#06b6d4','#10b981'],
+        borderWidth: 2, borderRadius: 6,
+      }]
+    },
+    options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{grid:{color:'#2a2a3e'},ticks:{color:'#6b7280',callback:v=>'R$'+v.toLocaleString('pt-BR')}},x:{grid:{display:false},ticks:{color:'#6b7280'}}} }
+  });
+
+  // Status reservas
+  const ctxSt = document.getElementById('chartRezdyStatus').getContext('2d');
+  window.chartRezdySt = new Chart(ctxSt, {
+    type: 'bar',
+    data: {
+      labels: ['Maio 2026','Abril 2026','Maio 2025'],
+      datasets: [
+        { label:'Confirmadas', data:[REZDY.mai26.conf,REZDY.abr26.conf,REZDY.mai25.conf], backgroundColor:'#10b98180', borderColor:'#10b981', borderWidth:2, borderRadius:4 },
+        { label:'Canceladas',  data:[REZDY.mai26.canc,REZDY.abr26.canc,REZDY.mai25.canc], backgroundColor:'#ef444480', borderColor:'#ef4444', borderWidth:2, borderRadius:4 },
+      ]
+    },
+    options: { responsive:true, plugins:{legend:{labels:{color:'#6b7280'}}}, scales:{y:{grid:{color:'#2a2a3e'},ticks:{color:'#6b7280'}},x:{grid:{display:false},ticks:{color:'#6b7280'}}} }
+  });
+
+  // Meta Spend
+  const ctxMs = document.getElementById('chartMetaSpend').getContext('2d');
+  new Chart(ctxMs, {
+    type:'bar',
+    data:{
+      labels:['Maio/25','Abril/26','Maio/26'],
+      datasets:[{
+        label:'Investimento Meta (R$)',
+        data:[META_SPEND.mai25, META_SPEND.abr26, META_SPEND.mai26],
+        backgroundColor:['#6b728080','#06b6d480','#7c3aed80'],
+        borderColor:['#6b7280','#06b6d4','#7c3aed'],
+        borderWidth:2, borderRadius:6
+      }]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#2a2a3e'},ticks:{color:'#6b7280',callback:v=>'R$'+v.toLocaleString('pt-BR')}},x:{grid:{display:false},ticks:{color:'#6b7280'}}}}
+  });
+
+  // Top adsets maio26
+  const top5 = ADSETS_MAI26.slice(0,6);
+  const ctxAs = document.getElementById('chartAdsets').getContext('2d');
+  new Chart(ctxAs, {
+    type:'bar', indexAxis:'y',
+    data:{
+      labels: top5.map(a=>a.nome.length>28?a.nome.slice(0,28)+'…':a.nome),
+      datasets:[{data:top5.map(a=>a.gasto), backgroundColor:palette.map(c=>c+'99'), borderColor:palette, borderWidth:1.5, borderRadius:4}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#2a2a3e'},ticks:{color:'#6b7280',callback:v=>'R$'+v.toLocaleString('pt-BR')}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}
+  });
+
+  // Produtos Rezdy donut
+  const ctxProd = document.getElementById('chartRezdyProd').getContext('2d');
+  new Chart(ctxProd, {
+    type:'doughnut',
+    data:{
+      labels: REZDY_PRODUTOS_MAI26.map(p=>p.nome),
+      datasets:[{ data: REZDY_PRODUTOS_MAI26.map(p=>p.rec), backgroundColor: palette.map(c=>c+'cc'), borderColor:'#0d0d14', borderWidth:2 }]
+    },
+    options:{ responsive:true, plugins:{ legend:{labels:{color:'#94a3b8',font:{size:11}}}, tooltip:{callbacks:{label:ctx=>`R$ ${ctx.raw.toLocaleString('pt-BR')}`}} } }
+  });
+
+  // Top criativos
+  const top8 = CRIATIVOS_MAI26.slice(0,8);
+  const ctxCr = document.getElementById('chartCriativos').getContext('2d');
+  new Chart(ctxCr, {
+    type:'bar', indexAxis:'y',
+    data:{
+      labels: top8.map(c=>c.nome.length>20?c.nome.slice(0,20)+'…':c.nome),
+      datasets:[{data:top8.map(c=>c.gasto), backgroundColor:palette.map(c=>c+'bb'), borderColor:palette, borderWidth:1.5, borderRadius:4}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#2a2a3e'},ticks:{color:'#6b7280',callback:v=>'R$'+v.toLocaleString('pt-BR')}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}
+  });
+
+  // CTR vs CPC scatter
+  const ctxSc = document.getElementById('chartCtrCpc').getContext('2d');
+  new Chart(ctxSc, {
+    type:'bubble',
+    data:{
+      datasets:[{
+        label:'Criativos',
+        data: CRIATIVOS_MAI26.slice(0,10).map(c=>({x:c.ctr, y:c.cpc, r:Math.min(Math.sqrt(c.gasto)/2,20)})),
+        backgroundColor:'#7c3aed80', borderColor:'#7c3aed', borderWidth:1
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const i=ctx.dataIndex; const c=CRIATIVOS_MAI26[i]; return[c.nome, `CTR:${c.ctr}% CPC:R$${c.cpc}`, `Gasto:R$${c.gasto}`]}}}},
+      scales:{
+        x:{grid:{color:'#2a2a3e'},ticks:{color:'#6b7280'},title:{display:true,text:'CTR (%)',color:'#6b7280'}},
+        y:{grid:{color:'#2a2a3e'},ticks:{color:'#6b7280'},title:{display:true,text:'CPC (R$)',color:'#6b7280'}}
+      }
+    }
+  });
+}
+
+// ═══ TABELA CRIATIVOS ═══════════════════════════════════════════
+function renderTabelaCriativos() {
+  const tbody = document.getElementById('tabelaCriativos');
+  tbody.innerHTML = CRIATIVOS_MAI26.map((c,i) => {
+    const score = c.ctr / Math.max(c.cpc, 0.01);
+    const stars = score > 20 ? '★★★' : score > 8 ? '★★☆' : '★☆☆';
+    const pillClass = score > 20 ? 'pill-green' : score > 8 ? 'pill-yellow' : 'pill-red';
+    return `
+    <tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td><strong>${c.nome}</strong></td>
+      <td><span class="tag" style="font-size:10px">${c.publico}</span></td>
+      <td>R$ ${c.gasto.toLocaleString('pt-BR')}</td>
+      <td>${c.imp.toLocaleString('pt-BR')}</td>
+      <td class="${c.ctr > 5 ? 'up' : c.ctr > 3 ? 'neutral' : ''}">${c.ctr}%</td>
+      <td class="${c.cpc < 0.20 ? 'up' : c.cpc < 0.50 ? 'neutral' : 'down'}">R$ ${c.cpc}</td>
+      <td>${c.acoes.toLocaleString('pt-BR')}</td>
+      <td><span class="stars">${stars}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══ BARRAS ADSETS ═══════════════════════════════════════════════
+function renderBars(containerId, adsets) {
+  const max = Math.max(...adsets.map(a => a.gasto));
+  document.getElementById(containerId).innerHTML = adsets.map(a => `
+    <div class="bar-row">
+      <div class="bar-label" title="${a.nome}">${a.nome}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(a.gasto/max*100).toFixed(1)}%"></div></div>
+      <div class="bar-val">R$ ${a.gasto.toLocaleString('pt-BR')}</div>
+    </div>`).join('');
+}
+
+function showPeriod(period, tab) {
+  document.querySelectorAll('.periodo-view').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('periodo' + period.charAt(0).toUpperCase() + period.slice(1)).style.display = 'block';
+  tab.classList.add('active');
+}
+
+// ═══ REZDY PRODUTOS ═══════════════════════════════════════════════
+function renderRezdyProdutos() {
+  const max = Math.max(...REZDY_PRODUTOS_MAI26.map(p => p.rec));
+  document.getElementById('rezdyProdutos').innerHTML = REZDY_PRODUTOS_MAI26.map(p => `
+    <div class="bar-row">
+      <div class="bar-label" title="${p.nome}">${p.nome}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(p.rec/max*100).toFixed(1)}%"></div></div>
+      <div class="bar-val">R$ ${p.rec.toLocaleString('pt-BR')}</div>
+    </div>`).join('');
+}
+
+// ═══ REZDY TABELA COMPARATIVA ════════════════════════════════════
+function renderRezdyTabela() {
+  const momRec  = ((REZDY.mai26.rec - REZDY.abr26.rec) / REZDY.abr26.rec * 100).toFixed(1);
+  const yoyRec  = ((REZDY.mai26.rec - REZDY.mai25.rec) / REZDY.mai25.rec * 100).toFixed(1);
+  const momConf = ((REZDY.mai26.conf - REZDY.abr26.conf) / REZDY.abr26.conf * 100).toFixed(1);
+  const yoyConf = ((REZDY.mai26.conf - REZDY.mai25.conf) / REZDY.mai25.conf * 100).toFixed(1);
+  const tkM26   = Math.round(REZDY.mai26.rec / REZDY.mai26.conf).toLocaleString('pt-BR');
+  const tkA26   = Math.round(REZDY.abr26.rec / REZDY.abr26.conf).toLocaleString('pt-BR');
+  const tkM25   = Math.round(REZDY.mai25.rec / REZDY.mai25.conf).toLocaleString('pt-BR');
+
+  document.getElementById('rezdyTabela').innerHTML = `
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Métrica</th>
+        <th>Maio 2026</th>
+        <th>Abril 2026</th>
+        <th>Maio 2025</th>
+        <th>MoM (Mai/Abr)</th>
+        <th>YoY (Mai26/Mai25)</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Receita Total</strong></td>
+          <td>R$ ${REZDY.mai26.rec.toLocaleString('pt-BR')}</td>
+          <td>R$ ${REZDY.abr26.rec.toLocaleString('pt-BR')}</td>
+          <td>R$ ${REZDY.mai25.rec.toLocaleString('pt-BR')}</td>
+          <td class="${momRec>=0?'up':'down'}">${momRec>=0?'▲':'▼'} ${Math.abs(momRec)}%</td>
+          <td class="${yoyRec>=0?'up':'down'}">${yoyRec>=0?'▲':'▼'} ${Math.abs(yoyRec)}%</td>
+        </tr>
+        <tr>
+          <td><strong>Reservas Confirmadas</strong></td>
+          <td>${REZDY.mai26.conf}</td>
+          <td>${REZDY.abr26.conf}</td>
+          <td>${REZDY.mai25.conf}</td>
+          <td class="${momConf>=0?'up':'down'}">${momConf>=0?'▲':'▼'} ${Math.abs(momConf)}%</td>
+          <td class="${yoyConf>=0?'up':'down'}">${yoyConf>=0?'▲':'▼'} ${Math.abs(yoyConf)}%</td>
+        </tr>
+        <tr>
+          <td><strong>Canceladas</strong></td>
+          <td>${REZDY.mai26.canc}</td>
+          <td>${REZDY.abr26.canc}</td>
+          <td>${REZDY.mai25.canc}</td>
+          <td>—</td><td>—</td>
+        </tr>
+        <tr>
+          <td><strong>PAX (passageiros)</strong></td>
+          <td>${REZDY.mai26.pax}</td>
+          <td>${REZDY.abr26.pax}</td>
+          <td>${REZDY.mai25.pax}</td>
+          <td class="${REZDY.mai26.pax>=REZDY.abr26.pax?'up':'down'}">${REZDY.mai26.pax>=REZDY.abr26.pax?'▲':'▼'} ${Math.abs(((REZDY.mai26.pax-REZDY.abr26.pax)/REZDY.abr26.pax*100)).toFixed(1)}%</td>
+          <td class="${REZDY.mai26.pax>=REZDY.mai25.pax?'up':'down'}">${REZDY.mai26.pax>=REZDY.mai25.pax?'▲':'▼'} ${Math.abs(((REZDY.mai26.pax-REZDY.mai25.pax)/REZDY.mai25.pax*100)).toFixed(1)}%</td>
+        </tr>
+        <tr>
+          <td><strong>Ticket Médio</strong></td>
+          <td>R$ ${tkM26}</td>
+          <td>R$ ${tkA26}</td>
+          <td>R$ ${tkM25}</td>
+          <td>—</td><td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>`;
+}
+
+// ═══ REZDY UPDATE ════════════════════════════════════════════════
+function updateRezdy(mai26, abr26, mai25) {
+  // Atualiza charts
+  if (window.chartRezdyRec) {
+    window.chartRezdyRec.data.datasets[0].data = [mai26.rec, abr26.rec, mai25.rec];
+    window.chartRezdyRec.update();
+  }
+  if (window.chartRezdySt) {
+    window.chartRezdySt.data.datasets[0].data = [mai26.conf, abr26.conf, mai25.conf];
+    window.chartRezdySt.data.datasets[1].data = [mai26.canc, abr26.canc, mai25.canc];
+    window.chartRezdySt.update();
+  }
+
+  // ROAS (receita total / investimento Meta — indicador de negócio, não atribuição direta)
+  const roas = (mai26.rec / META_SPEND.mai26).toFixed(1);
+  document.getElementById('roasValue').textContent = roas + 'x';
+  document.getElementById('roasSub').textContent = 'Receita Rezdy ÷ Meta Ads Mai/26';
+  document.getElementById('roasSub').className = 'kpi-sub up';
+
+  // CAC (Meta spend / confirmadas — proxy)
+  const cacGeral = (META_SPEND.mai26 / mai26.conf).toFixed(0);
+  document.getElementById('cacValue').textContent = 'R$ ' + parseInt(cacGeral).toLocaleString('pt-BR');
+  document.getElementById('cacSub').textContent   = 'Meta spend ÷ confirmadas Mai/26';
+  document.getElementById('cacSub').className = 'kpi-sub neutral';
+
+  // CAC Namorados (R$327 / confirmadas proporcionais ao clique)
+  const cacNam = (327 / (mai26.conf * 0.012)).toFixed(0); // ~1.2% das confirmadas via namorados
+  document.getElementById('cacNamValue').textContent = 'R$ ' + parseInt(cacNam).toLocaleString('pt-BR');
+  document.getElementById('cacNamSub').textContent   = 'Estimativa proporc. cliques';
+}
+
+// ═══ INIT ═══════════════════════════════════════════════════════
+renderRezdyCards();
+renderRezdyProdutos();
+renderRezdyTabela();
+renderTabelaCriativos();
+renderBars('barsMai26', ADSETS_MAI26);
+renderBars('barsAbr26', ADSETS_ABR26);
+renderBars('barsMai25', ADSETS_MAI25);
+initCharts();
+// Atualizar ROAS e CAC com dados reais
+updateRezdy(REZDY.mai26, REZDY.abr26, REZDY.mai25);
+</script>
+</body>
+</html>
