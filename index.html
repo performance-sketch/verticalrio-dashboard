@@ -6362,18 +6362,19 @@ const DADOS_META = {
 const DADOS_REZDY_LIVE = {
   "resumo": {
     "total_reservas": 6000,
-    "receita_total": 18446713.69,
-    "total_pago": 9046771.54,
-    "total_a_pagar": 9399942.15,
+    "receita_total": 18445646.11,
+    "total_pago": 9046346.56,
+    "total_a_pagar": 9399299.55,
     "contagem_status": {
-      "CONFIRMED": 2711,
+      "CONFIRMED": 2712,
+      "PROCESSING": 1,
+      "ABANDONED_CART": 3066,
       "PENDING_CUSTOMER": 5,
-      "ABANDONED_CART": 3068,
       "CANCELLED": 202,
       "ON_HOLD": 14
     },
     "receita_por_produto": {
-      "Doors off | 30min": 15419588.01,
+      "Doors off | 30min": 15418208.01,
       "Doors off | 45min": 958700.0,
       "Doors off | 30min (GYG)": 136880.0,
       "Gift Card Vertical Rio": 78000.0,
@@ -6382,7 +6383,6 @@ const DADOS_REZDY_LIVE = {
       "Shuttle Vertical Rio": 5180.0
     },
     "reservas_por_dia": {
-      "2026-06-01": 21,
       "2026-06-02": 12,
       "2026-06-03": 29,
       "2026-06-04": 21,
@@ -6411,9 +6411,78 @@ const DADOS_REZDY_LIVE = {
       "2026-06-27": 7,
       "2026-06-28": 33,
       "2026-06-29": 17,
-      "2026-06-30": 16
+      "2026-06-30": 16,
+      "2026-07-01": 4
     },
     "tabela": [
+      {
+        "numeroPedido": "VRYNXT7W",
+        "status": "CONFIRMED",
+        "source": "ONLINE",
+        "agente": "-",
+        "nomeCliente": "Brett Broster",
+        "emailCliente": "Bbroster@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "dataCriacao": "2026-07-01",
+        "dataFulfillment": "2026-07-22",
+        "horaFulfillment": "08:30",
+        "valorTotal": 1591.2,
+        "valorPago": 1591.2,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRLDLJMZ",
+        "status": "PROCESSING",
+        "source": "ONLINE",
+        "agente": "-",
+        "nomeCliente": "Brett Broster",
+        "emailCliente": "bbroster@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "dataCriacao": "2026-07-01",
+        "dataFulfillment": "2026-07-22",
+        "horaFulfillment": "08:30",
+        "valorTotal": 1591.2,
+        "valorPago": 0.0,
+        "valorAPagar": 1591.2,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRQMDAFE",
+        "status": "ABANDONED_CART",
+        "source": "ONLINE",
+        "agente": "-",
+        "nomeCliente": "Brett Broster",
+        "emailCliente": "Bbroster@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 1,
+        "dataCriacao": "2026-07-01",
+        "dataFulfillment": "",
+        "horaFulfillment": "",
+        "valorTotal": 1591.2,
+        "valorPago": 0.0,
+        "valorAPagar": 1591.2,
+        "moeda": "BRL"
+      },
+      {
+        "numeroPedido": "VRYX0ENW",
+        "status": "CONFIRMED",
+        "source": "ONLINE",
+        "agente": "-",
+        "nomeCliente": "MIRZA ISKANDAR",
+        "emailCliente": "mrz.isk@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "dataCriacao": "2026-07-01",
+        "dataFulfillment": "2026-07-20",
+        "horaFulfillment": "11:00",
+        "valorTotal": 2873.82,
+        "valorPago": 2873.82,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
       {
         "numeroPedido": "VRG3DQFX",
         "status": "CONFIRMED",
@@ -108345,74 +108414,6 @@ const DADOS_REZDY_LIVE = {
         "valorPago": 1275.0,
         "valorAPagar": 0.0,
         "moeda": "BRL"
-      },
-      {
-        "numeroPedido": "VRM6TMRT",
-        "status": "ABANDONED_CART",
-        "source": "ONLINE",
-        "agente": "-",
-        "nomeCliente": "Vladislav Agafonov",
-        "emailCliente": "Set-vladislav@mail.ru",
-        "produto": "Doors off | 30min",
-        "quantidade": 1,
-        "dataCriacao": "2025-09-26",
-        "dataFulfillment": "",
-        "horaFulfillment": "",
-        "valorTotal": 1275.0,
-        "valorPago": 0.0,
-        "valorAPagar": 1275.0,
-        "moeda": "BRL"
-      },
-      {
-        "numeroPedido": "VRJBV9HJ",
-        "status": "CONFIRMED",
-        "source": "INTERNAL",
-        "agente": "Luma Keily Cunha",
-        "nomeCliente": "Luis A Colon",
-        "emailCliente": "luiscolon.colon@gmail.com",
-        "produto": "Doors off | 30min",
-        "quantidade": 3,
-        "dataCriacao": "2025-09-26",
-        "dataFulfillment": "2025-09-29",
-        "horaFulfillment": "16:30",
-        "valorTotal": 4890.0,
-        "valorPago": 4890.0,
-        "valorAPagar": 0.0,
-        "moeda": "BRL"
-      },
-      {
-        "numeroPedido": "VRHBYENK",
-        "status": "ABANDONED_CART",
-        "source": "ONLINE",
-        "agente": "-",
-        "nomeCliente": "Vladislav Agafonov",
-        "emailCliente": "Set-vladislav@mail.ru",
-        "produto": "Doors off | 30min",
-        "quantidade": 1,
-        "dataCriacao": "2025-09-26",
-        "dataFulfillment": "",
-        "horaFulfillment": "",
-        "valorTotal": 1275.0,
-        "valorPago": 0.0,
-        "valorAPagar": 1275.0,
-        "moeda": "BRL"
-      },
-      {
-        "numeroPedido": "VRCDASN4",
-        "status": "ABANDONED_CART",
-        "source": "ONLINE",
-        "agente": "-",
-        "nomeCliente": "Vladislav Agafonov",
-        "emailCliente": "Set-vladislav@mail.ru",
-        "produto": "Doors off | 30min",
-        "quantidade": 1,
-        "dataCriacao": "2025-09-26",
-        "dataFulfillment": "",
-        "horaFulfillment": "",
-        "valorTotal": 1275.0,
-        "valorPago": 0.0,
-        "valorAPagar": 1275.0,
-        "moeda": "BRL"
       }
     ]
   },
@@ -108420,17 +108421,17 @@ const DADOS_REZDY_LIVE = {
     {
       "mes": "2025-09",
       "label": "Set/2025",
-      "ordens": 131,
-      "receitaTotal": 329283.47,
-      "receitaProdutos": 299020.0,
-      "pago": 173225.18,
+      "ordens": 127,
+      "receitaTotal": 320568.47,
+      "receitaProdutos": 291100.0,
+      "pago": 168335.18,
       "porFonte": {
-        "ONLINE": 105,
-        "INTERNAL": 26
+        "ONLINE": 102,
+        "INTERNAL": 25
       },
       "porStatus": {
-        "CONFIRMED": 64,
-        "ABANDONED_CART": 66,
+        "CONFIRMED": 63,
+        "ABANDONED_CART": 63,
         "CANCELLED": 1
       }
     },
@@ -108600,20 +108601,36 @@ const DADOS_REZDY_LIVE = {
         "CANCELLED": 7,
         "ON_HOLD": 6
       }
+    },
+    {
+      "mes": "2026-07",
+      "label": "Jul/2026",
+      "ordens": 4,
+      "receitaTotal": 7647.42,
+      "receitaProdutos": 6540.0,
+      "pago": 4465.02,
+      "porFonte": {
+        "ONLINE": 4
+      },
+      "porStatus": {
+        "CONFIRMED": 2,
+        "PROCESSING": 1,
+        "ABANDONED_CART": 1
+      }
     }
   ],
   "porFonte": {
     "ONLINE": {
-      "ordens": 4545,
-      "receita": 13589235.73,
-      "confirmadas": 1542,
-      "pax": 3087
+      "ordens": 4546,
+      "receita": 13593058.15,
+      "confirmadas": 1544,
+      "pax": 3090
     },
     "INTERNAL": {
-      "ordens": 1409,
-      "receita": 4714365.18,
-      "confirmadas": 1132,
-      "pax": 2448
+      "ordens": 1408,
+      "receita": 4709475.18,
+      "confirmadas": 1131,
+      "pax": 2445
     },
     "MARKETPLACE_PREF_RATE": {
       "ordens": 46,
@@ -108640,9 +108657,9 @@ const DADOS_REZDY_LIVE = {
     {
       "dia": "Quarta",
       "indice": 2,
-      "ordens": 828,
-      "receita": 2589821.63,
-      "confirmadas": 362
+      "ordens": 832,
+      "receita": 2597469.05,
+      "confirmadas": 364
     },
     {
       "dia": "Quinta",
@@ -108654,9 +108671,9 @@ const DADOS_REZDY_LIVE = {
     {
       "dia": "Sexta",
       "indice": 4,
-      "ordens": 896,
-      "receita": 2899225.38,
-      "confirmadas": 439
+      "ordens": 892,
+      "receita": 2890510.38,
+      "confirmadas": 438
     },
     {
       "dia": "Sabado",
@@ -108678,7 +108695,7 @@ const DADOS_REZDY_LIVE = {
       "dia": "Segunda",
       "indice": 0,
       "ordens": 393,
-      "receita": 1102855.0,
+      "receita": 1101265.0,
       "confirmadas": 393
     },
     {
@@ -108691,9 +108708,9 @@ const DADOS_REZDY_LIVE = {
     {
       "dia": "Quarta",
       "indice": 2,
-      "ordens": 344,
-      "receita": 989761.0,
-      "confirmadas": 344
+      "ordens": 345,
+      "receita": 991081.0,
+      "confirmadas": 345
     },
     {
       "dia": "Quinta",
@@ -108785,9 +108802,9 @@ const DADOS_REZDY_LIVE = {
       "inicio": "2026-06-29",
       "fim": "2026-07-05",
       "label": "29/06",
-      "booked": 33,
+      "booked": 37,
       "fulfilled": 40,
-      "receitaBooked": 88068.02
+      "receitaBooked": 95715.44
     }
   ],
   "leadTimeHeatmap": {
@@ -108801,7 +108818,8 @@ const DADOS_REZDY_LIVE = {
       "2026-03",
       "2026-04",
       "2026-05",
-      "2026-06"
+      "2026-06",
+      "2026-07"
     ],
     "fulfillMeses": [
       "2025-09",
@@ -108824,6 +108842,9 @@ const DADOS_REZDY_LIVE = {
       "2027-02"
     ],
     "dados": {
+      "2026-07": {
+        "2026-07": 2
+      },
       "2026-06": {
         "2026-07": 27,
         "2026-09": 13,
@@ -108906,7 +108927,7 @@ const DADOS_REZDY_LIVE = {
       },
       "2025-09": {
         "2025-10": 20,
-        "2025-09": 35,
+        "2025-09": 34,
         "2025-11": 6,
         "2026-05": 1,
         "2025-12": 4,
@@ -109007,7 +109028,7 @@ const DADOS_REZDY_LIVE = {
       "imagem": ""
     }
   ],
-  "dataAtualizacao": "30/06/2026 23:46:08"
+  "dataAtualizacao": "01/07/2026 04:43:51"
 };
 const DADOS_LINKTREE = { "totalCliques": 0, "visualizacoes": 0, "ctr": 0.0, "links": [], "dataAtualizacao": "" };
 </script>
