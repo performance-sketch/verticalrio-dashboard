@@ -6362,18 +6362,18 @@ const DADOS_META = {
 const DADOS_REZDY_LIVE = {
   "resumo": {
     "total_reservas": 6000,
-    "receita_total": 18580148.63,
-    "total_pago": 9396681.2,
-    "total_a_pagar": 9183467.43,
+    "receita_total": 18580205.83,
+    "total_pago": 9399941.2,
+    "total_a_pagar": 9180264.63,
     "contagem_status": {
       "CONFIRMED": 2780,
-      "ABANDONED_CART": 3008,
+      "CANCELLED": 193,
+      "ABANDONED_CART": 3007,
       "ON_HOLD": 18,
-      "PENDING_CUSTOMER": 2,
-      "CANCELLED": 192
+      "PENDING_CUSTOMER": 2
     },
     "receita_por_produto": {
-      "Doors off | 30min": 15392143.01,
+      "Doors off | 30min": 15391943.01,
       "Doors off | 30min (GYG)": 161230.0,
       "Doors on | 30 min": 140920.0,
       "Doors off | 45min": 1030730.0,
@@ -6411,9 +6411,26 @@ const DADOS_REZDY_LIVE = {
       "2026-07-30": 30,
       "2026-07-31": 19,
       "2026-08-01": 23,
-      "2026-08-02": 2
+      "2026-08-02": 3
     },
     "tabela": [
+      {
+        "numeroPedido": "VRLKRGB2",
+        "status": "CONFIRMED",
+        "source": "INTERNAL",
+        "agente": "Lucas Menezes",
+        "nomeCliente": "Sabine Francisca Johanna Elsjan",
+        "emailCliente": "Sabine-elsjan@hotmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "dataCriacao": "2026-08-02",
+        "dataFulfillment": "2026-08-23",
+        "horaFulfillment": "17:15",
+        "valorTotal": 3260.0,
+        "valorPago": 3260.0,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
       {
         "numeroPedido": "VRGKNTGN",
         "status": "CONFIRMED",
@@ -6467,7 +6484,7 @@ const DADOS_REZDY_LIVE = {
       },
       {
         "numeroPedido": "VRVTCSVZ",
-        "status": "CONFIRMED",
+        "status": "CANCELLED",
         "source": "MARKETPLACE_PREF_RATE",
         "agente": "-",
         "nomeCliente": "Andrejs Didurs",
@@ -108396,23 +108413,6 @@ const DADOS_REZDY_LIVE = {
         "valorPago": 0.0,
         "valorAPagar": 1723.8,
         "moeda": "BRL"
-      },
-      {
-        "numeroPedido": "VRUJQAJE",
-        "status": "ABANDONED_CART",
-        "source": "ONLINE",
-        "agente": "-",
-        "nomeCliente": "Rafael Alves de Souzs",
-        "emailCliente": "rafaepba16@hotmail.com",
-        "produto": "Doors off | 30min",
-        "quantidade": 2,
-        "dataCriacao": "2025-12-04",
-        "dataFulfillment": "",
-        "horaFulfillment": "",
-        "valorTotal": 3202.8,
-        "valorPago": 0.0,
-        "valorAPagar": 3202.8,
-        "moeda": "BRL"
       }
     ]
   },
@@ -108420,19 +108420,19 @@ const DADOS_REZDY_LIVE = {
     {
       "mes": "2025-12",
       "label": "Dez/2025",
-      "ordens": 732,
-      "receitaTotal": 2237562.35,
-      "receitaProdutos": 2046420.0,
+      "ordens": 731,
+      "receitaTotal": 2234359.55,
+      "receitaProdutos": 2043520.0,
       "pago": 1031389.55,
       "porFonte": {
         "INTERNAL": 146,
-        "ONLINE": 578,
+        "ONLINE": 577,
         "MARKETPLACE_PREF_RATE": 8
       },
       "porStatus": {
         "CONFIRMED": 306,
         "CANCELLED": 24,
-        "ABANDONED_CART": 402
+        "ABANDONED_CART": 401
       }
     },
     {
@@ -108571,17 +108571,18 @@ const DADOS_REZDY_LIVE = {
     {
       "mes": "2026-08",
       "label": "Ago/2026",
-      "ordens": 25,
-      "receitaTotal": 68490.71,
-      "receitaProdutos": 59030.0,
-      "pago": 45120.31,
+      "ordens": 26,
+      "receitaTotal": 71750.71,
+      "receitaProdutos": 61730.0,
+      "pago": 48380.31,
       "porFonte": {
+        "INTERNAL": 8,
         "ONLINE": 17,
-        "MARKETPLACE_PREF_RATE": 1,
-        "INTERNAL": 7
+        "MARKETPLACE_PREF_RATE": 1
       },
       "porStatus": {
         "CONFIRMED": 15,
+        "CANCELLED": 1,
         "ABANDONED_CART": 8,
         "ON_HOLD": 1,
         "PENDING_CUSTOMER": 1
@@ -108589,23 +108590,23 @@ const DADOS_REZDY_LIVE = {
     }
   ],
   "porFonte": {
+    "INTERNAL": {
+      "ordens": 1548,
+      "receita": 5235367.18,
+      "confirmadas": 1278,
+      "pax": 2809
+    },
     "ONLINE": {
-      "ordens": 4398,
-      "receita": 13179398.67,
+      "ordens": 4397,
+      "receita": 13176195.87,
       "confirmadas": 1459,
       "pax": 2923
     },
     "MARKETPLACE_PREF_RATE": {
       "ordens": 55,
       "receita": 168642.78,
-      "confirmadas": 44,
-      "pax": 75
-    },
-    "INTERNAL": {
-      "ordens": 1547,
-      "receita": 5232107.18,
-      "confirmadas": 1277,
-      "pax": 2807
+      "confirmadas": 43,
+      "pax": 74
     }
   },
   "diaSemanaBooking": [
@@ -108633,8 +108634,8 @@ const DADOS_REZDY_LIVE = {
     {
       "dia": "Quinta",
       "indice": 3,
-      "ordens": 867,
-      "receita": 2668653.81,
+      "ordens": 866,
+      "receita": 2665451.01,
       "confirmadas": 406
     },
     {
@@ -108649,14 +108650,14 @@ const DADOS_REZDY_LIVE = {
       "indice": 5,
       "ordens": 906,
       "receita": 2831861.65,
-      "confirmadas": 412
+      "confirmadas": 411
     },
     {
       "dia": "Domingo",
       "indice": 6,
-      "ordens": 869,
-      "receita": 2556471.2,
-      "confirmadas": 388
+      "ordens": 870,
+      "receita": 2559731.2,
+      "confirmadas": 389
     }
   ],
   "diaSemanaFulfil": [
@@ -108706,7 +108707,7 @@ const DADOS_REZDY_LIVE = {
       "dia": "Domingo",
       "indice": 6,
       "ordens": 442,
-      "receita": 1284031.96,
+      "receita": 1285151.96,
       "confirmadas": 442
     }
   ],
@@ -108771,9 +108772,9 @@ const DADOS_REZDY_LIVE = {
       "inicio": "2026-07-27",
       "fim": "2026-08-02",
       "label": "27/07",
-      "booked": 133,
-      "fulfilled": 66,
-      "receitaBooked": 393547.7
+      "booked": 134,
+      "fulfilled": 65,
+      "receitaBooked": 396807.7
     }
   ],
   "leadTimeHeatmap": {
@@ -108986,7 +108987,7 @@ const DADOS_REZDY_LIVE = {
       "imagem": ""
     }
   ],
-  "dataAtualizacao": "02/08/2026 11:21:55"
+  "dataAtualizacao": "02/08/2026 12:36:37"
 };
 const DADOS_LINKTREE = { "totalCliques": 0, "visualizacoes": 0, "ctr": 0.0, "links": [], "dataAtualizacao": "" };
 </script>
