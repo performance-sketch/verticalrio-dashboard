@@ -6362,21 +6362,20 @@ const DADOS_META = {
 const DADOS_REZDY_LIVE = {
   "resumo": {
     "total_reservas": 6000,
-    "receita_total": 18565212.63,
-    "total_pago": 9398742.8,
+    "receita_total": 18564971.01,
+    "total_pago": 9398501.18,
     "total_a_pagar": 9166469.83,
     "contagem_status": {
       "CONFIRMED": 2781,
-      "PROCESSING": 3,
+      "ABANDONED_CART": 3004,
       "PENDING_CUSTOMER": 3,
       "CANCELLED": 193,
-      "ABANDONED_CART": 3001,
       "PENDING_SUPPLIER": 1,
       "ON_HOLD": 18
     },
     "receita_por_produto": {
+      "Doors off | 30min": 15374313.01,
       "Doors off | 45min": 1032880.0,
-      "Doors off | 30min": 15374653.01,
       "Doors off | 30min (GYG)": 161230.0,
       "Doors on | 30 min": 140920.0,
       "Gift Card Vertical Rio": 82500.0,
@@ -6384,7 +6383,6 @@ const DADOS_REZDY_LIVE = {
       "Shuttle Vertical Rio": 7380.0
     },
     "reservas_por_dia": {
-      "2026-07-03": 10,
       "2026-07-04": 16,
       "2026-07-06": 19,
       "2026-07-07": 4,
@@ -6413,9 +6411,27 @@ const DADOS_REZDY_LIVE = {
       "2026-07-30": 30,
       "2026-07-31": 19,
       "2026-08-01": 23,
-      "2026-08-02": 13
+      "2026-08-02": 13,
+      "2026-08-03": 1
     },
     "tabela": [
+      {
+        "numeroPedido": "VRAFJDGT",
+        "status": "CONFIRMED",
+        "source": "ONLINE",
+        "agente": "-",
+        "nomeCliente": "Marjorie Castañeda vivas",
+        "emailCliente": "marjorie2798@gmail.com",
+        "produto": "Doors off | 30min",
+        "quantidade": 2,
+        "dataCriacao": "2026-08-03",
+        "dataFulfillment": "2026-09-08",
+        "horaFulfillment": "10:30",
+        "valorTotal": 3488.4,
+        "valorPago": 3488.4,
+        "valorAPagar": 0.0,
+        "moeda": "BRL"
+      },
       {
         "numeroPedido": "VR5F0MYY",
         "status": "CONFIRMED",
@@ -6452,7 +6468,7 @@ const DADOS_REZDY_LIVE = {
       },
       {
         "numeroPedido": "VRJPGK6T",
-        "status": "PROCESSING",
+        "status": "ABANDONED_CART",
         "source": "ONLINE",
         "agente": "-",
         "nomeCliente": "Maela Hickling",
@@ -6460,8 +6476,8 @@ const DADOS_REZDY_LIVE = {
         "produto": "Doors off | 30min",
         "quantidade": 1,
         "dataCriacao": "2026-08-02",
-        "dataFulfillment": "2026-08-03",
-        "horaFulfillment": "15:45",
+        "dataFulfillment": "",
+        "horaFulfillment": "",
         "valorTotal": 1448.4,
         "valorPago": 0.0,
         "valorAPagar": 1448.4,
@@ -6469,7 +6485,7 @@ const DADOS_REZDY_LIVE = {
       },
       {
         "numeroPedido": "VRCCBW9Y",
-        "status": "PROCESSING",
+        "status": "ABANDONED_CART",
         "source": "ONLINE",
         "agente": "-",
         "nomeCliente": "Maela Hickling",
@@ -6477,8 +6493,8 @@ const DADOS_REZDY_LIVE = {
         "produto": "Doors off | 30min",
         "quantidade": 1,
         "dataCriacao": "2026-08-02",
-        "dataFulfillment": "2026-08-03",
-        "horaFulfillment": "15:45",
+        "dataFulfillment": "",
+        "horaFulfillment": "",
         "valorTotal": 1448.4,
         "valorPago": 0.0,
         "valorAPagar": 1448.4,
@@ -6486,7 +6502,7 @@ const DADOS_REZDY_LIVE = {
       },
       {
         "numeroPedido": "VRP0CWKG",
-        "status": "PROCESSING",
+        "status": "ABANDONED_CART",
         "source": "ONLINE",
         "agente": "-",
         "nomeCliente": "Maela Hickling",
@@ -6494,8 +6510,8 @@ const DADOS_REZDY_LIVE = {
         "produto": "Doors off | 30min",
         "quantidade": 1,
         "dataCriacao": "2026-08-02",
-        "dataFulfillment": "2026-08-03",
-        "horaFulfillment": "15:45",
+        "dataFulfillment": "",
+        "horaFulfillment": "",
         "valorTotal": 1448.4,
         "valorPago": 0.0,
         "valorAPagar": 1448.4,
@@ -108398,23 +108414,6 @@ const DADOS_REZDY_LIVE = {
         "valorPago": 145.0,
         "valorAPagar": 3299.7,
         "moeda": "BRL"
-      },
-      {
-        "numeroPedido": "VRVGWCLU",
-        "status": "CONFIRMED",
-        "source": "ONLINE",
-        "agente": "-",
-        "nomeCliente": "María Esther Rivas Quijada",
-        "emailCliente": "merq16@gmail.com",
-        "produto": "Doors off | 30min",
-        "quantidade": 2,
-        "dataCriacao": "2025-12-05",
-        "dataFulfillment": "2025-12-31",
-        "horaFulfillment": "15:00",
-        "valorTotal": 3730.02,
-        "valorPago": 3730.02,
-        "valorAPagar": 0.0,
-        "moeda": "BRL"
       }
     ]
   },
@@ -108422,17 +108421,17 @@ const DADOS_REZDY_LIVE = {
     {
       "mes": "2025-12",
       "label": "Dez/2025",
-      "ordens": 721,
-      "receitaTotal": 2193243.35,
-      "receitaProdutos": 2004370.0,
-      "pago": 1011693.35,
+      "ordens": 720,
+      "receitaTotal": 2189513.33,
+      "receitaProdutos": 2001190.0,
+      "pago": 1007963.33,
       "porFonte": {
         "INTERNAL": 146,
-        "ONLINE": 567,
+        "ONLINE": 566,
         "MARKETPLACE_PREF_RATE": 8
       },
       "porStatus": {
-        "CONFIRMED": 302,
+        "CONFIRMED": 301,
         "CANCELLED": 24,
         "ABANDONED_CART": 395
       }
@@ -108573,21 +108572,20 @@ const DADOS_REZDY_LIVE = {
     {
       "mes": "2026-08",
       "label": "Ago/2026",
-      "ordens": 36,
-      "receitaTotal": 97873.71,
-      "receitaProdutos": 85740.0,
-      "pago": 66878.11,
+      "ordens": 37,
+      "receitaTotal": 101362.11,
+      "receitaProdutos": 88580.0,
+      "pago": 70366.51,
       "porFonte": {
-        "ONLINE": 24,
+        "ONLINE": 25,
         "INTERNAL": 11,
         "MARKETPLACE_PREF_RATE": 1
       },
       "porStatus": {
-        "CONFIRMED": 20,
-        "PROCESSING": 3,
+        "CONFIRMED": 21,
+        "ABANDONED_CART": 11,
         "PENDING_CUSTOMER": 2,
         "CANCELLED": 1,
-        "ABANDONED_CART": 8,
         "PENDING_SUPPLIER": 1,
         "ON_HOLD": 1
       }
@@ -108596,7 +108594,7 @@ const DADOS_REZDY_LIVE = {
   "porFonte": {
     "ONLINE": {
       "ordens": 4394,
-      "receita": 13155122.67,
+      "receita": 13154881.05,
       "confirmadas": 1458,
       "pax": 2916
     },
@@ -108617,9 +108615,9 @@ const DADOS_REZDY_LIVE = {
     {
       "dia": "Segunda",
       "indice": 0,
-      "ordens": 827,
-      "receita": 2589641.17,
-      "confirmadas": 396
+      "ordens": 828,
+      "receita": 2593129.57,
+      "confirmadas": 397
     },
     {
       "dia": "Terca",
@@ -108645,9 +108643,9 @@ const DADOS_REZDY_LIVE = {
     {
       "dia": "Sexta",
       "indice": 4,
-      "ordens": 879,
-      "receita": 2817949.57,
-      "confirmadas": 434
+      "ordens": 878,
+      "receita": 2814219.55,
+      "confirmadas": 433
     },
     {
       "dia": "Sabado",
@@ -108675,16 +108673,16 @@ const DADOS_REZDY_LIVE = {
     {
       "dia": "Terca",
       "indice": 1,
-      "ordens": 385,
-      "receita": 1115428.0,
-      "confirmadas": 385
+      "ordens": 386,
+      "receita": 1118268.0,
+      "confirmadas": 386
     },
     {
       "dia": "Quarta",
       "indice": 2,
-      "ordens": 352,
-      "receita": 1035550.0,
-      "confirmadas": 352
+      "ordens": 351,
+      "receita": 1032370.0,
+      "confirmadas": 351
     },
     {
       "dia": "Quinta",
@@ -108776,9 +108774,9 @@ const DADOS_REZDY_LIVE = {
       "inicio": "2026-08-03",
       "fim": "2026-08-09",
       "label": "03/08",
-      "booked": 0,
+      "booked": 1,
       "fulfilled": 34,
-      "receitaBooked": 0.0
+      "receitaBooked": 3488.4
     }
   ],
   "leadTimeHeatmap": {
@@ -108813,7 +108811,7 @@ const DADOS_REZDY_LIVE = {
     ],
     "dados": {
       "2026-08": {
-        "2026-09": 1,
+        "2026-09": 2,
         "2026-08": 18,
         "2027-01": 1
       },
@@ -108893,7 +108891,7 @@ const DADOS_REZDY_LIVE = {
       "2025-12": {
         "2026-02": 31,
         "2026-01": 63,
-        "2025-12": 221,
+        "2025-12": 220,
         "2026-05": 2,
         "2026-04": 2,
         "2026-03": 2
@@ -108993,7 +108991,7 @@ const DADOS_REZDY_LIVE = {
       "imagem": ""
     }
   ],
-  "dataAtualizacao": "03/08/2026 00:04:27"
+  "dataAtualizacao": "03/08/2026 04:08:51"
 };
 const DADOS_LINKTREE = { "totalCliques": 0, "visualizacoes": 0, "ctr": 0.0, "links": [], "dataAtualizacao": "" };
 </script>
